@@ -23,12 +23,12 @@ export function PortfolioCaseVisualDiagram({
 }) {
   return (
     <figure
-      aria-label={`한눈에 보는 구조: ${diagram.title}`}
+      aria-label={`한눈에 보는 아키텍처: ${diagram.title}`}
       className="border-border bg-background flex flex-col gap-4 rounded-md border p-4"
     >
       <figcaption className="flex flex-col gap-2">
         <span className="text-muted-foreground text-sm font-semibold tracking-[0.16em] uppercase">
-          한눈에 보는 구조
+          한눈에 보는 아키텍처
         </span>
         <h3 className="text-foreground text-lg font-semibold tracking-tight">
           {diagram.title}

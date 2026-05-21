@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { PortfolioCaseCard } from "@/components/portfolio-case-card";
 import { ProjectRow } from "@/components/project-card";
@@ -6,6 +7,7 @@ import { SectionHeader } from "@/components/section-header";
 import {
   featuredPortfolioCases,
   getSupportingProjects,
+  projectArchitectureSummaries,
 } from "@/content/portfolio-cases";
 import {
   additionalProjects,
@@ -14,6 +16,18 @@ import {
 } from "@/content/projects";
 
 const supportingAdditionalProjects = getSupportingProjects(additionalProjects);
+const visibleArchitectureSummaryProjectSlugs = [
+  "concert-booking",
+  "realtime-chat",
+  "ai-usage-billing-gateway",
+  "borrow-me",
+] as const;
+const visibleProjectArchitectureSummaries = projectArchitectureSummaries.filter(
+  (summary) =>
+    visibleArchitectureSummaryProjectSlugs.includes(
+      summary.projectSlug as (typeof visibleArchitectureSummaryProjectSlugs)[number],
+    ),
+);
 
 export const metadata: Metadata = {
   title: "프로젝트",
@@ -48,6 +62,50 @@ export default function ProjectsPage() {
                 project={project}
                 rank={index + 1}
               />
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="flex flex-col gap-4">
+        <SectionHeader
+          title="전체 아키텍처 요약"
+          description="대표 문제 해결 사례가 각 프로젝트 전체 흐름 안에서 어느 구간에 위치하는지 짧게 연결합니다."
+        />
+        <div className="border-border border-y">
+          {visibleProjectArchitectureSummaries.map((summary) => {
+            const project = getProjectBySlug(summary.projectSlug);
+            const portfolioCase = featuredPortfolioCases.find(
+              (item) => item.slug === summary.caseSlug,
+            );
+
+            if (!project || !portfolioCase) {
+              return null;
+            }
+
+            return (
+              <article
+                key={summary.projectSlug}
+                className="border-border grid gap-3 border-b py-4 last:border-b-0 lg:grid-cols-[1fr_2fr_auto] lg:items-center"
+              >
+                <div className="flex flex-col gap-1">
+                  <h3 className="text-foreground font-semibold">
+                    {project.title}
+                  </h3>
+                  <p className="text-muted-foreground text-sm">
+                    {portfolioCase.domain}
+                  </p>
+                </div>
+                <p className="text-foreground text-sm leading-6 [overflow-wrap:anywhere]">
+                  {summary.flow}
+                </p>
+                <Link
+                  href={`/case-studies/${summary.caseSlug}`}
+                  className="text-primary text-sm font-semibold hover:underline"
+                >
+                  대표 사례 보기
+                </Link>
+              </article>
             );
           })}
         </div>

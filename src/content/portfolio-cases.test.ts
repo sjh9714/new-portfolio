@@ -57,6 +57,11 @@ describe("PDF-style portfolio cases", () => {
       expect(portfolioCase.solution.length).toBeGreaterThanOrEqual(3);
       expect(portfolioCase.result.length).toBeGreaterThanOrEqual(3);
       expect(portfolioCase.evidence.length).toBeGreaterThan(0);
+      expect(portfolioCase.architectureSummary).toBeDefined();
+      expect(
+        portfolioCase.architectureSummary.sourceOfTruth ??
+          portfolioCase.architectureSummary.designReason,
+      ).toBeTruthy();
       expect(portfolioCase.limitations.length).toBeGreaterThan(0);
       expect(portfolioCase.interviewQuestions.length).toBeGreaterThan(0);
     }
@@ -259,7 +264,7 @@ describe("PDF-style portfolio cases", () => {
     expect(diagramSource).toContain("흐름 세부");
     expect(diagramSource).toContain("<table");
     expect(diagramSource).toContain("PortfolioCaseVisualDiagram");
-    expect(visualSource).toContain("한눈에 보는 구조");
+    expect(visualSource).toContain("한눈에 보는 아키텍처");
     expect(visualSource).toContain("<figure");
     expect(visualSource).toContain("<figcaption");
     expect(visualSource).toContain("aria-label");
@@ -296,12 +301,32 @@ describe("PDF-style portfolio cases", () => {
       "utf8",
     );
 
+    expect(diagramSource).toContain("문제 구간 아키텍처");
+    expect(diagramSource).toContain("아키텍처 판단 요약");
     expect(diagramSource).toContain('aria-label="구조도 범례"');
     expect(diagramSource).toContain("·");
     expect(diagramSource).toContain("<details");
     expect(diagramSource).toContain("<summary");
     expect(diagramSource).toContain("구성 요소 설명");
     expect(diagramSource).toContain("흐름 세부");
+  });
+
+  it("shows compact project-level architecture summaries on projects page", () => {
+    const projectSource = readFileSync(
+      join(process.cwd(), "src/app/projects/page.tsx"),
+      "utf8",
+    );
+
+    expect(projectSource).toContain("전체 아키텍처 요약");
+    for (const slug of [
+      "concert-booking",
+      "realtime-chat",
+      "ai-usage-billing-gateway",
+      "borrow-me",
+    ]) {
+      expect(projectSource).toContain(slug);
+    }
+    expect(projectSource).not.toContain('"msa-shop"');
   });
 
   it("can resolve every published case by slug", () => {
