@@ -1,0 +1,17 @@
+## TL;DR
+
+동일 좌석에 요청이 몰리는 콘서트 예매 흐름에서 좌석 오버셀링, 중복 예약, 결제/만료 race, Kafka publish 실패를 하나의 정합성 문제로 묶어 검증했습니다. Redis는 빠른 경합 제어와 대기열에 사용하되, 최종 진실은 DB 상태와 이벤트 복구 흐름으로 유지했습니다.
+
+## Problem
+
+- 동일 좌석에 여러 사용자가 동시에 접근하면 seat hold와 payment confirm 사이에서 race가 발생합니다.
+- 대기열 token이 userId와 scheduleId에 묶이지 않으면 우회 요청을 차단하기 어렵습니다.
+- 결제 성공, 예약 만료, 취소 이벤트가 엇갈리면 좌석과 예약 상태가 갈라질 수 있습니다.
+- DB commit 이후 Kafka publish가 실패하면 downstream consumer는 상태 변화를 보지 못합니다.
+
+## Design Decisions
+
+- 좌석 경합은 비관적 락, 낙관적 락, Redis 분산 락을 비교해 시나리오별 실패 양상을 드러냈습니다.
+- Idempotency-Key를 예약과 결제 요청에 적용해 네트워크 재시도와 중복 클릭을 정상 입력으로 처리했습니다.
+- Outbox relay는 DB transaction과 이벤트 발행 사이의 간극을 줄이고, DEAD 상태와 DLT replay로 수동 복구 경로를 남겼습니다.
+- Redis stock은 성능 최적화 계층으로만 두고, DB final consistency와 reconciliation으로 불일치를 복구합니다.
