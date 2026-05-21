@@ -180,7 +180,7 @@ export const featuredPortfolioCases: PortfolioCase[] = [
       failureRecoveryPath:
         "Consumer 실패 시 DLT로 격리하고, Redis stock 불일치는 Reconciliation Job으로 복구합니다.",
       designReason:
-        "Redis는 빠른 경합 제어와 대기열에는 적합하지만 최종 기준 데이터로 두면 복구 기준이 흐려지므로 PostgreSQL을 source of truth로 유지했습니다.",
+        "Redis는 빠른 경합 제어와 대기열에는 적합하지만 최종 기준 데이터로 두면 복구 기준이 흐려지므로 PostgreSQL을 최종 기준 데이터로 유지했습니다.",
     },
     problem: [
       "동일 좌석에 여러 사용자가 동시에 접근하면 읽기-수정-쓰기 사이 race condition으로 오버셀링이 발생할 수 있었습니다.",
@@ -205,11 +205,11 @@ export const featuredPortfolioCases: PortfolioCase[] = [
     measurement: {
       scenarios: [
         {
-          label: "동일 좌석 경합 시나리오",
+          label: "동일 좌석 경합 측정 시나리오",
           value: "동일 좌석 100 concurrent requests",
         },
         {
-          label: "분산 좌석 예약 시나리오",
+          label: "서로 다른 좌석 예약 측정 시나리오",
           value: "서로 다른 좌석 50명 동시 예약",
         },
       ],
@@ -486,6 +486,14 @@ export const featuredPortfolioCases: PortfolioCase[] = [
       "Testcontainers 검증 시나리오",
       "혼합 부하 테스트",
     ]),
+    measurement: {
+      scenarios: [
+        {
+          label: "혼합 부하 시나리오",
+          value: "200 VU, 45초 기준 총 RPS 약 969~1,005",
+        },
+      ],
+    },
     implementationDetails: [
       "Outbox Table은 이벤트 발행 성공 여부와 재처리 상태를 추적하는 복구 기준으로 둡니다.",
       "DLT와 DEAD 상태는 자동 재시도로 해결되지 않는 이벤트를 운영자가 확인 가능한 대상으로 분리합니다.",
@@ -743,11 +751,11 @@ export const featuredPortfolioCases: PortfolioCase[] = [
     measurement: {
       scenarios: [
         {
-          label: "조회 API 시나리오",
+          label: "채팅방 조회 API 개선 전후 시나리오",
           value: "채팅방 조회 API 개선 전후 비교",
         },
         {
-          label: "쿼리 수 변화",
+          label: "채팅방 조회 쿼리 수 변화",
           value: "2N+1회 -> 1회",
         },
       ],
@@ -1156,11 +1164,11 @@ export const featuredPortfolioCases: PortfolioCase[] = [
     measurement: {
       scenarios: [
         {
-          label: "조회 API 시나리오",
+          label: "상품 목록 조회 API 개선 전후 시나리오",
           value: "상품 목록 조회 API 개선 전후 비교",
         },
         {
-          label: "쿼리 수 변화",
+          label: "상품 목록 쿼리 수 변화",
           value: "201 queries -> 3 queries",
         },
       ],

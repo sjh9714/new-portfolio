@@ -90,7 +90,7 @@ export const projects: Project[] = [
       "Testcontainers",
     ],
     interviewQuestions: [
-      "왜 Redis stock을 최종 진실로 두지 않았나요?",
+      "왜 Redis stock을 최종 기준 데이터로 두지 않았나요?",
       "낙관적 락이 서로 다른 좌석 예매에서도 실패한 이유는 무엇인가요?",
       "Outbox가 exactly-once를 보장하지 않는다면 중복은 어디서 흡수했나요?",
     ],

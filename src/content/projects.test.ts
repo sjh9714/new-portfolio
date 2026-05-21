@@ -68,6 +68,8 @@ const legacyPublicStrings = [
   ["재처리", " 재처리"].join(""),
   ["보상", " 보상"].join(""),
   ["재시도", " 재시도"].join(""),
+  ["source", " of", " truth"].join(""),
+  "최종 진실 원천",
 ];
 
 describe("portfolio project content", () => {

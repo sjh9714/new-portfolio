@@ -145,7 +145,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         id: "redis",
         label: "Redis Stock / Queue",
         description:
-          "대기열과 빠른 재고 조회를 맡지만 최종 진실 원천은 아닙니다.",
+          "대기열과 빠른 재고 조회를 맡지만 최종 기준 데이터는 아닙니다.",
         kind: "cache",
         sourceOfTruth: false,
         evidenceLabel: "혼합 부하 테스트",
@@ -524,7 +524,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         id: "ledger",
         label: "Append-only Ledger",
         description:
-          "debit/credit balance와 currency invariant의 최종 진실 원천입니다.",
+          "debit/credit balance와 currency invariant의 최종 기준 데이터입니다.",
         kind: "ledger",
         sourceOfTruth: true,
         evidenceLabel: "Append-only Ledger 불변성",

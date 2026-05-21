@@ -92,9 +92,13 @@ describe("PDF-style portfolio cases", () => {
         expect(group.label).not.toBe("");
         expect(group.label).not.toContain("추가 기입 예정");
         expect(group.label).not.toContain("TBD");
+        expect(group.label).not.toContain("추가 측정 예정");
+        expect(group.label.toLowerCase()).not.toContain("pending");
         expect(group.value).not.toBe("");
         expect(group.value).not.toContain("추가 기입 예정");
         expect(group.value).not.toContain("TBD");
+        expect(group.value).not.toContain("추가 측정 예정");
+        expect(group.value.toLowerCase()).not.toContain("pending");
       }
 
       for (const item of portfolioCase.measurement?.executionEnvironment ??
@@ -104,6 +108,20 @@ describe("PDF-style portfolio cases", () => {
         expect(item.value).not.toContain("TBD");
       }
     }
+  });
+
+  it("connects the Outbox/DLT case to the measured mixed-load scenario without inventing execution environment", () => {
+    const outboxCase = getPortfolioCaseBySlug("concert-outbox-dlt-recovery");
+
+    expect(outboxCase?.measurement?.scenarios).toEqual(
+      expect.arrayContaining([
+        {
+          label: "혼합 부하 시나리오",
+          value: "200 VU, 45초 기준 총 RPS 약 969~1,005",
+        },
+      ]),
+    );
+    expect(outboxCase?.measurement?.executionEnvironment).toBeUndefined();
   });
 
   it("preserves legacy case study URLs as aliases", () => {

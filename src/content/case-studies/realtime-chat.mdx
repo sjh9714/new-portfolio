@@ -24,7 +24,7 @@ Kafka를 붙여도 roomId key를 고려하지 않으면 같은 방 메시지 순
 
 STOMP subscribe authorization은 사용자가 특정 room topic을 구독할 권한이 있는지 확인합니다. 메시지 publish는 Kafka producer ACK/NACK 결과를 기준으로 성공과 실패를 분리하고, roomId를 key로 사용해 같은 방의 순서를 하나의 partition 안에서 유지하도록 설계했습니다.
 
-Redis presence는 최종 진실 원천이 아니라 짧게 살아 있는 접속 상태입니다. 끊김 이후 복구는 Redis presence가 아니라 Message DB와 reconnect sync API가 담당합니다. client가 마지막으로 받은 위치를 보내면, 서버는 DB 기준으로 이후 메시지를 다시 조회합니다.
+Redis presence는 최종 기준 데이터가 아니라 짧게 살아 있는 접속 상태입니다. 끊김 이후 복구는 Redis presence가 아니라 Message DB와 reconnect sync API가 담당합니다. client가 마지막으로 받은 위치를 보내면, 서버는 DB 기준으로 이후 메시지를 다시 조회합니다.
 
 읽음 상태와 메시지 목록 조회는 N+1이 발생하기 쉬운 영역입니다. 이 부분은 조회 API 성능 개선으로 먼저 측정했고, 실시간 전달 경로의 지연과 완전성은 별도 benchmark로 분리했습니다. 이렇게 나누면 “조회 API는 측정됨”과 “실시간 전달 품질은 아직 측정 전”을 혼동하지 않습니다.
 
