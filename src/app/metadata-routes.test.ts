@@ -1,0 +1,27 @@
+import { describe, expect, it, vi } from "vitest";
+
+import robots from "./robots";
+import sitemap from "./sitemap";
+import { featuredProjects } from "@/content/projects";
+
+describe("metadata routes", () => {
+  it("uses NEXT_PUBLIC_SITE_URL for robots and sitemap", () => {
+    vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://portfolio.example");
+
+    expect(robots().sitemap).toBe("https://portfolio.example/sitemap.xml");
+    expect(sitemap().map((entry) => entry.url)).toEqual(
+      expect.arrayContaining([
+        "https://portfolio.example/",
+        "https://portfolio.example/projects",
+        "https://portfolio.example/resume",
+        "https://portfolio.example/about",
+        ...featuredProjects.map(
+          (project) => `https://portfolio.example/case-studies/${project.slug}`,
+        ),
+      ]),
+    );
+    expect(sitemap().some((entry) => entry.url.endsWith("/blog"))).toBe(false);
+
+    vi.unstubAllEnvs();
+  });
+});

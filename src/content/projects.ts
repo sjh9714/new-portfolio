@@ -13,7 +13,7 @@ export type Project = {
   title: string;
   subtitle: string;
   role: string;
-  period: string;
+  period?: string;
   repoUrl: string;
   category: ProjectCategory;
   domain: string;
@@ -34,7 +34,6 @@ export const projects: Project[] = [
     title: "Concert Booking",
     subtitle: "고동시성 콘서트 예매 정합성 백엔드",
     role: "Personal backend project",
-    period: "README 기준 미표기",
     repoUrl: "https://github.com/sjh9714/concert-booking",
     category: "featured",
     domain: "Ticketing / Reservation",
@@ -43,7 +42,7 @@ export const projects: Project[] = [
     solution:
       "좌석 락 전략 비교, Queue token 바인딩, Idempotency-Key, Outbox/DLT, Redis reconciliation을 조합해 DB 최종 정합성을 유지",
     result:
-      "동일 좌석 100개 동시 요청에서 success 1, fail 99, overselling 0을 기록하고 예약/결제/만료 정합성을 Testcontainers로 검증",
+      "동일 좌석 100개 동시 요청에서 success 1, fail 99, overselling 0을 기록하고 예약/결제/만료 정합성을 Testcontainers로 검증했습니다.",
     primaryTechStack: ["Java", "Spring Boot", "PostgreSQL", "Redis", "Kafka"],
     allTechStack: [
       "Java",
@@ -94,8 +93,8 @@ export const projects: Project[] = [
       "Outbox가 exactly-once를 보장하지 않는다면 중복은 어디서 흡수했나요?",
     ],
     limitations: [
-      "운영 알림, tracing, SLO, runbook은 포트폴리오 문서의 다음 보강 범위입니다.",
-      "Redis 장애 시 fail-open/fail-closed 정책은 별도 장애 시나리오로 더 명시해야 합니다.",
+      "운영 알림, tracing, SLO, runbook은 별도 운영 문서로 확장할 예정입니다.",
+      "Redis 장애 시 fail-open/fail-closed 정책은 추가 장애 시나리오로 분리해 검증할 수 있습니다.",
     ],
   },
   {
@@ -103,7 +102,6 @@ export const projects: Project[] = [
     title: "Realtime Chat",
     subtitle: "Kafka/Redis 기반 다중 인스턴스 채팅 정합성",
     role: "Personal backend project",
-    period: "README 기준 미표기",
     repoUrl: "https://github.com/sjh9714/realtime-chat",
     category: "featured",
     domain: "Realtime Messaging",
@@ -112,7 +110,7 @@ export const projects: Project[] = [
     solution:
       "STOMP 구독 인가, Kafka ACK/NACK, roomId key 기반 ordering, Redis presence, reconnect sync API, DLT replay를 구성",
     result:
-      "채팅방 조회 API RPS와 p95를 개선하고 N+1을 제거했으며, 아직 실제 send-to-receive latency는 Pending으로 분리",
+      "채팅방 조회 API RPS와 p95 응답 시간을 개선하고 N+1 쿼리를 제거했으며, 메시지 지연과 전달 완전성은 별도 측정 항목으로 분리했습니다.",
     primaryTechStack: ["Java", "Spring Boot", "WebSocket", "Kafka", "Redis"],
     allTechStack: [
       "Java",
@@ -148,31 +146,25 @@ export const projects: Project[] = [
       },
       {
         label: "Send-to-receive latency",
-        value: "p50/p95/p99 benchmark 필요",
+        value: "p50/p95/p99 benchmark pending",
         status: "pending",
       },
       {
         label: "WebSocket delivery completeness",
-        value: "1,000 concurrent sessions 기준 복구율/누락률 검증 필요",
+        value:
+          "1,000 concurrent sessions recovery and loss-rate benchmark pending",
         status: "pending",
       },
     ],
-    jdTags: [
-      "WebSocket",
-      "Kafka",
-      "Redis",
-      "Authorization",
-      "N+1",
-      "DLT",
-    ],
+    jdTags: ["WebSocket", "Kafka", "Redis", "Authorization", "N+1", "DLT"],
     interviewQuestions: [
       "roomId를 Kafka key로 잡았을 때 순서 보장은 어디까지 가능한가요?",
       "구독 인가는 handshake와 subscribe 중 어디서 검증했나요?",
       "reconnect sync API가 누락 메시지를 어떻게 판별하나요?",
     ],
     limitations: [
-      "send-to-receive p50/p95/p99와 delivery completeness가 아직 Pending입니다.",
-      "Kafka consumer failure 이후 DLT replay 성공률을 독립 benchmark로 더 보여줘야 합니다.",
+      "send-to-receive p50/p95/p99와 delivery completeness는 독립 benchmark로 기록할 항목입니다.",
+      "Kafka consumer failure 이후 DLT replay 성공률은 별도 장애 시나리오로 수치화할 수 있습니다.",
     ],
   },
   {
@@ -180,7 +172,6 @@ export const projects: Project[] = [
     title: "AI Usage Billing Gateway",
     subtitle: "멀티테넌트 SaaS 사용량 과금 게이트웨이",
     role: "Personal backend project",
-    period: "README 기준 미표기",
     repoUrl: "https://github.com/sjh9714/ai-usage-billing-gateway",
     category: "featured",
     domain: "Billing / Multi-tenant Security",
@@ -189,7 +180,7 @@ export const projects: Project[] = [
     solution:
       "tenant isolation, API key prefix/hash 저장, usage idempotency, webhook duplicate/conflict 구분, append-only ledger invariant를 구성",
     result:
-      "보안/정합성 흐름은 검증했지만 mixed usage 성능 결과와 production readiness는 아직 Pending으로 명시",
+      "API key 보안, usage idempotency, webhook 중복 처리, append-only ledger invariant를 검증하고 성능/운영 지표는 공개 측정 전 상태로 구분했습니다.",
     primaryTechStack: ["Java", "Spring Boot", "PostgreSQL", "Kafka", "Redis"],
     allTechStack: [
       "Java",
@@ -220,17 +211,18 @@ export const projects: Project[] = [
       },
       {
         label: "Append-only ledger invariant",
-        value: "debit/credit balance, single currency, positive amount invariant 검증",
+        value:
+          "debit/credit balance, single currency, positive amount invariant 검증",
         status: "verified",
       },
       {
         label: "k6 mixed usage scenario",
-        value: "throughput/latency/error rate 결과 수집 예정",
+        value: "throughput/latency/error-rate benchmark pending",
         status: "pending",
       },
       {
         label: "Production performance claim",
-        value: "Not claimed",
+        value: "operational performance data pending",
         status: "pending",
       },
     ],
@@ -248,9 +240,9 @@ export const projects: Project[] = [
       "append-only ledger에서 refund reversal은 어떻게 표현해야 하나요?",
     ],
     limitations: [
-      "invoice generation은 manual endpoint에서 scheduler 또는 Spring Batch로 보강해야 합니다.",
-      "k6 mixed usage 결과, dashboard, alerting, tracing, SLO는 아직 Pending입니다.",
-      "strict quota reservation과 refund reversal ledger는 다음 구현 범위입니다.",
+      "invoice generation은 manual endpoint에서 scheduler 또는 Spring Batch로 확장할 수 있습니다.",
+      "mixed usage benchmark, dashboard, alerting, tracing, SLO는 공개 측정 항목으로 남겨두었습니다.",
+      "strict quota reservation과 refund reversal ledger는 다음 단계의 도메인 확장 지점입니다.",
     ],
   },
   {
@@ -258,7 +250,6 @@ export const projects: Project[] = [
     title: "MSA Shop",
     subtitle: "SAGA·Outbox 기반 쇼핑몰 주문 보상 흐름 실험",
     role: "Personal backend project",
-    period: "README 기준 미표기",
     repoUrl: "https://github.com/sjh9714/msa-shop",
     category: "featured",
     domain: "Commerce / Distributed Transaction",
@@ -267,8 +258,14 @@ export const projects: Project[] = [
     solution:
       "RabbitMQ 이벤트, SAGA/Outbox 보상 흐름, Gateway 인증/rate limit, Prometheus/Grafana/Zipkin 관측성을 구성",
     result:
-      "MSA 환경에서 주문 흐름의 장애 경계와 보상 트랜잭션을 학습하고 검증하기 위한 멀티 모듈 백엔드 프로젝트로 정리",
-    primaryTechStack: ["Java", "Spring Boot", "RabbitMQ", "PostgreSQL", "Docker"],
+      "주문, 재고, 결제, 정산 경계를 분리하고 RabbitMQ 이벤트와 SAGA/Outbox 보상 흐름으로 장애 지점을 설명할 수 있게 구성했습니다.",
+    primaryTechStack: [
+      "Java",
+      "Spring Boot",
+      "RabbitMQ",
+      "PostgreSQL",
+      "Docker",
+    ],
     allTechStack: [
       "Java",
       "Spring Boot",
@@ -286,7 +283,8 @@ export const projects: Project[] = [
     evidence: [
       {
         label: "SAGA compensation flow",
-        value: "주문 실패 시 재고 보상, 주문 저장 실패 시 Outbox 보상 흐름 구성",
+        value:
+          "주문 실패 시 재고 보상, 주문 저장 실패 시 Outbox 보상 흐름 구성",
         status: "verified",
       },
       {
@@ -312,8 +310,8 @@ export const projects: Project[] = [
       "Outbox relay가 죽으면 어떤 지표와 재처리 경로가 필요할까요?",
     ],
     limitations: [
-      "운영 경험 있는 MSA가 아니라 장애 경계와 보상 흐름을 실험한 프로젝트로 표현해야 합니다.",
-      "정산 서비스의 exactly-once 요구 수준과 중복 흡수 지점을 더 명확히 문서화해야 합니다.",
+      "프로덕션 트래픽을 운영한 기록이 아니라 서비스 경계와 보상 흐름을 검증한 학습형 프로젝트입니다.",
+      "정산 서비스의 exactly-once 요구 수준과 중복 흡수 지점은 더 명확한 시나리오 문서로 확장할 수 있습니다.",
     ],
   },
   {
@@ -321,16 +319,22 @@ export const projects: Project[] = [
     title: "TimeDeal Service",
     subtitle: "타임딜 주문 동시성·캐시·레질리언스 API",
     role: "Personal backend project",
-    period: "README 기준 미표기",
     repoUrl: "https://github.com/sjh9714/timedeal-service",
     category: "additional",
     domain: "Commerce / Flash Sale",
-    problem: "타임딜 주문에서 재고 경합, 캐시 일관성, 외부 장애 전파를 통제해야 함",
+    problem:
+      "타임딜 주문에서 재고 경합, 캐시 일관성, 외부 장애 전파를 통제해야 함",
     solution:
       "락 전략, Redis, Caffeine, Resilience4j, Prometheus/Grafana, k6 결과를 commerce resilience 관점으로 정리",
     result:
-      "Concert Booking과 겹치는 동시성 축은 메인에서 제외하고 commerce resilience 보조 사례로 배치",
-    primaryTechStack: ["Java", "Spring Boot", "Redis", "Caffeine", "Resilience4j"],
+      "락 전략, Redis/Caffeine 캐싱, Resilience4j, Prometheus/Grafana를 조합해 타임딜 주문 흐름의 경합과 장애 전파를 검증했습니다.",
+    primaryTechStack: [
+      "Java",
+      "Spring Boot",
+      "Redis",
+      "Caffeine",
+      "Resilience4j",
+    ],
     allTechStack: [
       "Java",
       "Spring Boot",
@@ -359,7 +363,7 @@ export const projects: Project[] = [
       "캐시를 쓰면서 DB와 불일치가 생길 때 복구 기준은 무엇인가요?",
     ],
     limitations: [
-      "Concert Booking과 주제가 겹치므로 메인 사례로 중복 배치하지 않습니다.",
+      "콘서트 예매와 유사한 경합 주제가 있어 commerce resilience 관점으로 차이를 분리해 설명합니다.",
     ],
   },
   {
@@ -367,14 +371,15 @@ export const projects: Project[] = [
     title: "BorrowMe",
     subtitle: "대학생 물건 대여 예약·검색·소셜 API",
     role: "11인 팀 프로젝트",
-    period: "README 기준 미표기",
     repoUrl: "https://github.com/sjh9714/borrow_me",
     category: "additional",
     domain: "Rental / Team Project",
-    problem: "팀 기반 대여 서비스에서 예약 정합성, 상품 목록 조회 성능, 협업 흐름을 함께 다뤄야 함",
+    problem:
+      "팀 기반 대여 서비스에서 예약 정합성, 상품 목록 조회 성능, 협업 흐름을 함께 다뤄야 함",
     solution:
       "동시 예약 재고 초과 방지, N+1 제거, 상품 목록 조회 최적화, 해커톤 팀 협업 경험을 짧게 정리",
-    result: "상품 목록 p95 1,010ms -> 23ms, 쿼리 201회 -> 3회 개선 사례를 보조 카드로 표시",
+    result:
+      "상품 목록 p95 1,010ms -> 23ms, 쿼리 201회 -> 3회로 개선하고 동시 예약 재고 초과를 방지했습니다.",
     primaryTechStack: ["Java", "Spring Boot", "JPA", "MySQL", "k6"],
     allTechStack: ["Java", "Spring Boot", "JPA", "MySQL", "OAuth", "k6"],
     evidence: [
@@ -400,7 +405,7 @@ export const projects: Project[] = [
       "p95 개선에서 가장 큰 병목은 N+1이었나요, 인덱스였나요?",
     ],
     limitations: [
-      "기술 깊이는 featured 프로젝트보다 낮으므로 협업과 성능 개선 카드로만 사용합니다.",
+      "해커톤 팀 프로젝트 특성상 장기 운영 지표보다 협업과 성능 개선 결과에 초점을 둡니다.",
     ],
   },
   {
@@ -408,13 +413,15 @@ export const projects: Project[] = [
     title: "Running App",
     subtitle: "러닝 기록·챌린지·트레이닝 플랜 풀스택 앱",
     role: "Full-stack project",
-    period: "README 기준 미표기",
     repoUrl: "https://github.com/sjh9714/Running_App",
     category: "additional",
     domain: "Fitness / Product",
-    problem: "러닝 활동, 챌린지, 플랜, 이벤트 기반 처리, 웹/iOS 경험을 하나의 사용자 흐름으로 연결해야 함",
-    solution: "이벤트 기반 비동기 처리와 Redis 캐싱을 제품 기능 완성도 관점으로 정리",
-    result: "백엔드 메인 사례가 아니라 사용자 기능을 끝까지 만든 제품 감각 카드로 배치",
+    problem:
+      "러닝 활동, 챌린지, 플랜, 이벤트 기반 처리, 웹/iOS 경험을 하나의 사용자 흐름으로 연결해야 함",
+    solution:
+      "이벤트 기반 비동기 처리와 Redis 캐싱을 제품 기능 완성도 관점으로 정리",
+    result:
+      "러닝 기록, 챌린지, 트레이닝 플랜 흐름을 이벤트 기반 비동기 처리와 Redis 캐싱으로 구현했습니다.",
     primaryTechStack: ["Java", "Spring Boot", "Redis", "Event-driven", "iOS"],
     allTechStack: [
       "Java",
@@ -441,7 +448,7 @@ export const projects: Project[] = [
       "제품 기능 완성도와 백엔드 깊이 사이에서 어떤 우선순위를 잡았나요?",
     ],
     limitations: [
-      "백엔드 포트폴리오 메인으로는 넓고 얕아 보일 수 있어 Additional로 둡니다.",
+      "기능 범위가 넓어 핵심 백엔드 주제는 이벤트 처리와 캐싱으로 좁혀 설명합니다.",
     ],
   },
   {
@@ -449,13 +456,15 @@ export const projects: Project[] = [
     title: "AI Interview Coach",
     subtitle: "JD 분석 기반 질문 생성과 SSE 피드백 서비스",
     role: "Personal AI/backend project",
-    period: "README 기준 미표기",
     repoUrl: "https://github.com/sjh9714/interview-coach",
     category: "additional",
     domain: "AI / Interview",
-    problem: "LLM 기반 기능이 단순 API 연결처럼 보이지 않도록 SSE, RAG, 캐싱, 성능 병목을 백엔드 문제로 정리해야 함",
-    solution: "SSE timeout, heap/ZGC tuning, N+1 개선, Redis caching 중심으로 AI 서비스 백엔드 문제를 표현",
-    result: "트렌드 카드로는 유효하지만 featured 사례는 과금/정합성 프로젝트에 양보",
+    problem:
+      "LLM 기반 기능이 단순 API 연결처럼 보이지 않도록 SSE, RAG, 캐싱, 성능 병목을 백엔드 문제로 정리해야 함",
+    solution:
+      "SSE timeout, heap/ZGC tuning, N+1 개선, Redis caching 중심으로 AI 서비스 백엔드 문제를 표현",
+    result:
+      "JD 분석, 질문 생성, SSE 피드백 흐름을 여러 Spring Boot 서비스로 나누고 캐싱/스트리밍 안정성 과제를 정리했습니다.",
     primaryTechStack: ["Java", "Spring Boot", "SSE", "RAG", "Redis"],
     allTechStack: [
       "Java",
@@ -474,7 +483,7 @@ export const projects: Project[] = [
       },
       {
         label: "Backend focus",
-        value: "SSE timeout, heap/ZGC, N+1, Redis caching 중심 보강 필요",
+        value: "SSE timeout, heap/ZGC, N+1, Redis caching 중심 확장 항목",
         status: "pending",
       },
     ],
@@ -484,7 +493,7 @@ export const projects: Project[] = [
       "RAG 품질보다 백엔드 안정성에서 가장 어려웠던 지점은 무엇인가요?",
     ],
     limitations: [
-      "AI 기능 자체보다 백엔드 안정성 문제 중심으로 설명해야 합니다.",
+      "LLM 품질 평가보다 스트리밍 안정성, 캐싱, 서비스 분리 흐름을 중심으로 설명합니다.",
     ],
   },
   {
@@ -492,13 +501,14 @@ export const projects: Project[] = [
     title: "Memory of Year",
     subtitle: "앨범·편지·사진·스티커 관리 팀 프로젝트 API",
     role: "7인 팀 프로젝트",
-    period: "README 기준 미표기",
     repoUrl: "https://github.com/sjh9714/memory_of_year",
     category: "archive",
-    domain: "Archive / Early Team Project",
-    problem: "팀 프로젝트 API 구현 경험은 있으나 현재 featured 프로젝트보다 백엔드 임팩트가 약함",
-    solution: "JWT, S3, Swagger, k6, N+1 개선 경험을 early team project로만 보관",
-    result: "메인 화면에서는 숨기고 전체 프로젝트 아카이브에서만 노출",
+    domain: "Early Team Project",
+    problem:
+      "앨범, 편지, 사진, 스티커를 관리하는 팀 서비스에서 인증, 파일 업로드, API 문서화를 구성해야 함",
+    solution: "JWT 인증, S3 파일 저장, Swagger 문서화, k6/N+1 개선 경험을 정리",
+    result:
+      "JWT, S3, Swagger, k6, N+1 개선을 포함한 초기 팀 프로젝트 경험을 정리했습니다.",
     primaryTechStack: ["Java", "Spring Boot", "JWT", "S3", "k6"],
     allTechStack: ["Java", "Spring Boot", "JWT", "S3", "Swagger", "k6"],
     evidence: [
@@ -513,7 +523,7 @@ export const projects: Project[] = [
       "초기 팀 프로젝트와 현재 featured 프로젝트 사이에서 성장한 지점은 무엇인가요?",
     ],
     limitations: [
-      "다른 레포에 비해 백엔드 임팩트가 약하므로 Archive로 분류합니다.",
+      "현재 대표 사례보다 백엔드 임팩트가 작아 전체 프로젝트 목록에서만 짧게 다룹니다.",
     ],
   },
 ];
@@ -534,20 +544,19 @@ export function getProjectBySlug(slug: string) {
   return projects.find((project) => project.slug === slug);
 }
 
-export function getEvidencePreview(project: Project, limit: number) {
-  const pendingEvidence = project.evidence.find(
+export function getEvidencePreview(project: Project, limit = 2) {
+  const pending = project.evidence.find(
     (evidence) => evidence.status === "pending",
   );
-
-  if (!pendingEvidence || limit >= project.evidence.length) {
-    return project.evidence.slice(0, limit);
-  }
-
-  const nonPendingEvidence = project.evidence.find(
+  const measuredOrVerified = project.evidence.filter(
     (evidence) => evidence.status !== "pending",
   );
 
-  return [nonPendingEvidence, pendingEvidence]
+  if (!pending) {
+    return measuredOrVerified.slice(0, limit);
+  }
+
+  return [measuredOrVerified[0], pending]
     .filter((evidence): evidence is ProjectEvidence => Boolean(evidence))
     .slice(0, limit);
 }

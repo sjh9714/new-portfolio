@@ -1,17 +1,39 @@
 ## TL;DR
 
-AI API 사용량을 멀티테넌트 단위로 수집하고, API key 보안, usage idempotency, invoice 중복 생성, webhook duplicate/conflict, append-only ledger invariant를 검증한 과금 백엔드 사례입니다.
+AI Usage Billing Gateway는 멀티테넌트 SaaS에서 API key, usage event, invoice, payment webhook, append-only ledger가 함께 움직일 때 생기는 보안과 정합성 문제를 다룹니다. 이 프로젝트의 중심 가정은 “중복 요청은 예외가 아니라 정상 입력”이라는 점입니다.
+
+API key는 최초 발급 시 원문을 1회만 반환하고 DB에는 prefix/hash를 저장합니다. usage event는 idempotency key와 request hash로 중복과 충돌을 구분하고, payment webhook은 providerEventId와 payload hash로 duplicate/conflict를 나눕니다. ledger는 debit/credit balance, single currency, positive amount invariant를 검증합니다.
 
 ## Problem
 
-- API key 원문이 DB에 저장되면 유출 시 즉시 악용될 수 있습니다.
-- timeout/retry가 있는 사용량 수집 API는 같은 usage event를 여러 번 받을 수 있습니다.
-- 결제 provider webhook은 중복 delivery가 정상 동작이므로 duplicate와 conflict를 구분해야 합니다.
-- ledger는 수정 가능한 잔액 컬럼만으로는 감사와 정산 근거를 설명하기 어렵습니다.
+SaaS 과금에서는 사용량 수집 요청이 timeout이나 retry 때문에 여러 번 들어올 수 있습니다. 결제 provider의 webhook도 중복 delivery가 정상 동작입니다. 이 입력들을 모두 “버그”로 보면 장애가 날 때마다 데이터 정합성의 기준이 흔들립니다.
+
+API key 보안도 단순 저장으로 끝나지 않습니다. 원문 key가 DB에 남으면 유출 시 즉시 악용될 수 있고, tenant isolation이 약하면 organization 간 사용량과 invoice가 섞일 수 있습니다. ledger는 금액을 덮어쓰는 방식으로 만들면 나중에 어떤 이벤트가 잔액을 바꿨는지 설명하기 어렵습니다.
+
+## Naive Approach
+
+단순한 과금 구현은 API key 원문을 저장하고, usage request가 들어올 때마다 row를 추가하고, 월말에 invoice total을 업데이트하는 방식입니다. webhook은 마지막 결제 상태를 덮어쓰고, refund는 invoice amount를 수정할 수도 있습니다.
+
+이 방식은 화면에는 잘 보이지만 audit과 reconciliation에 약합니다. 같은 usage가 두 번 들어왔는지, provider가 같은 이벤트를 다시 보냈는지, payload가 달라진 conflict인지, refund가 원거래의 reversal인지 확인하기 어렵습니다. 그래서 저장 모델을 “최신 상태 덮어쓰기”보다 “중복을 구분하고 변경 근거를 남기는 흐름”으로 잡았습니다.
+
+## Architecture / Flow
+
+<ArchitectureDiagram />
 
 ## Design Decisions
 
-- API key는 최초 발급 시에만 원문을 반환하고 DB에는 prefix와 hash만 저장합니다.
-- usage event와 webhook은 idempotency key, providerEventId, payload hash로 중복과 충돌을 구분합니다.
-- ledger는 append-only invariant를 둬 debit/credit balance, 단일 currency, 양수 amount 조건을 검증합니다.
-- mixed usage benchmark, scheduler/batch, dashboard, SLO는 아직 Pending으로 표시해 실무 준비도를 부풀리지 않습니다.
+API key는 raw value를 다시 보여주지 않습니다. 발급 순간에만 원문을 반환하고, 이후 인증은 prefix로 후보를 찾은 뒤 hash로 검증합니다. usage event는 tenant scope 안에서 idempotency key와 request hash를 함께 봅니다. 같은 key와 같은 hash는 duplicate로 흡수하고, 같은 key지만 hash가 다르면 conflict로 다룹니다.
+
+Webhook은 providerEventId를 기준으로 중복 delivery를 흡수하되, payload hash가 달라진 경우는 같은 이벤트 id에 다른 의미가 들어온 상태로 분리합니다. ledger는 append-only entry로 charge, payment, adjustment를 남기는 방향이며, debit/credit balance, 단일 currency, 양수 amount 조건을 invariant로 둡니다.
+
+성능 claim은 별도로 다룹니다. k6 mixed usage scenario와 운영형 performance data는 공개 측정 전 상태로 두고, Verified evidence는 보안/정합성 시나리오에만 붙였습니다.
+
+## Evidence Notes
+
+Verified evidence는 API Key storage, Usage idempotency, Webhook duplicate handling, Append-only ledger invariant입니다. API key 원문 미저장, usage 중복 처리와 request hash mismatch 구분, providerEventId/payload hash 기반 webhook 처리, ledger invariant 검증을 각각 분리했습니다.
+
+Pending evidence는 k6 mixed usage scenario와 Production performance claim입니다. throughput, latency, error rate, dashboard, alerting, tracing, SLO는 공개 측정 결과가 생긴 뒤에만 Measured로 올릴 수 있습니다.
+
+## Limitations
+
+invoice generation은 현재 manual endpoint 성격의 흐름에서 scheduler 또는 Spring Batch로 확장할 수 있습니다. strict quota reservation과 refund reversal ledger도 billing domain을 더 실무적으로 만들기 위한 다음 단계입니다. 성능과 운영 지표는 공개 측정 전까지 별도 상태로 유지합니다.

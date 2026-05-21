@@ -1,17 +1,39 @@
 ## TL;DR
 
-쇼핑몰 도메인을 User, Product, Order, Payment, Settlement, Gateway로 나누고 RabbitMQ 이벤트, SAGA/Outbox 보상 흐름, Gateway 인증/rate limit, 관측성 구성을 실험한 멀티 모듈 백엔드 프로젝트입니다.
+MSA Shop은 User, Product, Order, Payment, Settlement, Gateway로 서비스를 나눴을 때 하나의 로컬 transaction으로 처리할 수 없는 주문 흐름을 SAGA/Outbox와 RabbitMQ 이벤트로 설명하는 프로젝트입니다. 목적은 대규모 운영을 주장하는 것이 아니라, 서비스 경계와 보상 트랜잭션을 질문 가능한 형태로 보여주는 것입니다.
+
+Verified evidence는 SAGA compensation flow, RabbitMQ event flow, Gateway boundary, Observability stack입니다. 주문 실패 시 재고 보상, 주문 저장 실패 시 Outbox 보상, Gateway 인증/rate limit, Prometheus/Grafana/Zipkin 구성을 분리해 보여줍니다.
 
 ## Problem
 
-- 서비스가 분리되면 주문, 재고, 결제를 하나의 로컬 transaction으로 묶을 수 없습니다.
-- 주문 저장 실패와 결제 성공이 엇갈리면 보상 트랜잭션이 필요합니다.
-- Gateway 인증과 rate limit은 서비스별 책임과 공통 책임의 경계를 드러냅니다.
-- MSA는 과장하기 쉬운 주제라 실제 운영 경험처럼 보이지 않게 표현해야 합니다.
+쇼핑몰 주문은 주문 생성, 재고 예약, 결제 승인, 정산 집계가 이어지는 흐름입니다. 모놀리스라면 한 DB transaction 안에서 일부를 묶을 수 있지만, 서비스와 DB가 나뉘면 같은 방식으로 rollback할 수 없습니다. 결제는 성공했는데 주문 저장이 실패하거나, 재고 예약은 되었는데 결제가 실패하는 상황을 별도 보상 흐름으로 다뤄야 합니다.
+
+면접에서 MSA는 바로 질문이 들어오는 주제입니다. “왜 나눴는가”, “DB는 서비스별로 분리했는가”, “분산 트랜잭션은 어떻게 처리했는가”, “Outbox relay가 죽으면 어떻게 복구하는가”를 설명할 수 있어야 합니다. 그래서 이 case study는 멋진 서비스 이름보다 장애 경계와 보상 경로를 전면에 둡니다.
+
+## Naive Approach
+
+단순한 구현은 Order Service가 Product와 Payment를 순서대로 HTTP 호출하고, 중간 실패가 나면 앞선 호출을 다시 취소하는 방식입니다. 하지만 네트워크 timeout이 실제 실패인지 응답 유실인지 알 수 없고, 취소 호출도 실패할 수 있습니다. 각 서비스가 자신의 DB 상태와 외부 이벤트 발행을 따로 처리하면 “DB commit은 됐는데 이벤트 발행은 실패”하는 상태도 생깁니다.
+
+이 문제를 줄이기 위해 서비스 로컬 상태 변경과 이벤트 발행 의도를 Outbox로 묶고, RabbitMQ 이벤트로 다음 서비스를 진행시키는 흐름을 선택했습니다. 보상도 happy path의 부록이 아니라 실패 경로의 일부로 드러나야 합니다.
+
+## Architecture / Flow
+
+<ArchitectureDiagram />
 
 ## Design Decisions
 
-- RabbitMQ 이벤트로 서비스 간 흐름을 연결하고, SAGA/Outbox로 실패 지점별 보상 경로를 문서화했습니다.
-- 주문 실패 시 재고 보상, 결제 성공 후 주문 저장 실패 시 Outbox 보상 흐름을 분리했습니다.
-- Prometheus, Grafana, Zipkin은 운영을 주장하기 위한 장식이 아니라 장애 경계를 관찰하기 위한 실험 요소로 둡니다.
-- 이 프로젝트는 운영 가능한 대규모 시스템이 아니라 장애 경계와 보상 흐름을 학습하고 검증하기 위한 사례로 표현합니다.
+Gateway는 인증과 rate limit의 공통 경계를 맡고, Order Service는 Saga 상태를 관리합니다. Product Reserve는 재고 예약과 취소 보상을, Payment Service는 결제 승인과 취소 경계를 맡습니다. Settlement Service는 결제 완료 이벤트를 정산 집계로 반영합니다.
+
+RabbitMQ는 서비스 간 이벤트 전달 경계이고, Service Outbox는 로컬 DB commit 이후 이벤트 발행 의도를 남기는 장치입니다. Outbox relay가 멈추면 이벤트가 사라지는 것이 아니라 재시도 가능한 상태로 남아야 합니다. 보상 실패는 다시 관찰 가능한 상태와 재처리 기준을 가져야 합니다.
+
+Observability stack은 “운영했다”는 장식이 아니라 장애 경계를 보기 위한 최소 구성입니다. Prometheus/Grafana/Zipkin은 주문 생성부터 결제/정산까지 흐름의 지연과 실패 지점을 설명하는 근거로 배치했습니다.
+
+## Evidence Notes
+
+SAGA compensation flow는 주문 실패 시 재고 보상과 주문 저장 실패 시 Outbox 보상 흐름을 검증 항목으로 둡니다. RabbitMQ event flow는 Order, Product, Payment, Settlement 간 이벤트 연결을 확인합니다. Gateway boundary는 인증과 rate limit 경계를, Observability stack은 Prometheus/Grafana/Zipkin 구성을 의미합니다.
+
+이 case study는 measured throughput보다 distributed transaction reasoning에 초점을 둡니다. 그래서 수치가 없는 항목은 Verified로만 표시하고, 운영 규모 표현은 사용하지 않습니다.
+
+## Limitations
+
+프로덕션 트래픽을 운영한 기록이 아니라 서비스 경계와 보상 흐름을 검증한 학습형 프로젝트입니다. 정산 서비스의 exactly-once 요구 수준, 중복 이벤트 흡수 위치, 보상 실패 재처리 정책은 더 구체적인 시나리오 문서로 확장할 수 있습니다.

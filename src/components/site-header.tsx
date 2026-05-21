@@ -4,21 +4,24 @@ import { navigationItems, profile } from "@/content/profile";
 
 export function SiteHeader() {
   return (
-    <header className="border-b border-border bg-background">
+    <header className="border-border bg-background border-b">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-5 py-4 md:px-8">
         <Link
           href="/"
-          className="text-2xl font-bold tracking-tight text-foreground"
-          aria-label="SJH portfolio home"
+          className="text-foreground text-2xl font-bold tracking-tight"
+          aria-label="성진혁 portfolio home"
         >
           {profile.initials}
         </Link>
-        <nav aria-label="Primary navigation" className="hidden items-center gap-7 md:flex">
+        <nav
+          aria-label="Primary navigation"
+          className="hidden items-center gap-7 md:flex"
+        >
           {navigationItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="text-sm font-medium text-foreground transition-colors hover:text-primary"
+              className="text-foreground hover:text-primary text-sm font-medium transition-colors"
             >
               {item.label}
             </Link>
@@ -26,7 +29,7 @@ export function SiteHeader() {
         </nav>
         <Link
           href="/projects"
-          className="text-sm font-semibold text-primary md:hidden"
+          className="text-primary text-sm font-semibold md:hidden"
         >
           Projects
         </Link>

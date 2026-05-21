@@ -90,19 +90,21 @@ const proofItems = [
 export default function Home() {
   return (
     <div className="bg-background">
-      <section className="border-b border-border">
+      <section className="border-border border-b">
         <div className="mx-auto flex max-w-7xl flex-col gap-10 px-5 py-12 md:px-8 md:py-20">
           <div className="flex max-w-4xl flex-col gap-6">
-            <h1 className="text-5xl font-bold tracking-tight text-foreground md:text-7xl">
+            <h1 className="text-foreground text-5xl font-bold tracking-tight md:text-7xl">
               Backend Engineer
             </h1>
-            <p className="max-w-3xl text-xl leading-9 text-muted-foreground">
+            <p className="text-muted-foreground max-w-3xl text-xl leading-9">
               {profile.headline}
             </p>
             <div className="flex flex-col gap-3 sm:flex-row">
-              <Button disabled aria-label="이력서 PDF는 아직 준비 중입니다">
-                <BookOpen data-icon="inline-start" aria-hidden="true" />
-                이력서 PDF
+              <Button asChild>
+                <Link href="/resume">
+                  <BookOpen data-icon="inline-start" aria-hidden="true" />
+                  Web Resume
+                </Link>
               </Button>
               <Button asChild variant="outline">
                 <a href={profile.githubUrl} target="_blank" rel="noreferrer">
@@ -113,27 +115,29 @@ export default function Home() {
               <Button asChild variant="outline">
                 <Link href="/case-studies/concert-booking">Case Studies</Link>
               </Button>
-              <Button disabled variant="outline" aria-label="Email is not configured">
-                <Mail data-icon="inline-start" aria-hidden="true" />
-                Email
+              <Button asChild variant="outline">
+                <a href={`mailto:${profile.email}`}>
+                  <Mail data-icon="inline-start" aria-hidden="true" />
+                  Email
+                </a>
               </Button>
             </div>
           </div>
 
-          <div className="grid border border-border md:grid-cols-4">
+          <div className="border-border grid border md:grid-cols-4">
             {proofItems.map((item) => (
               <div
                 key={item.title}
-                className="flex gap-4 border-b border-border p-5 last:border-b-0 md:border-b-0 md:border-r md:last:border-r-0"
+                className="border-border flex gap-4 border-b p-5 last:border-b-0 md:border-r md:border-b-0 md:last:border-r-0"
               >
-                <span className="flex size-11 shrink-0 items-center justify-center rounded-md border border-border bg-card">
+                <span className="border-border bg-card flex size-11 shrink-0 items-center justify-center rounded-md border">
                   <item.icon aria-hidden="true" />
                 </span>
                 <div className="flex flex-col gap-1">
-                  <h2 className="text-sm font-semibold text-foreground [overflow-wrap:anywhere]">
+                  <h2 className="text-foreground text-sm font-semibold [overflow-wrap:anywhere]">
                     {item.title}
                   </h2>
-                  <p className="text-sm leading-6 text-muted-foreground">
+                  <p className="text-muted-foreground text-sm leading-6">
                     {item.description}
                   </p>
                 </div>
@@ -144,7 +148,7 @@ export default function Home() {
       </section>
 
       <div className="mx-auto flex max-w-7xl flex-col gap-16 px-5 py-12 md:px-8 md:py-16">
-        <section className="grid gap-px overflow-hidden border border-border bg-border md:grid-cols-4">
+        <section className="border-border bg-border grid gap-px overflow-hidden border md:grid-cols-4">
           {focusCards.map((card) => (
             <FocusCard key={card.title} {...card} />
           ))}
@@ -153,7 +157,7 @@ export default function Home() {
         <section className="flex flex-col gap-6">
           <SectionHeader
             title="Featured Case Studies"
-            description="9개 프로젝트를 전시장처럼 늘어놓지 않고, 면접 질문을 유도할 4개 문제 해결 사례만 깊게 보여줍니다."
+            description="면접 질문을 유도할 4개 문제 해결 사례를 먼저 읽히도록 구성했습니다."
             action={
               <Button asChild variant="ghost">
                 <Link href="/projects">전체 프로젝트 보기</Link>
@@ -178,41 +182,39 @@ export default function Home() {
         <section className="flex flex-col gap-5">
           <SectionHeader
             title="Additional Projects"
-            description="메인 주제와 겹치거나 보조 서사가 강한 프로젝트는 짧게 정리합니다."
+            description="대표 사례를 보완하는 팀 협업, 제품 구현, 캐싱, AI 서비스 경험을 짧게 정리합니다."
             action={
               <Button asChild variant="ghost">
                 <Link href="/projects">모든 프로젝트 보기</Link>
               </Button>
             }
           />
-          <div className="border-y border-border">
+          <div className="border-border border-y">
             {additionalProjects.map((project) => (
               <ProjectRow key={project.slug} project={project} />
             ))}
           </div>
         </section>
 
-        <section className="flex flex-col gap-6 border border-border bg-card p-6">
+        <section className="border-border bg-card flex flex-col gap-6 border p-6">
           <SectionHeader
-            title="Blog Weapon"
-            description="블로그는 양보다 한 번 클릭했을 때 기대를 충족하는 깊이로 준비합니다. 아직 공개 링크가 없으므로 Coming soon으로만 표시합니다."
-            action={
-              <Button asChild variant="outline">
-                <Link href="/blog">Blog Topics</Link>
-              </Button>
-            }
+            title="Writing Queue"
+            description="Redis, Idempotency, Outbox 주제를 프로젝트 근거와 연결해 깊게 정리할 예정입니다."
           />
           <div className="grid gap-4 md:grid-cols-3">
             {blogTopics.map((topic) => (
-              <article key={topic.title} className="flex flex-col gap-3 border border-border p-4">
+              <article
+                key={topic.title}
+                className="border-border flex flex-col gap-3 border p-4"
+              >
                 <topic.icon aria-hidden="true" />
-                <h3 className="font-semibold leading-6 text-foreground">
+                <h3 className="text-foreground leading-6 font-semibold">
                   {topic.title}
                 </h3>
-                <p className="text-sm leading-6 text-muted-foreground">
+                <p className="text-muted-foreground text-sm leading-6">
                   {topic.summary}
                 </p>
-                <span className="mt-auto text-xs font-semibold uppercase tracking-[0.16em] text-primary">
+                <span className="text-primary mt-auto text-xs font-semibold tracking-[0.16em] uppercase">
                   Coming soon
                 </span>
               </article>

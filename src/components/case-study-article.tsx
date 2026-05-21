@@ -16,15 +16,15 @@ export function CaseStudyArticle({
 }) {
   return (
     <article className="mx-auto flex max-w-5xl flex-col gap-12 px-5 py-12 md:px-8 md:py-16">
-      <header className="flex flex-col gap-6 border-b border-border pb-10">
+      <header className="border-border flex flex-col gap-6 border-b pb-10">
         <div className="flex flex-col gap-3">
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+          <p className="text-muted-foreground text-sm font-semibold tracking-[0.18em] uppercase">
             Case Study / {project.domain}
           </p>
-          <h1 className="max-w-4xl text-4xl font-bold tracking-tight text-foreground md:text-6xl">
+          <h1 className="text-foreground max-w-4xl text-4xl font-bold tracking-tight md:text-6xl">
             {project.title}
           </h1>
-          <p className="max-w-3xl text-lg leading-8 text-muted-foreground">
+          <p className="text-muted-foreground max-w-3xl text-lg leading-8">
             {project.subtitle}
           </p>
         </div>
@@ -44,16 +44,15 @@ export function CaseStudyArticle({
         </div>
       </header>
 
-      <section className="flex flex-col gap-5">
-        <SectionHeader
-          title="Architecture / Flow"
-          description="앱 화면이 아니라 백엔드 흐름, 장애 경계, 정합성 지점을 먼저 보여줍니다."
-        />
-        <ArchitectureDiagram slug={project.slug} />
-      </section>
-
       <section className="case-study-mdx">
-        <MDXRemote source={mdxSource} />
+        <MDXRemote
+          source={mdxSource}
+          components={{
+            ArchitectureDiagram: () => (
+              <ArchitectureDiagram slug={project.slug} />
+            ),
+          }}
+        />
       </section>
 
       <section className="flex flex-col gap-5">
@@ -65,13 +64,15 @@ export function CaseStudyArticle({
           {project.evidence.map((evidence) => (
             <div
               key={evidence.label}
-              className="flex flex-col gap-3 rounded-md border border-border bg-card p-4"
+              className="border-border bg-card flex flex-col gap-3 rounded-md border p-4"
             >
               <div className="flex items-start justify-between gap-3">
-                <h3 className="font-semibold text-foreground">{evidence.label}</h3>
+                <h3 className="text-foreground font-semibold">
+                  {evidence.label}
+                </h3>
                 <StatusBadge status={evidence.status} />
               </div>
-              <p className="text-sm leading-6 text-muted-foreground">
+              <p className="text-muted-foreground text-sm leading-6">
                 {evidence.value}
               </p>
             </div>
@@ -80,25 +81,31 @@ export function CaseStudyArticle({
       </section>
 
       <section className="grid gap-6 md:grid-cols-2">
-        <div className="flex flex-col gap-4 rounded-md border border-border bg-card p-5">
-          <h2 className="text-xl font-semibold text-foreground">Limitations</h2>
-          <ul className="flex flex-col gap-3 text-sm leading-6 text-muted-foreground">
+        <div className="border-border bg-card flex flex-col gap-4 rounded-md border p-5">
+          <h2 className="text-foreground text-xl font-semibold">Limitations</h2>
+          <ul className="text-muted-foreground flex flex-col gap-3 text-sm leading-6">
             {project.limitations.map((item) => (
               <li key={item} className="flex gap-2">
-                <span aria-hidden="true" className="mt-2 size-1 rounded-full bg-primary" />
+                <span
+                  aria-hidden="true"
+                  className="bg-primary mt-2 size-1 rounded-full"
+                />
                 <span>{item}</span>
               </li>
             ))}
           </ul>
         </div>
-        <div className="flex flex-col gap-4 rounded-md border border-border bg-card p-5">
-          <h2 className="text-xl font-semibold text-foreground">
+        <div className="border-border bg-card flex flex-col gap-4 rounded-md border p-5">
+          <h2 className="text-foreground text-xl font-semibold">
             Interview Questions
           </h2>
-          <ul className="flex flex-col gap-3 text-sm leading-6 text-muted-foreground">
+          <ul className="text-muted-foreground flex flex-col gap-3 text-sm leading-6">
             {project.interviewQuestions.map((item) => (
               <li key={item} className="flex gap-2">
-                <span aria-hidden="true" className="mt-2 size-1 rounded-full bg-primary" />
+                <span
+                  aria-hidden="true"
+                  className="bg-primary mt-2 size-1 rounded-full"
+                />
                 <span>{item}</span>
               </li>
             ))}

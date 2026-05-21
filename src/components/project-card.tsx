@@ -20,17 +20,17 @@ export function ProjectCard({
   return (
     <article
       id={project.slug}
-      className="flex h-full flex-col gap-5 border border-border bg-card p-5"
+      className="border-border bg-card flex h-full flex-col gap-5 border p-5"
     >
       <div className="flex flex-col gap-2">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+        <p className="text-muted-foreground text-xs font-semibold tracking-[0.16em] uppercase">
           {project.domain}
         </p>
         <div className="flex flex-col gap-1">
-          <h3 className="text-xl font-semibold tracking-tight text-primary">
+          <h3 className="text-primary text-xl font-semibold tracking-tight">
             {project.title}
           </h3>
-          <p className="text-sm leading-6 text-muted-foreground">
+          <p className="text-muted-foreground text-sm leading-6">
             {project.subtitle}
           </p>
         </div>
@@ -39,20 +39,22 @@ export function ProjectCard({
       <div className="flex flex-1 flex-col gap-4 text-sm leading-6">
         <LabeledText label="Problem" value={project.problem} />
         <LabeledText label="Solution" value={project.solution} />
-        {!compact ? <LabeledText label="Result" value={project.result} /> : null}
+        {!compact ? (
+          <LabeledText label="Result" value={project.result} />
+        ) : null}
       </div>
 
       <div className="flex flex-col gap-2">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+        <p className="text-muted-foreground text-xs font-semibold tracking-[0.16em] uppercase">
           Evidence
         </p>
         <div className="flex flex-col gap-2">
           {evidencePreview.map((evidence) => (
             <div
               key={`${project.slug}-${evidence.label}`}
-              className="flex items-center justify-between gap-3 rounded-md border border-border bg-background px-3 py-2"
+              className="border-border bg-background flex items-center justify-between gap-3 rounded-md border px-3 py-2"
             >
-              <span className="min-w-0 text-sm leading-5 text-foreground">
+              <span className="text-foreground min-w-0 text-sm leading-5">
                 {evidence.label}
               </span>
               <StatusBadge status={evidence.status} />
@@ -96,12 +98,12 @@ export function ProjectCard({
 
 export function ProjectRow({ project }: { project: Project }) {
   return (
-    <article className="grid gap-4 border-b border-border py-5 last:border-b-0 md:grid-cols-[1.1fr_2fr_1.2fr_auto] md:items-center">
+    <article className="border-border grid gap-4 border-b py-5 last:border-b-0 md:grid-cols-[1.1fr_2fr_1.2fr_auto] md:items-center">
       <div>
-        <h3 className="font-semibold text-foreground">{project.title}</h3>
-        <p className="text-sm text-muted-foreground">{project.domain}</p>
+        <h3 className="text-foreground font-semibold">{project.title}</h3>
+        <p className="text-muted-foreground text-sm">{project.domain}</p>
       </div>
-      <p className="text-sm leading-6 text-foreground">{project.result}</p>
+      <p className="text-foreground text-sm leading-6">{project.result}</p>
       <div className="flex flex-wrap gap-2">
         {project.primaryTechStack.map((tech) => (
           <Badge key={tech} variant="outline" className="rounded-md">
@@ -110,7 +112,12 @@ export function ProjectRow({ project }: { project: Project }) {
         ))}
       </div>
       <Button asChild variant="ghost" size="sm">
-        <a href={project.repoUrl} target="_blank" rel="noreferrer" aria-label={`${project.title} GitHub`}>
+        <a
+          href={project.repoUrl}
+          target="_blank"
+          rel="noreferrer"
+          aria-label={`${project.title} GitHub`}
+        >
           <ExternalLink data-icon="inline-end" aria-hidden="true" />
           Repo
         </a>
@@ -122,7 +129,7 @@ export function ProjectRow({ project }: { project: Project }) {
 function LabeledText({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col gap-1">
-      <p className="text-xs font-semibold text-primary">{label}</p>
+      <p className="text-primary text-xs font-semibold">{label}</p>
       <p className="text-foreground">{value}</p>
     </div>
   );

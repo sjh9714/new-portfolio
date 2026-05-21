@@ -27,7 +27,11 @@ export function StatusBadge({
   return (
     <Badge
       variant="outline"
-      className={cn("h-6 rounded-md font-semibold", statusClasses[status], className)}
+      className={cn(
+        "h-6 rounded-md font-semibold",
+        statusClasses[status],
+        className,
+      )}
     >
       {statusCopy[status]}
     </Badge>

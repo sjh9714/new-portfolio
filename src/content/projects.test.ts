@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 
+import { blogTopics } from "./blog";
+import { navigationItems, profile } from "./profile";
 import {
   additionalProjects,
   archiveProjects,
@@ -14,6 +18,31 @@ const disallowedConceptExamples = [
   "file-service",
   "idempotency-library",
   "outbox-starter",
+];
+
+const bannedSubmissionPhrases = [
+  "README 기준 미표기",
+  "제공된 범위",
+  "카드로 배치",
+  "메인 사례",
+  "양보",
+  "Email 미설정",
+  "PDF 준비 중",
+  "Not claimed",
+  "보강 필요",
+  "실무 준비도를 부풀리지 않습니다",
+  "실제 운영 경험처럼 보이지 않게",
+];
+
+const sourceFilesWithPublicCopy = [
+  "src/content/projects.ts",
+  "src/content/profile.ts",
+  "src/app/page.tsx",
+  "src/app/about/page.tsx",
+  "src/app/resume/page.tsx",
+  "src/app/sitemap.ts",
+  "src/content/case-studies/ai-usage-billing-gateway.mdx",
+  "src/content/case-studies/msa-shop.mdx",
 ];
 
 describe("portfolio project content", () => {
@@ -44,17 +73,69 @@ describe("portfolio project content", () => {
       expect(project.evidence.length).toBeGreaterThan(0);
 
       for (const evidence of project.evidence) {
-        expect(["measured", "verified", "pending"]).toContain(
-          evidence.status,
-        );
+        expect(["measured", "verified", "pending"]).toContain(evidence.status);
         expect(evidence.label.length).toBeGreaterThan(0);
         expect(evidence.value.length).toBeGreaterThan(0);
       }
     }
   });
 
+  it("has submission-ready contact and hides blog navigation until a post is published", () => {
+    const hasPublishedBlogPost = blogTopics.some(
+      (topic) => topic.status === "published",
+    );
+
+    expect(profile.name).toBe("성진혁");
+    expect(profile.email).toBe("jinhyuk9714@gmail.com");
+    expect(
+      navigationItems.some((item) => (item.href as string) === "/blog"),
+    ).toBe(hasPublishedBlogPost);
+  });
+
+  it("does not expose draft-only or internal strategy phrasing", () => {
+    const combinedSource = sourceFilesWithPublicCopy
+      .map((file) => readFileSync(join(process.cwd(), file), "utf8"))
+      .join("\n");
+
+    for (const phrase of bannedSubmissionPhrases) {
+      expect(combinedSource).not.toContain(phrase);
+    }
+  });
+
+  it("does not keep placeholder project periods", () => {
+    for (const project of projects) {
+      expect(project.period).not.toBe("README 기준 미표기");
+    }
+  });
+
+  it("requires featured projects to have enough evidence, limits, and interview hooks", () => {
+    for (const project of featuredProjects) {
+      expect(project.evidence.length).toBeGreaterThanOrEqual(2);
+      expect(project.limitations.length).toBeGreaterThanOrEqual(1);
+      expect(project.interviewQuestions.length).toBeGreaterThanOrEqual(1);
+    }
+  });
+
+  it("keeps pending language out of measured evidence", () => {
+    const pendingWords = ["pending", "Pending", "예정", "필요", "Not claimed"];
+
+    for (const project of projects) {
+      for (const evidence of project.evidence) {
+        if (evidence.status !== "measured") {
+          continue;
+        }
+
+        for (const word of pendingWords) {
+          expect(evidence.value).not.toContain(word);
+        }
+      }
+    }
+  });
+
   it("marks known unfinished claims as pending instead of measured", () => {
-    const realtime = projects.find((project) => project.slug === "realtime-chat");
+    const realtime = projects.find(
+      (project) => project.slug === "realtime-chat",
+    );
     const billing = projects.find(
       (project) => project.slug === "ai-usage-billing-gateway",
     );
@@ -94,20 +175,18 @@ describe("portfolio project content", () => {
   });
 
   it("surfaces pending evidence in compact featured previews when pending claims exist", () => {
-    const realtime = projects.find((project) => project.slug === "realtime-chat");
+    const realtime = projects.find(
+      (project) => project.slug === "realtime-chat",
+    );
     const billing = projects.find(
       (project) => project.slug === "ai-usage-billing-gateway",
     );
 
     expect(realtime && getEvidencePreview(realtime, 2)).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ status: "pending" }),
-      ]),
+      expect.arrayContaining([expect.objectContaining({ status: "pending" })]),
     );
     expect(billing && getEvidencePreview(billing, 2)).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ status: "pending" }),
-      ]),
+      expect.arrayContaining([expect.objectContaining({ status: "pending" })]),
     );
   });
 });

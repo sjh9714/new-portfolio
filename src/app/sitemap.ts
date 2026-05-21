@@ -1,16 +1,23 @@
 import type { MetadataRoute } from "next";
 
 import { featuredProjects } from "@/content/projects";
+import { publishedBlogTopics } from "@/content/blog";
+import { getSiteUrl } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
-  const routes = ["", "/projects", "/resume", "/blog", "/about"];
+  const baseUrl = getSiteUrl();
+  const routes = ["", "/projects", "/resume", "/about"];
+  const blogRoutes = publishedBlogTopics.length > 0 ? ["/blog"] : [];
   const caseStudyRoutes = featuredProjects.map(
     (project) => `/case-studies/${project.slug}`,
   );
 
-  return [...routes, ...caseStudyRoutes].map((route) => ({
-    url: `${baseUrl}${route}`,
-    lastModified: new Date(),
-  }));
+  return [...routes, ...blogRoutes, ...caseStudyRoutes].map((route) => {
+    const url = route === "" ? `${baseUrl}/` : `${baseUrl}${route}`;
+
+    return {
+      url,
+      lastModified: new Date(),
+    };
+  });
 }

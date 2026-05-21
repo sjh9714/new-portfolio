@@ -7,6 +7,7 @@ This repository is a Korean backend developer portfolio site.
 The site must make a busy Korean engineering interviewer understand the candidate's backend strengths within 30 seconds.
 
 Primary positioning:
+
 - Java/Spring backend engineer
 - concurrency, consistency, event-driven architecture, realtime messaging, billing/tenant security
 - evidence-driven portfolio with tests, diagrams, and measured/verified/pending labels
@@ -23,6 +24,7 @@ Primary positioning:
 - All featured case studies must include:
   - TL;DR
   - Problem
+  - Naive Approach
   - Architecture / Flow
   - Design Decisions
   - Evidence
@@ -43,6 +45,8 @@ Primary positioning:
 Use these commands before finishing work:
 
 ```bash
+npm run format:check
+npm run typecheck
 npm test
 npm run lint
 npm run build
@@ -76,6 +80,7 @@ They should read like an engineering design review.
 A task is done only when:
 
 - TypeScript compiles
+- `npm run format:check` passes
 - `npm test` passes
 - `npm run lint` passes
 - `npm run build` passes

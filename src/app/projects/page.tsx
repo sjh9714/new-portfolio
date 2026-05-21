@@ -20,7 +20,7 @@ export default function ProjectsPage() {
     <div className="mx-auto flex max-w-7xl flex-col gap-10 px-5 py-12 md:px-8 md:py-16">
       <SectionHeader
         title="Projects"
-        description="메인 4개는 깊게, 나머지는 보조 서사와 아카이브로 정리합니다."
+        description="Featured case study와 additional project를 읽는 부담이 적은 단위로 나눴습니다."
       />
       <Tabs defaultValue="featured" className="gap-8">
         <TabsList className="w-full justify-start overflow-x-auto">
@@ -34,14 +34,14 @@ export default function ProjectsPage() {
           ))}
         </TabsContent>
         <TabsContent value="additional">
-          <div className="border-y border-border">
+          <div className="border-border border-y">
             {additionalProjects.map((project) => (
               <ProjectRow key={project.slug} project={project} />
             ))}
           </div>
         </TabsContent>
         <TabsContent value="archive">
-          <div className="border-y border-border">
+          <div className="border-border border-y">
             {archiveProjects.map((project) => (
               <ProjectRow key={project.slug} project={project} />
             ))}

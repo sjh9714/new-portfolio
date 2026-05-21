@@ -1,6 +1,10 @@
-# SJH Backend Portfolio
+# 성진혁 Backend Portfolio
 
 Korean backend developer portfolio site for presenting Java/Spring projects through problem-solving case studies, architecture flows, and honest evidence labels.
+
+Public contact: [jinhyuk9714@gmail.com](mailto:jinhyuk9714@gmail.com)
+
+Live site: [new-portfolio-smoky-one-41.vercel.app](https://new-portfolio-smoky-one-41.vercel.app)
 
 ## Positioning
 
@@ -27,9 +31,17 @@ Open [http://localhost:3000](http://localhost:3000).
 ## Verification
 
 ```bash
+npm run format:check
+npm run typecheck
 npm test
 npm run lint
 npm run build
+```
+
+For the full local verification pipeline:
+
+```bash
+npm run ci
 ```
 
 ## Content Rule

@@ -4,7 +4,8 @@ import { Cable, DatabaseZap, RotateCcw } from "lucide-react";
 export type BlogTopic = {
   title: string;
   summary: string;
-  status: "coming-soon";
+  status: "coming-soon" | "published";
+  url?: string;
   icon: LucideIcon;
 };
 
@@ -34,3 +35,7 @@ export const blogTopics: BlogTopic[] = [
     icon: Cable,
   },
 ];
+
+export const publishedBlogTopics = blogTopics.filter(
+  (topic) => topic.status === "published",
+);
