@@ -38,6 +38,7 @@ const sourceFilesWithPublicCopy = [
   "src/content/projects.ts",
   "src/content/profile.ts",
   "src/app/page.tsx",
+  "src/app/case-studies/page.tsx",
   "src/app/about/page.tsx",
   "src/app/resume/page.tsx",
   "src/app/sitemap.ts",
@@ -90,6 +91,49 @@ describe("portfolio project content", () => {
     expect(
       navigationItems.some((item) => (item.href as string) === "/blog"),
     ).toBe(hasPublishedBlogPost);
+  });
+
+  it("routes case study navigation to the index instead of a single project", () => {
+    expect(navigationItems).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          href: "/case-studies",
+          label: "Case Studies",
+        }),
+      ]),
+    );
+    expect(
+      navigationItems.some(
+        (item) => (item.href as string) === "/case-studies/concert-booking",
+      ),
+    ).toBe(false);
+  });
+
+  it("keeps unpublished writing off the homepage", () => {
+    const homeSource = readFileSync(
+      join(process.cwd(), "src/app/page.tsx"),
+      "utf8",
+    );
+    const hasPublishedBlogPost = blogTopics.some(
+      (topic) => topic.status === "published",
+    );
+
+    if (!hasPublishedBlogPost) {
+      expect(homeSource).not.toContain("Writing Queue");
+      expect(homeSource).not.toContain("blogTopics");
+    }
+  });
+
+  it("keeps compact project cards complete enough for a 30-second scan", () => {
+    const projectCardSource = readFileSync(
+      join(process.cwd(), "src/components/project-card.tsx"),
+      "utf8",
+    );
+
+    expect(projectCardSource).toContain('LabeledText label="Problem"');
+    expect(projectCardSource).toContain('LabeledText label="Solution"');
+    expect(projectCardSource).toContain('LabeledText label="Result"');
+    expect(projectCardSource).not.toContain("!compact");
   });
 
   it("does not expose draft-only or internal strategy phrasing", () => {

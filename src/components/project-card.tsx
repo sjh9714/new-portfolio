@@ -39,9 +39,7 @@ export function ProjectCard({
       <div className="flex flex-1 flex-col gap-4 text-sm leading-6">
         <LabeledText label="Problem" value={project.problem} />
         <LabeledText label="Solution" value={project.solution} />
-        {!compact ? (
-          <LabeledText label="Result" value={project.result} />
-        ) : null}
+        <LabeledText label="Result" value={project.result} />
       </div>
 
       <div className="flex flex-col gap-2">
@@ -98,7 +96,7 @@ export function ProjectCard({
 
 export function ProjectRow({ project }: { project: Project }) {
   return (
-    <article className="border-border grid gap-4 border-b py-5 last:border-b-0 md:grid-cols-[1.1fr_2fr_1.2fr_auto] md:items-center">
+    <article className="border-border grid gap-4 border-b py-5 last:border-b-0 lg:grid-cols-[1.1fr_2fr_1.2fr_auto] lg:items-center">
       <div>
         <h3 className="text-foreground font-semibold">{project.title}</h3>
         <p className="text-muted-foreground text-sm">{project.domain}</p>

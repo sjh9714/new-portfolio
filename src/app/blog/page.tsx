@@ -7,6 +7,10 @@ import { blogTopics } from "@/content/blog";
 export const metadata: Metadata = {
   title: "Blog",
   description: "Coming soon backend deep-dive blog topics.",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default function BlogPage() {

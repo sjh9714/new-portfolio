@@ -12,7 +12,7 @@ export const profile = {
 } as const;
 
 export const navigationItems = [
-  { href: "/case-studies/concert-booking", label: "Case Studies" },
+  { href: "/case-studies", label: "Case Studies" },
   { href: "/projects", label: "Projects" },
   { href: "/resume", label: "Resume" },
   { href: "/about", label: "Contact" },

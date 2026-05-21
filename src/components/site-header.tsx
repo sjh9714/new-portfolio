@@ -5,7 +5,7 @@ import { navigationItems, profile } from "@/content/profile";
 export function SiteHeader() {
   return (
     <header className="border-border bg-background border-b">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-5 py-4 md:px-8">
+      <div className="mx-auto flex max-w-7xl flex-col gap-3 px-5 py-4 md:flex-row md:items-center md:justify-between md:gap-6 md:px-8">
         <Link
           href="/"
           className="text-foreground text-2xl font-bold tracking-tight"
@@ -15,24 +15,18 @@ export function SiteHeader() {
         </Link>
         <nav
           aria-label="Primary navigation"
-          className="hidden items-center gap-7 md:flex"
+          className="flex w-full items-center gap-5 overflow-x-auto md:w-auto md:gap-7"
         >
           {navigationItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="text-foreground hover:text-primary text-sm font-medium transition-colors"
+              className="text-foreground hover:text-primary shrink-0 text-sm font-medium transition-colors"
             >
               {item.label}
             </Link>
           ))}
         </nav>
-        <Link
-          href="/projects"
-          className="text-primary text-sm font-semibold md:hidden"
-        >
-          Projects
-        </Link>
       </div>
     </header>
   );

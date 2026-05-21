@@ -18,7 +18,6 @@ import { ProjectCard, ProjectRow } from "@/components/project-card";
 import { SectionHeader } from "@/components/section-header";
 import { Button } from "@/components/ui/button";
 import { additionalProjects, featuredProjects } from "@/content/projects";
-import { blogTopics } from "@/content/blog";
 import { profile } from "@/content/profile";
 
 const focusCards = [
@@ -164,7 +163,7 @@ export default function Home() {
               </Button>
             }
           />
-          <div className="grid gap-4 lg:grid-cols-4">
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {featuredProjects.map((project) => (
               <ProjectCard key={project.slug} project={project} compact />
             ))}
@@ -192,32 +191,6 @@ export default function Home() {
           <div className="border-border border-y">
             {additionalProjects.map((project) => (
               <ProjectRow key={project.slug} project={project} />
-            ))}
-          </div>
-        </section>
-
-        <section className="border-border bg-card flex flex-col gap-6 border p-6">
-          <SectionHeader
-            title="Writing Queue"
-            description="Redis, Idempotency, Outbox 주제를 프로젝트 근거와 연결해 깊게 정리할 예정입니다."
-          />
-          <div className="grid gap-4 md:grid-cols-3">
-            {blogTopics.map((topic) => (
-              <article
-                key={topic.title}
-                className="border-border flex flex-col gap-3 border p-4"
-              >
-                <topic.icon aria-hidden="true" />
-                <h3 className="text-foreground leading-6 font-semibold">
-                  {topic.title}
-                </h3>
-                <p className="text-muted-foreground text-sm leading-6">
-                  {topic.summary}
-                </p>
-                <span className="text-primary mt-auto text-xs font-semibold tracking-[0.16em] uppercase">
-                  Coming soon
-                </span>
-              </article>
             ))}
           </div>
         </section>

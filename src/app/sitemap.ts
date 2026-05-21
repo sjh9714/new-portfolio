@@ -6,7 +6,7 @@ import { getSiteUrl } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = getSiteUrl();
-  const routes = ["", "/projects", "/resume", "/about"];
+  const routes = ["", "/case-studies", "/projects", "/resume", "/about"];
   const blogRoutes = publishedBlogTopics.length > 0 ? ["/blog"] : [];
   const caseStudyRoutes = featuredProjects.map(
     (project) => `/case-studies/${project.slug}`,

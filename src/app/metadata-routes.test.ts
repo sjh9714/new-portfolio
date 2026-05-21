@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
+import { metadata as blogMetadata } from "./blog/page";
 import robots from "./robots";
 import sitemap from "./sitemap";
 import { featuredProjects } from "@/content/projects";
@@ -12,6 +13,7 @@ describe("metadata routes", () => {
     expect(sitemap().map((entry) => entry.url)).toEqual(
       expect.arrayContaining([
         "https://portfolio.example/",
+        "https://portfolio.example/case-studies",
         "https://portfolio.example/projects",
         "https://portfolio.example/resume",
         "https://portfolio.example/about",
@@ -23,5 +25,14 @@ describe("metadata routes", () => {
     expect(sitemap().some((entry) => entry.url.endsWith("/blog"))).toBe(false);
 
     vi.unstubAllEnvs();
+  });
+
+  it("keeps unpublished blog pages out of public discovery", () => {
+    expect(blogMetadata.robots).toEqual(
+      expect.objectContaining({
+        index: false,
+        follow: false,
+      }),
+    );
   });
 });

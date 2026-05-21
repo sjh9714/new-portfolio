@@ -49,7 +49,9 @@ export default function ResumePage() {
         </div>
         {resumeExists ? (
           <Button asChild>
-            <a href="/resume.pdf">PDF 다운로드</a>
+            <a href="/resume.pdf" download="sung-jinhyuk-resume.pdf">
+              PDF 다운로드
+            </a>
           </Button>
         ) : null}
       </header>

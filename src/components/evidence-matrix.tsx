@@ -1,13 +1,11 @@
 import { StatusBadge } from "@/components/status-badge";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import type { EvidenceStatus } from "@/content/projects";
+
+const statusLabels: Record<EvidenceStatus, string> = {
+  measured: "Measured",
+  verified: "Verified",
+  pending: "Pending",
+};
 
 const rows: {
   status: EvidenceStatus;
@@ -40,69 +38,36 @@ const rows: {
 
 export function EvidenceMatrix() {
   return (
-    <div className="border-border bg-card border">
-      <div className="grid gap-0 md:hidden">
-        {rows.map((row) => (
-          <article
-            key={row.status}
-            className="border-border flex flex-col gap-4 border-b p-4 last:border-b-0"
-          >
-            <div className="flex items-center justify-between gap-3">
-              <h3 className="text-foreground font-semibold">{row.status}</h3>
-              <StatusBadge status={row.status} />
-            </div>
-            <div className="flex flex-col gap-2">
-              <p className="text-muted-foreground text-xs font-semibold tracking-[0.16em] uppercase">
-                정의
-              </p>
-              <p className="text-foreground text-sm leading-6">
-                {row.definition}
-              </p>
-            </div>
-            <div className="flex flex-col gap-2">
-              <p className="text-muted-foreground text-xs font-semibold tracking-[0.16em] uppercase">
-                기준
-              </p>
-              <p className="text-foreground text-sm leading-6">
-                {row.standard}
-              </p>
-            </div>
-            <code className="border-border bg-muted text-foreground block rounded-md border p-3 font-mono text-xs leading-5 [overflow-wrap:anywhere]">
-              {row.expression}
-            </code>
-          </article>
-        ))}
-      </div>
-      <Table className="hidden md:table">
-        <TableHeader>
-          <TableRow>
-            <TableHead>Status</TableHead>
-            <TableHead>정의</TableHead>
-            <TableHead>기준</TableHead>
-            <TableHead>표현</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {rows.map((row) => (
-            <TableRow key={row.status}>
-              <TableCell>
-                <StatusBadge status={row.status} />
-              </TableCell>
-              <TableCell className="leading-6 whitespace-normal">
-                {row.definition}
-              </TableCell>
-              <TableCell className="leading-6 whitespace-normal">
-                {row.standard}
-              </TableCell>
-              <TableCell className="whitespace-normal">
-                <code className="border-border bg-muted text-foreground block rounded-md border p-3 font-mono text-xs leading-5">
-                  {row.expression}
-                </code>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+    <div className="grid gap-4 md:grid-cols-3">
+      {rows.map((row) => (
+        <article
+          key={row.status}
+          className="border-border bg-card flex min-w-0 flex-col gap-4 border p-4"
+        >
+          <div className="flex items-start justify-between gap-3">
+            <h3 className="text-foreground font-semibold">
+              {statusLabels[row.status]}
+            </h3>
+            <StatusBadge status={row.status} />
+          </div>
+          <EvidenceText label="정의" value={row.definition} />
+          <EvidenceText label="기준" value={row.standard} />
+          <code className="border-border bg-muted text-foreground block rounded-md border p-3 font-mono text-xs leading-5 [overflow-wrap:anywhere]">
+            {row.expression}
+          </code>
+        </article>
+      ))}
+    </div>
+  );
+}
+
+function EvidenceText({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex flex-col gap-2">
+      <p className="text-muted-foreground text-xs font-semibold tracking-[0.16em] uppercase">
+        {label}
+      </p>
+      <p className="text-foreground text-sm leading-6">{value}</p>
     </div>
   );
 }
