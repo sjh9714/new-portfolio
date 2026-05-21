@@ -16,8 +16,13 @@ import { EvidenceMatrix } from "@/components/evidence-matrix";
 import { FocusCard } from "@/components/focus-card";
 import { ProjectCard, ProjectRow } from "@/components/project-card";
 import { SectionHeader } from "@/components/section-header";
+import { StatusBadge } from "@/components/status-badge";
 import { Button } from "@/components/ui/button";
-import { additionalProjects, featuredProjects } from "@/content/projects";
+import {
+  additionalProjects,
+  featuredProjects,
+  getProjectBySlug,
+} from "@/content/projects";
 import { profile } from "@/content/profile";
 
 const focusCards = [
@@ -86,18 +91,53 @@ const proofItems = [
   },
 ];
 
+const snapshotItems = [
+  {
+    projectSlug: "concert-booking",
+    projectName: "Concert Booking",
+    evidenceLabel: "Hot Seat Contention",
+  },
+  {
+    projectSlug: "realtime-chat",
+    projectName: "Realtime Chat",
+    evidenceLabel: "Chat room API RPS",
+  },
+  {
+    projectSlug: "ai-usage-billing-gateway",
+    projectName: "AI Billing",
+    evidenceLabel: "Usage idempotency",
+  },
+].map((item) => {
+  const project = getProjectBySlug(item.projectSlug);
+  const evidence = project?.evidence.find(
+    (entry) => entry.label === item.evidenceLabel,
+  );
+
+  return {
+    ...item,
+    evidence,
+  };
+});
+
 export default function Home() {
+  const [primaryProject, ...secondaryProjects] = featuredProjects;
+
   return (
     <div className="bg-background">
       <section className="border-border border-b">
-        <div className="mx-auto flex max-w-7xl flex-col gap-10 px-5 py-12 md:px-8 md:py-20">
-          <div className="flex max-w-4xl flex-col gap-6">
-            <h1 className="text-foreground text-5xl font-bold tracking-tight md:text-7xl">
-              Backend Engineer
-            </h1>
-            <p className="text-muted-foreground max-w-3xl text-xl leading-9">
-              {profile.headline}
-            </p>
+        <div className="mx-auto grid max-w-7xl gap-10 px-5 py-12 md:px-8 md:py-20 lg:grid-cols-[1.05fr_0.95fr] lg:items-end">
+          <div className="flex max-w-4xl flex-col gap-7">
+            <div className="flex flex-col gap-4">
+              <p className="text-primary text-sm font-semibold tracking-[0.2em] uppercase">
+                Java / Spring Backend Portfolio
+              </p>
+              <h1 className="text-foreground text-5xl leading-tight font-bold tracking-tight md:text-7xl">
+                Backend Engineer
+              </h1>
+              <p className="text-muted-foreground max-w-3xl text-xl leading-9">
+                {profile.headline}
+              </p>
+            </div>
             <div className="flex flex-col gap-3 sm:flex-row">
               <Button asChild>
                 <Link href="/resume">
@@ -106,13 +146,13 @@ export default function Home() {
                 </Link>
               </Button>
               <Button asChild variant="outline">
+                <Link href="/case-studies">Case Studies</Link>
+              </Button>
+              <Button asChild variant="outline">
                 <a href={profile.githubUrl} target="_blank" rel="noreferrer">
                   <ExternalLink data-icon="inline-start" aria-hidden="true" />
                   GitHub
                 </a>
-              </Button>
-              <Button asChild variant="outline">
-                <Link href="/case-studies/concert-booking">Case Studies</Link>
               </Button>
               <Button asChild variant="outline">
                 <a href={`mailto:${profile.email}`}>
@@ -123,6 +163,44 @@ export default function Home() {
             </div>
           </div>
 
+          <aside className="border-border bg-card flex flex-col gap-5 border p-5">
+            <div className="flex flex-col gap-1">
+              <p className="text-primary text-sm font-semibold">
+                Evidence Snapshot
+              </p>
+              <h2 className="text-foreground text-2xl font-semibold tracking-tight">
+                대표 사례는 수치와 검증 상태로 먼저 읽힙니다.
+              </h2>
+            </div>
+            <div className="flex flex-col gap-3">
+              {snapshotItems.map((item) =>
+                item.evidence ? (
+                  <div
+                    key={`${item.projectSlug}-${item.evidenceLabel}`}
+                    className="border-border bg-background flex flex-col gap-2 rounded-md border p-4"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-muted-foreground text-xs font-semibold tracking-[0.16em] uppercase">
+                          {item.projectName}
+                        </p>
+                        <h3 className="text-foreground mt-1 font-semibold [overflow-wrap:anywhere]">
+                          {item.evidence.label}
+                        </h3>
+                      </div>
+                      <StatusBadge status={item.evidence.status} />
+                    </div>
+                    <p className="text-muted-foreground text-sm leading-6 [overflow-wrap:anywhere]">
+                      {item.evidence.value}
+                    </p>
+                  </div>
+                ) : null,
+              )}
+            </div>
+          </aside>
+        </div>
+
+        <div className="mx-auto max-w-7xl px-5 pb-12 md:px-8 md:pb-16">
           <div className="border-border grid border md:grid-cols-4">
             {proofItems.map((item) => (
               <div
@@ -159,14 +237,19 @@ export default function Home() {
             description="면접 질문을 유도할 4개 문제 해결 사례를 먼저 읽히도록 구성했습니다."
             action={
               <Button asChild variant="ghost">
-                <Link href="/projects">전체 프로젝트 보기</Link>
+                <Link href="/case-studies">전체 Case Studies 보기</Link>
               </Button>
             }
           />
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            {featuredProjects.map((project) => (
-              <ProjectCard key={project.slug} project={project} compact />
-            ))}
+          <div className="grid gap-4 lg:grid-cols-[1.08fr_1fr]">
+            {primaryProject ? (
+              <ProjectCard project={primaryProject} emphasis />
+            ) : null}
+            <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-1">
+              {secondaryProjects.map((project) => (
+                <ProjectCard key={project.slug} project={project} compact />
+              ))}
+            </div>
           </div>
         </section>
 

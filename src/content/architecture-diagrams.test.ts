@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 
 import { featuredProjects } from "./projects";
 import { architectureDiagrams } from "./architecture-diagrams";
@@ -65,5 +67,17 @@ describe("architecture diagram content", () => {
         expect(node.kind === "cache" && node.sourceOfTruth).toBe(false);
       }
     }
+  });
+
+  it("renders design-review markers for technical editorial diagrams", () => {
+    const source = readFileSync(
+      join(process.cwd(), "src/components/architecture-diagram/index.tsx"),
+      "utf8",
+    );
+
+    expect(source).toContain("source of truth");
+    expect(source).toContain("failure path");
+    expect(source).toContain("async boundary");
+    expect(source).toContain("pending marker");
   });
 });

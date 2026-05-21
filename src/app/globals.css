@@ -50,7 +50,7 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
+  --background: oklch(0.985 0.004 260);
   --foreground: oklch(0.18 0.01 260);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.18 0.01 260);
@@ -141,7 +141,7 @@
 
 @layer components {
   .case-study-mdx {
-    @apply border-border text-foreground flex flex-col gap-7 border-y py-10;
+    @apply border-border text-foreground bg-card flex min-w-0 flex-col gap-7 border-y py-10;
   }
 
   .case-study-mdx h2 {
@@ -153,14 +153,18 @@
   }
 
   .case-study-mdx p {
-    @apply text-muted-foreground max-w-3xl text-sm leading-7;
+    @apply text-muted-foreground max-w-[760px] text-sm leading-7 [overflow-wrap:anywhere];
   }
 
   .case-study-mdx ul {
-    @apply text-muted-foreground flex max-w-3xl flex-col gap-2 text-sm leading-7;
+    @apply text-muted-foreground flex max-w-[760px] flex-col gap-2 text-sm leading-7;
   }
 
   .case-study-mdx li {
-    @apply marker:text-primary list-disc;
+    @apply marker:text-primary ml-5 list-disc [overflow-wrap:anywhere];
+  }
+
+  .case-study-mdx code {
+    @apply [overflow-wrap:anywhere];
   }
 }

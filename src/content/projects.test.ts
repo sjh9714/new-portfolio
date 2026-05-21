@@ -122,18 +122,34 @@ describe("portfolio project content", () => {
       expect(homeSource).not.toContain("Writing Queue");
       expect(homeSource).not.toContain("blogTopics");
     }
+    expect(homeSource).toContain("Evidence Snapshot");
   });
 
-  it("keeps compact project cards complete enough for a 30-second scan", () => {
+  it("keeps project cards structured for a 30-second technical scan", () => {
     const projectCardSource = readFileSync(
       join(process.cwd(), "src/components/project-card.tsx"),
       "utf8",
     );
 
     expect(projectCardSource).toContain('LabeledText label="Problem"');
-    expect(projectCardSource).toContain('LabeledText label="Solution"');
+    expect(projectCardSource).toContain('LabeledText label="Design"');
     expect(projectCardSource).toContain('LabeledText label="Result"');
+    expect(projectCardSource).toContain("Evidence");
+    expect(projectCardSource).toContain("primaryTechStack");
     expect(projectCardSource).not.toContain("!compact");
+  });
+
+  it("renders case study detail as article plus sticky evidence sidebar", () => {
+    const caseStudySource = readFileSync(
+      join(process.cwd(), "src/components/case-study-article.tsx"),
+      "utf8",
+    );
+
+    expect(caseStudySource).toContain("lg:sticky");
+    expect(caseStudySource).toContain("Evidence");
+    expect(caseStudySource).toContain("Tech Stack");
+    expect(caseStudySource).toContain("Limitations");
+    expect(caseStudySource).toContain("Interview Questions");
   });
 
   it("does not expose draft-only or internal strategy phrasing", () => {
