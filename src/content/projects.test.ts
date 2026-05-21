@@ -252,6 +252,7 @@ describe("portfolio project content", () => {
     for (const topic of [
       "redis",
       "kafka",
+      "rabbitmq",
       "postgresql",
       "testcontainers",
       "k6",
