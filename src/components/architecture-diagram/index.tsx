@@ -46,6 +46,7 @@ const boundaryKindLabel: Record<ArchitectureBoundaryKind, string> = {
   async: "비동기 경계",
   failure: "실패/복구 경로",
   source: "최종 기준 데이터",
+  service: "서비스 경계",
 };
 
 const edgeIcons: Record<ArchitectureEdgeKind, typeof ArrowRight> = {

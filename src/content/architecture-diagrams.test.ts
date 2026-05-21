@@ -66,6 +66,23 @@ describe("architecture diagram content", () => {
         }
         expect(node.kind === "cache" && node.sourceOfTruth).toBe(false);
       }
+
+      for (const boundary of diagram.boundaries.filter(
+        (item) => item.kind === "source",
+      )) {
+        const boundaryNodes = boundary.nodeIds.map((nodeId) =>
+          diagram.nodes.find((node) => node.id === nodeId),
+        );
+
+        expect(
+          boundaryNodes.some((node) => node?.sourceOfTruth),
+          `${diagram.slug}:${boundary.id}:source-node`,
+        ).toBe(true);
+        expect(
+          boundaryNodes.every((node) => node?.kind !== "cache"),
+          `${diagram.slug}:${boundary.id}:no-cache`,
+        ).toBe(true);
+      }
     }
   });
 

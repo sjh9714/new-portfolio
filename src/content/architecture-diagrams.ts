@@ -24,7 +24,8 @@ export type ArchitectureBoundaryKind =
   | "transaction"
   | "async"
   | "failure"
-  | "source";
+  | "source"
+  | "service";
 
 export type ArchitectureNode = {
   id: string;
@@ -825,7 +826,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
       {
         id: "service-boundary",
         label: "서비스와 DB 경계",
-        kind: "source",
+        kind: "service",
         nodeIds: ["order", "product", "payment", "settlement", "service-db"],
       },
       {

@@ -30,6 +30,14 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
+## Environment
+
+```bash
+NEXT_PUBLIC_SITE_URL=https://new-portfolio-smoky-one-41.vercel.app
+```
+
+`NEXT_PUBLIC_SITE_URL` is used for metadata, sitemap, and robots output.
+
 ## Verification
 
 ```bash
@@ -46,6 +54,14 @@ For the full local verification pipeline:
 npm run ci
 ```
 
+## Deployment
+
+The production site is deployed on Vercel from the `main` branch.
+
+- Install: `npm ci`
+- Build: `npm run build`
+- Production URL: [new-portfolio-smoky-one-41.vercel.app](https://new-portfolio-smoky-one-41.vercel.app)
+
 ## Content Rule
 
 All project evidence is sourced from `src/content/projects.ts`.
@@ -55,3 +71,6 @@ All project evidence is sourced from `src/content/projects.ts`.
 - `추가 측정 예정` (`pending`): not measured yet, or needs more operational data.
 
 Do not invent metrics.
+Benchmark numbers must come from committed/source-backed project evidence only.
+
+The resume PDF button is shown only when `public/resume.pdf` exists.
