@@ -282,11 +282,12 @@ describe("PDF-style portfolio cases", () => {
     );
 
     expect(visualSource).toContain('role="list"');
-    expect(visualSource).toContain("data-step");
-    expect(visualSource).toContain("before:content-[attr(data-step)]");
-    expect(visualSource).toContain('aria-hidden="true"');
+    expect(visualSource).toContain("list-none");
+    expect(visualSource).toContain("·");
     expect(visualSource).toContain('aria-label="표식"');
-    expect(visualSource).not.toContain("{index + 1}");
+    expect(visualSource).not.toContain("data-step");
+    expect(visualSource).not.toContain("before:content-[attr(data-step)]");
+    expect(visualSource).not.toContain("getStep");
   });
 
   it("keeps diagram legend semantic and moves node cards behind details", () => {
@@ -296,6 +297,7 @@ describe("PDF-style portfolio cases", () => {
     );
 
     expect(diagramSource).toContain('aria-label="구조도 범례"');
+    expect(diagramSource).toContain("·");
     expect(diagramSource).toContain("<details");
     expect(diagramSource).toContain("<summary");
     expect(diagramSource).toContain("구성 요소 설명");

@@ -58,12 +58,18 @@ export function PortfolioCaseDiagram({
         <p className="text-muted-foreground text-xs font-semibold tracking-[0.16em] uppercase">
           범례
         </p>
-        <ul aria-label="구조도 범례" className="flex flex-wrap gap-2">
-          {Object.values(markerLabel).map((label) => (
-            <li key={label}>
+        <ul
+          aria-label="구조도 범례"
+          className="flex flex-wrap items-center gap-2"
+        >
+          {Object.values(markerLabel).map((label, index, labels) => (
+            <li key={label} className="flex items-center gap-2">
               <Badge variant="outline" className="rounded-md">
                 {label}
               </Badge>
+              {index < labels.length - 1 ? (
+                <span className="text-muted-foreground text-xs">·</span>
+              ) : null}
             </li>
           ))}
         </ul>
@@ -187,12 +193,15 @@ function MarkerBadges({ markers }: { markers?: PortfolioDiagramMarker[] }) {
   }
 
   return (
-    <ul aria-label="표식" className="flex flex-wrap gap-2">
-      {markers.map((marker) => (
-        <li key={marker}>
+    <ul aria-label="표식" className="flex flex-wrap items-center gap-2">
+      {markers.map((marker, index) => (
+        <li key={marker} className="flex items-center gap-2">
           <Badge variant="outline" className="rounded-md text-[11px]">
             {markerLabel[marker]}
           </Badge>
+          {index < markers.length - 1 ? (
+            <span className="text-muted-foreground text-xs">·</span>
+          ) : null}
         </li>
       ))}
     </ul>

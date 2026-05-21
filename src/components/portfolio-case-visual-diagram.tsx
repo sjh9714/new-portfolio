@@ -16,10 +16,6 @@ const markerLabel: Record<PortfolioDiagramMarker, string> = {
   pending: "추가 검증 예정",
 };
 
-function getStep(index: number) {
-  return String(index + 1);
-}
-
 export function PortfolioCaseVisualDiagram({
   diagram,
 }: {
@@ -66,8 +62,8 @@ function FlowVisual({
   const edgeByFrom = new Map(diagram.edges.map((edge) => [edge.from, edge]));
 
   return (
-    <ul role="list" className="grid gap-3">
-      {diagram.nodes.map((node, index) => {
+    <ul role="list" className="grid list-none gap-3">
+      {diagram.nodes.map((node) => {
         const edge = edgeByFrom.get(node.id);
         const nextNode = edge
           ? diagram.nodes.find((candidate) => candidate.id === edge.to)
@@ -75,7 +71,7 @@ function FlowVisual({
 
         return (
           <li key={node.id} className="grid gap-2">
-            <VisualNodeCard node={node} step={getStep(index)} />
+            <VisualNodeCard node={node} />
             {edge && nextNode ? <VisualConnector edge={edge} /> : null}
           </li>
         );
@@ -84,28 +80,17 @@ function FlowVisual({
   );
 }
 
-function VisualNodeCard({
-  node,
-  step,
-}: {
-  node: PortfolioVisualDiagramNode;
-  step: string;
-}) {
+function VisualNodeCard({ node }: { node: PortfolioVisualDiagramNode }) {
   return (
     <div
       className={cn(
-        "border-border bg-card grid gap-3 rounded-md border p-4 md:grid-cols-[auto_1fr] md:items-start",
+        "border-border bg-card rounded-md border p-4",
         node.markers?.includes("source")
           ? "border-primary/45 bg-primary/5"
           : null,
         node.markers?.includes("pending") ? "border-dashed" : null,
       )}
     >
-      <span
-        aria-hidden="true"
-        data-step={step}
-        className="border-border text-muted-foreground flex size-7 items-center justify-center rounded-md border text-xs font-semibold before:content-[attr(data-step)]"
-      />
       <div className="grid gap-2">
         <h4 className="text-foreground font-semibold [overflow-wrap:anywhere]">
           {node.label}
@@ -165,29 +150,22 @@ function BeforeAfterColumn({
       )}
     >
       <h4 className="text-foreground font-semibold">{column.title}</h4>
-      <ul role="list" className="mt-4 grid gap-3">
+      <ul role="list" className="mt-4 grid list-none gap-3">
         {column.items.map((item, index) => (
           <li
             key={`${item.label}-${index}`}
             className="border-border bg-background rounded-md border p-3"
           >
-            <div className="flex items-start gap-3">
-              <span
-                aria-hidden="true"
-                data-step={getStep(index)}
-                className="border-border text-muted-foreground flex size-6 shrink-0 items-center justify-center rounded-md border text-xs font-semibold before:content-[attr(data-step)]"
-              />
-              <div className="grid gap-1">
-                <span className="text-foreground text-sm font-semibold [overflow-wrap:anywhere]">
-                  {item.label}
+            <div className="grid gap-1">
+              <span className="text-foreground text-sm font-semibold [overflow-wrap:anywhere]">
+                {item.label}
+              </span>
+              {item.value ? (
+                <span className="text-muted-foreground text-xs [overflow-wrap:anywhere]">
+                  {item.value}
                 </span>
-                {item.value ? (
-                  <span className="text-muted-foreground text-xs [overflow-wrap:anywhere]">
-                    {item.value}
-                  </span>
-                ) : null}
-                <MarkerBadges markers={item.markers} compact />
-              </div>
+              ) : null}
+              <MarkerBadges markers={item.markers} compact />
             </div>
           </li>
         ))}
@@ -212,7 +190,7 @@ function StateMachineVisual({
           </Badge>
         ))}
       </div>
-      <ul role="list" className="grid gap-3 md:grid-cols-2">
+      <ul role="list" className="grid list-none gap-3 md:grid-cols-2">
         {transitions.map((transition, index) => (
           <li
             key={`${transition.from}-${transition.to}-${index}`}
@@ -252,15 +230,18 @@ function MarkerBadges({
   }
 
   return (
-    <ul aria-label="표식" className="flex flex-wrap gap-2">
-      {markers.map((marker) => (
-        <li key={marker}>
+    <ul aria-label="표식" className="flex flex-wrap items-center gap-2">
+      {markers.map((marker, index) => (
+        <li key={marker} className="flex items-center gap-2">
           <Badge
             variant="outline"
             className={cn("rounded-md", compact ? "text-[11px]" : "text-xs")}
           >
             {markerLabel[marker]}
           </Badge>
+          {index < markers.length - 1 ? (
+            <span className="text-muted-foreground text-xs">·</span>
+          ) : null}
         </li>
       ))}
     </ul>
