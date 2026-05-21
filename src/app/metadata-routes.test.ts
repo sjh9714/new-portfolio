@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { metadata as blogMetadata } from "./blog/page";
 import robots from "./robots";
 import sitemap from "./sitemap";
-import { featuredProjects } from "@/content/projects";
+import { featuredPortfolioCases } from "@/content/portfolio-cases";
 
 describe("metadata routes", () => {
   it("uses NEXT_PUBLIC_SITE_URL for robots and sitemap", () => {
@@ -17,8 +17,9 @@ describe("metadata routes", () => {
         "https://portfolio.example/projects",
         "https://portfolio.example/resume",
         "https://portfolio.example/about",
-        ...featuredProjects.map(
-          (project) => `https://portfolio.example/case-studies/${project.slug}`,
+        ...featuredPortfolioCases.map(
+          (portfolioCase) =>
+            `https://portfolio.example/case-studies/${portfolioCase.slug}`,
         ),
       ]),
     );

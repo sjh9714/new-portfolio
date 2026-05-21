@@ -7,7 +7,8 @@ import { ProjectRow } from "@/components/project-card";
 import { SectionHeader } from "@/components/section-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { additionalProjects, featuredProjects } from "@/content/projects";
+import { featuredPortfolioCases } from "@/content/portfolio-cases";
+import { additionalProjects, getProjectBySlug } from "@/content/projects";
 import { profile } from "@/content/profile";
 
 export const metadata: Metadata = {
@@ -104,11 +105,47 @@ export default function ResumePage() {
       </section>
 
       <section className="flex flex-col gap-5">
-        <SectionHeader title="대표 프로젝트" />
+        <SectionHeader
+          title="대표 문제 해결 문장"
+          description="이력서의 한 줄이 포트폴리오 상세 문서로 이어지도록 구성했습니다."
+        />
         <div className="border-border border-y">
-          {featuredProjects.map((project) => (
-            <ProjectRow key={project.slug} project={project} />
-          ))}
+          {featuredPortfolioCases.map((portfolioCase) => {
+            const project = getProjectBySlug(portfolioCase.projectSlug);
+
+            if (!project) {
+              return null;
+            }
+
+            return (
+              <article
+                key={portfolioCase.slug}
+                className="border-border grid gap-4 border-b py-5 last:border-b-0 lg:grid-cols-[1fr_2.4fr_1fr] lg:items-start"
+              >
+                <div>
+                  <h3 className="text-foreground font-semibold">
+                    {project.title}
+                  </h3>
+                  <p className="text-muted-foreground text-sm">
+                    {portfolioCase.domain}
+                  </p>
+                  <p className="text-muted-foreground mt-2 text-xs">
+                    {project.team ?? project.role}
+                  </p>
+                </div>
+                <p className="text-foreground text-sm leading-7 [overflow-wrap:anywhere]">
+                  {portfolioCase.resumeLine}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {project.primaryTechStack.map((tech) => (
+                    <Badge key={tech} variant="outline" className="rounded-md">
+                      {tech}
+                    </Badge>
+                  ))}
+                </div>
+              </article>
+            );
+          })}
         </div>
       </section>
 

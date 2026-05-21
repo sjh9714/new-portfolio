@@ -45,7 +45,11 @@ const sourceFilesWithPublicCopy = [
   "src/app/resume/page.tsx",
   "src/app/sitemap.ts",
   "src/components/architecture-diagram/index.tsx",
+  "src/components/case-study-article.tsx",
+  "src/components/portfolio-case-card.tsx",
+  "src/components/portfolio-case-diagram.tsx",
   "src/components/evidence-matrix.tsx",
+  "src/content/portfolio-cases.ts",
   "src/content/architecture-diagrams.ts",
   "src/content/case-studies/concert-booking.mdx",
   "src/content/case-studies/realtime-chat.mdx",
@@ -67,17 +71,17 @@ const legacyPublicStrings = [
 ];
 
 describe("portfolio project content", () => {
-  it("uses the selected four featured backend case studies", () => {
+  it("keeps only project records with active top-level project weight as featured", () => {
     expect(featuredProjects.map((project) => project.slug)).toEqual([
       "concert-booking",
       "realtime-chat",
       "ai-usage-billing-gateway",
-      "msa-shop",
     ]);
   });
 
   it("groups the remaining real projects as additional or archive", () => {
     expect(additionalProjects.map((project) => project.slug)).toEqual([
+      "msa-shop",
       "timedeal-service",
       "borrow-me",
       "running-app",
@@ -143,6 +147,11 @@ describe("portfolio project content", () => {
       expect(homeSource).not.toContain("blogTopics");
     }
     expect(homeSource).toContain("핵심 검증 근거");
+    expect(homeSource).toContain(
+      "이 포트폴리오는 이력서에 한 줄로 압축한 문제 해결 경험을 구조도, 문제 원인, 해결 과정, 검증 결과로 확장한 문서입니다.",
+    );
+    expect(homeSource).toContain("이력서 한 줄을 확장한 문제 해결 포트폴리오");
+    expect(homeSource).toContain("featuredPortfolioCases");
     expect(homeSource).toContain('evidenceLabel: "동일 좌석 경합"');
     expect(homeSource).toContain('evidenceLabel: "채팅방 조회 API RPS"');
     expect(homeSource).toContain('evidenceLabel: "사용량 중복 처리"');
@@ -172,6 +181,7 @@ describe("portfolio project content", () => {
     expect(caseStudySource).toContain("lg:sticky");
     expect(caseStudySource).toContain("근거");
     expect(caseStudySource).toContain("기술 스택");
+    expect(caseStudySource).toContain("측정 환경");
     expect(caseStudySource).toContain("한계와 다음 검증");
     expect(caseStudySource).toContain("예상 면접 질문");
   });

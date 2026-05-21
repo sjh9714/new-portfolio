@@ -1,31 +1,37 @@
-import { MDXRemote } from "next-mdx-remote/rsc";
-
-import { ArchitectureDiagram } from "@/components/architecture-diagram";
+import { PortfolioCaseDiagram } from "@/components/portfolio-case-diagram";
 import { StatusBadge } from "@/components/status-badge";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import type { PortfolioCase } from "@/content/portfolio-cases";
 import type { Project } from "@/content/projects";
 
 export function CaseStudyArticle({
+  portfolioCase,
   project,
-  mdxSource,
 }: {
+  portfolioCase: PortfolioCase;
   project: Project;
-  mdxSource: string;
 }) {
   return (
     <article className="mx-auto flex max-w-7xl flex-col gap-10 px-5 py-12 md:px-8 md:py-16">
       <header className="border-border flex flex-col gap-6 border-b pb-10">
         <div className="flex flex-col gap-3">
           <p className="text-muted-foreground text-sm font-semibold tracking-[0.18em] uppercase">
-            문제 해결 사례 / {project.domain}
+            문제 해결 포트폴리오 / {portfolioCase.domain}
           </p>
-          <h1 className="text-foreground max-w-4xl text-4xl font-bold tracking-tight md:text-6xl">
-            {project.title}
+          <h1 className="text-foreground max-w-5xl text-4xl leading-tight font-bold tracking-tight md:text-6xl">
+            {portfolioCase.title}
           </h1>
-          <p className="text-muted-foreground max-w-3xl text-lg leading-8">
-            {project.subtitle}
+          <p className="text-muted-foreground max-w-4xl text-lg leading-8">
+            {portfolioCase.resumeLine}
           </p>
+        </div>
+        <div className="grid gap-3 md:grid-cols-3">
+          <MetaItem label="프로젝트" value={project.title} />
+          <MetaItem label="참여" value={project.team ?? project.role} />
+          {project.period ? (
+            <MetaItem label="기간" value={project.period} />
+          ) : null}
         </div>
         <div className="flex flex-wrap gap-2">
           {project.primaryTechStack.map((tech) => (
@@ -36,34 +42,118 @@ export function CaseStudyArticle({
         </div>
       </header>
 
-      <div className="grid gap-10 lg:grid-cols-[minmax(0,780px)_340px] lg:items-start">
-        <section className="case-study-mdx min-w-0">
-          <MDXRemote
-            source={mdxSource}
-            components={{
-              ArchitectureDiagram: () => (
-                <ArchitectureDiagram slug={project.slug} />
-              ),
-            }}
-          />
+      <div className="grid gap-10 lg:grid-cols-[minmax(0,800px)_340px] lg:items-start">
+        <section className="flex min-w-0 flex-col gap-8">
+          <PortfolioCaseDiagram portfolioCase={portfolioCase} />
+
+          <section className="grid gap-4">
+            <SummaryBlock title="문제" items={portfolioCase.problem} />
+            <SummaryBlock title="해결" items={portfolioCase.solution} />
+            <SummaryBlock title="결과" items={portfolioCase.result} />
+          </section>
+
+          <EvidenceSection portfolioCase={portfolioCase} />
+
+          <ContentSection title="상세 구현">
+            <OrderedList items={portfolioCase.implementationDetails} />
+          </ContentSection>
+
+          <ContentSection title="한계와 다음 검증">
+            <OrderedList items={portfolioCase.limitations} />
+          </ContentSection>
+
+          <ContentSection title="예상 면접 질문">
+            <OrderedList items={portfolioCase.interviewQuestions} />
+          </ContentSection>
         </section>
 
-        <CaseStudySidebar project={project} />
+        <CaseStudySidebar portfolioCase={portfolioCase} project={project} />
       </div>
     </article>
   );
 }
 
-function CaseStudySidebar({ project }: { project: Project }) {
+function MetaItem({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="border-border bg-card rounded-md border p-4">
+      <p className="text-primary text-xs font-semibold">{label}</p>
+      <p className="text-foreground mt-2 text-sm leading-6 [overflow-wrap:anywhere]">
+        {value}
+      </p>
+    </div>
+  );
+}
+
+function SummaryBlock({ title, items }: { title: string; items: string[] }) {
+  return (
+    <section className="border-border bg-card rounded-md border p-5">
+      <h2 className="text-foreground text-xl font-semibold">{title}</h2>
+      <OrderedList items={items} />
+    </section>
+  );
+}
+
+function EvidenceSection({ portfolioCase }: { portfolioCase: PortfolioCase }) {
+  return (
+    <ContentSection title="검증 근거 / 측정 환경">
+      <div className="grid gap-3">
+        {portfolioCase.evidence.map((evidence) => (
+          <div
+            key={evidence.label}
+            className="border-border bg-card rounded-md border p-4"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <h3 className="text-foreground font-semibold [overflow-wrap:anywhere]">
+                {evidence.label}
+              </h3>
+              <StatusBadge status={evidence.status} />
+            </div>
+            <p className="text-muted-foreground mt-2 text-sm leading-6 [overflow-wrap:anywhere]">
+              {evidence.value}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      {portfolioCase.measurementEnvironment?.length ? (
+        <div className="border-border bg-card mt-4 rounded-md border p-4">
+          <h3 className="text-foreground font-semibold">측정 환경</h3>
+          <dl className="mt-3 grid gap-3">
+            {portfolioCase.measurementEnvironment.map((item) => (
+              <div
+                key={item.label}
+                className="grid gap-1 sm:grid-cols-[140px_1fr]"
+              >
+                <dt className="text-primary text-sm font-semibold">
+                  {item.label}
+                </dt>
+                <dd className="text-muted-foreground text-sm leading-6 [overflow-wrap:anywhere]">
+                  {item.value}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      ) : null}
+    </ContentSection>
+  );
+}
+
+function CaseStudySidebar({
+  portfolioCase,
+  project,
+}: {
+  portfolioCase: PortfolioCase;
+  project: Project;
+}) {
   return (
     <aside
-      aria-label={`${project.title} 근거 요약`}
+      aria-label={`${portfolioCase.title} 근거 요약`}
       className="border-border bg-card flex flex-col gap-6 rounded-md border p-5 lg:sticky lg:top-6"
     >
-      <div className="flex flex-col gap-3">
-        <p className="text-primary text-sm font-semibold">근거</p>
+      <SidebarSection title="근거">
         <div className="flex flex-col gap-3">
-          {project.evidence.map((evidence) => (
+          {portfolioCase.evidence.map((evidence) => (
             <div
               key={evidence.label}
               className="border-border bg-background rounded-md border p-3"
@@ -80,7 +170,7 @@ function CaseStudySidebar({ project }: { project: Project }) {
             </div>
           ))}
         </div>
-      </div>
+      </SidebarSection>
 
       <SidebarSection title="기술 스택">
         <div className="flex flex-wrap gap-2">
@@ -92,12 +182,18 @@ function CaseStudySidebar({ project }: { project: Project }) {
         </div>
       </SidebarSection>
 
+      {portfolioCase.measurementEnvironment?.length ? (
+        <SidebarSection title="측정 환경">
+          <SidebarDefinitionList items={portfolioCase.measurementEnvironment} />
+        </SidebarSection>
+      ) : null}
+
       <SidebarSection title="한계와 다음 검증">
-        <SidebarList items={project.limitations} />
+        <SidebarList items={portfolioCase.limitations} />
       </SidebarSection>
 
       <SidebarSection title="예상 면접 질문">
-        <SidebarList items={project.interviewQuestions} />
+        <SidebarList items={portfolioCase.interviewQuestions} />
       </SidebarSection>
 
       <Button asChild className="w-full">
@@ -106,6 +202,23 @@ function CaseStudySidebar({ project }: { project: Project }) {
         </a>
       </Button>
     </aside>
+  );
+}
+
+function ContentSection({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="flex flex-col gap-4">
+      <h2 className="text-foreground text-2xl font-semibold tracking-tight">
+        {title}
+      </h2>
+      {children}
+    </section>
   );
 }
 
@@ -124,6 +237,18 @@ function SidebarSection({
   );
 }
 
+function OrderedList({ items }: { items: string[] }) {
+  return (
+    <ol className="text-muted-foreground mt-4 flex list-decimal flex-col gap-2 pl-5 text-sm leading-7">
+      {items.map((item) => (
+        <li key={item} className="[overflow-wrap:anywhere]">
+          {item}
+        </li>
+      ))}
+    </ol>
+  );
+}
+
 function SidebarList({ items }: { items: string[] }) {
   return (
     <ul className="text-muted-foreground flex flex-col gap-2 text-xs leading-5">
@@ -137,5 +262,22 @@ function SidebarList({ items }: { items: string[] }) {
         </li>
       ))}
     </ul>
+  );
+}
+
+function SidebarDefinitionList({
+  items,
+}: {
+  items: { label: string; value: string }[];
+}) {
+  return (
+    <dl className="text-muted-foreground flex flex-col gap-2 text-xs leading-5">
+      {items.map((item) => (
+        <div key={item.label} className="flex flex-col gap-1">
+          <dt className="text-foreground font-semibold">{item.label}</dt>
+          <dd className="[overflow-wrap:anywhere]">{item.value}</dd>
+        </div>
+      ))}
+    </dl>
   );
 }

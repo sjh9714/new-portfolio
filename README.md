@@ -6,11 +6,11 @@
 - GitHub: [github.com/sjh9714](https://github.com/sjh9714)
 - 이메일: [jinhyuk9714@gmail.com](mailto:jinhyuk9714@gmail.com)
 
-한국 백엔드 채용용으로 Java/Spring 프로젝트를 문제 해결 사례, 구조도, 검증 근거 중심으로 보여주는 포트폴리오 사이트입니다.
+한국 백엔드 채용용으로 Java/Spring 프로젝트를 프로젝트 전시장이 아니라 “이력서 한 줄을 확장한 문제 해결 문서”로 보여주는 포트폴리오 사이트입니다.
 
 ## Positioning
 
-동시성, 이벤트 정합성, 실시간 메시징, 과금/정산 도메인을 테스트와 수치로 검증하는 Java/Spring 백엔드 개발자 포트폴리오입니다.
+동시성, 이벤트 정합성, 실시간 메시징, 과금/정산 도메인을 테스트와 수치로 검증하는 Java/Spring 백엔드 개발자 포트폴리오입니다. 대표 상세 페이지는 프로젝트명이 아니라 문제, 해결, 결과, 도메인이 보이는 이력서 문장을 제목으로 사용합니다.
 
 ## Stack
 
@@ -18,7 +18,7 @@
 - TypeScript
 - Tailwind CSS
 - shadcn/ui primitives
-- MDX case-study prose
+- Structured portfolio case content
 - Vitest content guard tests
 
 ## Local Development
@@ -70,7 +70,8 @@ The production site is deployed on Vercel from the `main` branch.
 
 ## Content Rule
 
-All project evidence is sourced from `src/content/projects.ts`.
+Project catalog evidence is sourced from `src/content/projects.ts`.
+Representative case-study pages are sourced from `src/content/portfolio-cases.ts` and reuse only committed project evidence.
 
 - `측정 완료` (`measured`): numeric result measured with tools.
 - `시나리오 검증` (`verified`): repeatable scenario or integration verification.

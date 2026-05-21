@@ -14,15 +14,13 @@ import Link from "next/link";
 
 import { EvidenceMatrix } from "@/components/evidence-matrix";
 import { FocusCard } from "@/components/focus-card";
-import { ProjectCard, ProjectRow } from "@/components/project-card";
+import { PortfolioCaseCard } from "@/components/portfolio-case-card";
+import { ProjectRow } from "@/components/project-card";
 import { SectionHeader } from "@/components/section-header";
 import { StatusBadge } from "@/components/status-badge";
 import { Button } from "@/components/ui/button";
-import {
-  additionalProjects,
-  featuredProjects,
-  getProjectBySlug,
-} from "@/content/projects";
+import { featuredPortfolioCases } from "@/content/portfolio-cases";
+import { additionalProjects, getProjectBySlug } from "@/content/projects";
 import { profile } from "@/content/profile";
 
 const focusCards = [
@@ -119,6 +117,9 @@ const snapshotItems = [
   };
 });
 
+const portfolioPurpose =
+  "이 포트폴리오는 이력서에 한 줄로 압축한 문제 해결 경험을 구조도, 문제 원인, 해결 과정, 검증 결과로 확장한 문서입니다.";
+
 export default function Home() {
   return (
     <div className="bg-background">
@@ -134,6 +135,9 @@ export default function Home() {
               </h1>
               <p className="text-muted-foreground max-w-3xl text-xl leading-9">
                 {profile.headline}
+              </p>
+              <p className="text-muted-foreground max-w-3xl text-base leading-7">
+                {portfolioPurpose}
               </p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">
@@ -223,27 +227,40 @@ export default function Home() {
       </section>
 
       <div className="mx-auto flex max-w-7xl flex-col gap-16 px-5 py-12 md:px-8 md:py-16">
-        <section className="border-border bg-border grid gap-px overflow-hidden border md:grid-cols-4">
-          {focusCards.map((card) => (
-            <FocusCard key={card.title} {...card} />
-          ))}
-        </section>
-
         <section className="flex flex-col gap-6">
           <SectionHeader
-            title="대표 문제 해결 사례"
-            description="면접 질문을 유도할 4개 문제 해결 사례를 먼저 읽히도록 구성했습니다."
+            title="이력서 한 줄을 확장한 문제 해결 포트폴리오"
+            description="프로젝트명이 아니라 문제, 해결, 결과, 도메인이 보이는 이력서 문장을 기준으로 5개 대표 사례를 먼저 읽히도록 구성했습니다."
             action={
               <Button asChild variant="ghost">
                 <Link href="/case-studies">전체 사례 보기</Link>
               </Button>
             }
           />
-          <div className="grid gap-4 md:grid-cols-2">
-            {featuredProjects.map((project) => (
-              <ProjectCard key={project.slug} project={project} />
-            ))}
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {featuredPortfolioCases.map((portfolioCase, index) => {
+              const project = getProjectBySlug(portfolioCase.projectSlug);
+
+              if (!project) {
+                return null;
+              }
+
+              return (
+                <PortfolioCaseCard
+                  key={portfolioCase.slug}
+                  portfolioCase={portfolioCase}
+                  project={project}
+                  rank={index + 1}
+                />
+              );
+            })}
           </div>
+        </section>
+
+        <section className="border-border bg-border grid gap-px overflow-hidden border md:grid-cols-4">
+          {focusCards.map((card) => (
+            <FocusCard key={card.title} {...card} />
+          ))}
         </section>
 
         <section className="flex flex-col gap-6">

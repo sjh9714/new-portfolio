@@ -2,18 +2,18 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { featuredProjects } from "./projects";
 import { architectureDiagrams } from "./architecture-diagrams";
+import { getProjectBySlug } from "./projects";
 
 const legacyDeadReplayLabel = ["DEAD 상태와", "수동 재처리"].join(" ");
 const legacyCompensationLabel = ["결제 실패", "보상"].join(" ");
 const legacyRelayRetryLabel = ["relay", "재시도"].join(" ");
 
 describe("architecture diagram content", () => {
-  it("defines a diagram for every featured project", () => {
-    expect(Object.keys(architectureDiagrams).sort()).toEqual(
-      featuredProjects.map((project) => project.slug).sort(),
-    );
+  it("keeps every legacy architecture diagram connected to an existing project", () => {
+    for (const slug of Object.keys(architectureDiagrams)) {
+      expect(getProjectBySlug(slug)).toBeDefined();
+    }
   });
 
   it("only references existing nodes from edges and boundaries", () => {
@@ -41,10 +41,12 @@ describe("architecture diagram content", () => {
   });
 
   it("maps diagram evidence labels to project evidence and keeps pending markers honest", () => {
-    for (const project of featuredProjects) {
-      const diagram = architectureDiagrams[project.slug];
+    for (const diagram of Object.values(architectureDiagrams)) {
+      const project = getProjectBySlug(diagram.slug);
+      expect(project).toBeDefined();
+
       const evidenceByLabel = new Map(
-        project.evidence.map((evidence) => [evidence.label, evidence.status]),
+        project?.evidence.map((evidence) => [evidence.label, evidence.status]),
       );
       const evidenceLabels = [
         ...diagram.nodes.flatMap((node) =>
@@ -59,7 +61,7 @@ describe("architecture diagram content", () => {
       ];
 
       for (const label of evidenceLabels) {
-        expect(evidenceByLabel.has(label), `${project.slug}:${label}`).toBe(
+        expect(evidenceByLabel.has(label), `${diagram.slug}:${label}`).toBe(
           true,
         );
       }

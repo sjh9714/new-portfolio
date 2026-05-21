@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 
-import { ProjectCard, ProjectRow } from "@/components/project-card";
+import { PortfolioCaseCard } from "@/components/portfolio-case-card";
+import { ProjectRow } from "@/components/project-card";
 import { SectionHeader } from "@/components/section-header";
+import { featuredPortfolioCases } from "@/content/portfolio-cases";
 import {
   additionalProjects,
   archiveProjects,
-  featuredProjects,
+  getProjectBySlug,
 } from "@/content/projects";
 
 export const metadata: Metadata = {
@@ -23,13 +25,26 @@ export default function ProjectsPage() {
       />
       <section className="flex flex-col gap-5">
         <SectionHeader
-          title="대표 문제 해결 사례"
-          description="면접에서 깊게 질문받기 좋은 4개 사례입니다."
+          title="문제 해결 포트폴리오"
+          description="이력서 한 줄을 구조도와 검증 결과로 확장한 5개 대표 사례입니다."
         />
-        <div className="grid gap-4 lg:grid-cols-2">
-          {featuredProjects.map((project) => (
-            <ProjectCard key={project.slug} project={project} />
-          ))}
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {featuredPortfolioCases.map((portfolioCase, index) => {
+            const project = getProjectBySlug(portfolioCase.projectSlug);
+
+            if (!project) {
+              return null;
+            }
+
+            return (
+              <PortfolioCaseCard
+                key={portfolioCase.slug}
+                portfolioCase={portfolioCase}
+                project={project}
+                rank={index + 1}
+              />
+            );
+          })}
         </div>
       </section>
 

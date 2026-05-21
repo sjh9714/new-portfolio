@@ -1,49 +1,68 @@
-import { readFile } from "node:fs/promises";
-import path from "node:path";
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 import { CaseStudyArticle } from "@/components/case-study-article";
-import { featuredProjects, getProjectBySlug } from "@/content/projects";
+import {
+  featuredPortfolioCases,
+  getPortfolioCaseBySlug,
+  legacyCaseStudyAliases,
+} from "@/content/portfolio-cases";
+import { getProjectBySlug } from "@/content/projects";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
 export function generateStaticParams() {
-  return featuredProjects.map((project) => ({ slug: project.slug }));
+  return featuredPortfolioCases.map((portfolioCase) => ({
+    slug: portfolioCase.slug,
+  }));
 }
 
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const project = getProjectBySlug(slug);
+  const resolvedSlug = legacyCaseStudyAliases[slug] ?? slug;
+  const portfolioCase = resolvedSlug.startsWith("/")
+    ? undefined
+    : getPortfolioCaseBySlug(resolvedSlug);
 
-  if (!project || project.category !== "featured") {
+  if (!portfolioCase) {
     return {
       title: "문제 해결 사례",
     };
   }
 
   return {
-    title: project.title,
-    description: project.result,
+    title: portfolioCase.title,
+    description: portfolioCase.resumeLine,
   };
 }
 
 export default async function CaseStudyPage({ params }: PageProps) {
   const { slug } = await params;
-  const project = getProjectBySlug(slug);
+  const alias = legacyCaseStudyAliases[slug];
 
-  if (!project || project.category !== "featured") {
+  if (alias?.startsWith("/")) {
+    redirect(alias);
+  }
+
+  if (alias) {
+    redirect(`/case-studies/${alias}`);
+  }
+
+  const portfolioCase = getPortfolioCaseBySlug(slug);
+
+  if (!portfolioCase) {
     notFound();
   }
 
-  const mdxSource = await readFile(
-    path.join(process.cwd(), "src", "content", "case-studies", `${slug}.mdx`),
-    "utf8",
-  );
+  const project = getProjectBySlug(portfolioCase.projectSlug);
 
-  return <CaseStudyArticle project={project} mdxSource={mdxSource} />;
+  if (!project) {
+    notFound();
+  }
+
+  return <CaseStudyArticle portfolioCase={portfolioCase} project={project} />;
 }

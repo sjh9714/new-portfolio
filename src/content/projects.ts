@@ -13,6 +13,7 @@ export type Project = {
   title: string;
   subtitle: string;
   role: string;
+  team?: string;
   period?: string;
   repoUrl: string;
   category: ProjectCategory;
@@ -34,6 +35,7 @@ export const projects: Project[] = [
     title: "Concert Booking",
     subtitle: "고동시성 콘서트 예매 정합성 백엔드",
     role: "Personal backend project",
+    team: "개인 / BE 1",
     repoUrl: "https://github.com/sjh9714/concert-booking",
     category: "featured",
     domain: "Ticketing / Reservation",
@@ -102,6 +104,7 @@ export const projects: Project[] = [
     title: "Realtime Chat",
     subtitle: "Kafka/Redis 기반 다중 인스턴스 채팅 정합성",
     role: "Personal backend project",
+    team: "개인 / BE 1",
     repoUrl: "https://github.com/sjh9714/realtime-chat",
     category: "featured",
     domain: "Realtime Messaging",
@@ -172,6 +175,7 @@ export const projects: Project[] = [
     title: "AI Usage Billing Gateway",
     subtitle: "멀티테넌트 SaaS 사용량 과금 게이트웨이",
     role: "Personal backend project",
+    team: "개인 / BE 1",
     repoUrl: "https://github.com/sjh9714/ai-usage-billing-gateway",
     category: "featured",
     domain: "Billing / Multi-tenant Security",
@@ -250,8 +254,9 @@ export const projects: Project[] = [
     title: "MSA Shop",
     subtitle: "SAGA·Outbox 기반 쇼핑몰 주문 보상 흐름 실험",
     role: "Personal backend project",
+    team: "개인 학습 프로젝트",
     repoUrl: "https://github.com/sjh9714/msa-shop",
-    category: "featured",
+    category: "additional",
     domain: "Commerce / Distributed Transaction",
     problem:
       "서비스가 User, Product, Order, Payment, Settlement로 나뉠 때 주문 실패와 결제 성공 이후 저장 실패를 하나의 DB transaction처럼 처리할 수 없음",
@@ -371,6 +376,7 @@ export const projects: Project[] = [
     title: "BorrowMe",
     subtitle: "대학생 물건 대여 예약·검색·소셜 API",
     role: "11인 팀 프로젝트",
+    team: "11인 팀 프로젝트",
     repoUrl: "https://github.com/sjh9714/borrow_me",
     category: "additional",
     domain: "Rental / Team Project",
