@@ -57,14 +57,6 @@ export function CaseStudyArticle({
           <ContentSection title="상세 구현">
             <OrderedList items={portfolioCase.implementationDetails} />
           </ContentSection>
-
-          <ContentSection title="한계와 다음 검증">
-            <OrderedList items={portfolioCase.limitations} />
-          </ContentSection>
-
-          <ContentSection title="예상 면접 질문">
-            <OrderedList items={portfolioCase.interviewQuestions} />
-          </ContentSection>
         </section>
 
         <CaseStudySidebar portfolioCase={portfolioCase} project={project} />
@@ -94,8 +86,12 @@ function SummaryBlock({ title, items }: { title: string; items: string[] }) {
 }
 
 function EvidenceSection({ portfolioCase }: { portfolioCase: PortfolioCase }) {
+  const scenarios = portfolioCase.measurement?.scenarios ?? [];
+  const executionEnvironment =
+    portfolioCase.measurement?.executionEnvironment ?? [];
+
   return (
-    <ContentSection title="검증 근거 / 측정 환경">
+    <ContentSection title="검증 근거 / 측정 정보">
       <div className="grid gap-3">
         {portfolioCase.evidence.map((evidence) => (
           <div
@@ -115,25 +111,12 @@ function EvidenceSection({ portfolioCase }: { portfolioCase: PortfolioCase }) {
         ))}
       </div>
 
-      {portfolioCase.measurementEnvironment?.length ? (
-        <div className="border-border bg-card mt-4 rounded-md border p-4">
-          <h3 className="text-foreground font-semibold">측정 환경</h3>
-          <dl className="mt-3 grid gap-3">
-            {portfolioCase.measurementEnvironment.map((item) => (
-              <div
-                key={item.label}
-                className="grid gap-1 sm:grid-cols-[140px_1fr]"
-              >
-                <dt className="text-primary text-sm font-semibold">
-                  {item.label}
-                </dt>
-                <dd className="text-muted-foreground text-sm leading-6 [overflow-wrap:anywhere]">
-                  {item.value}
-                </dd>
-              </div>
-            ))}
-          </dl>
-        </div>
+      {scenarios.length ? (
+        <MeasurementList title="측정 시나리오" items={scenarios} />
+      ) : null}
+
+      {executionEnvironment.length ? (
+        <MeasurementList title="실행 환경" items={executionEnvironment} />
       ) : null}
     </ContentSection>
   );
@@ -148,30 +131,9 @@ function CaseStudySidebar({
 }) {
   return (
     <aside
-      aria-label={`${portfolioCase.title} 근거 요약`}
+      aria-label={`${portfolioCase.title} 요약`}
       className="border-border bg-card flex flex-col gap-6 rounded-md border p-5 lg:sticky lg:top-6"
     >
-      <SidebarSection title="근거">
-        <div className="flex flex-col gap-3">
-          {portfolioCase.evidence.map((evidence) => (
-            <div
-              key={evidence.label}
-              className="border-border bg-background rounded-md border p-3"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <h2 className="text-foreground text-sm leading-6 font-semibold [overflow-wrap:anywhere]">
-                  {evidence.label}
-                </h2>
-                <StatusBadge status={evidence.status} />
-              </div>
-              <p className="text-muted-foreground mt-2 text-xs leading-5 [overflow-wrap:anywhere]">
-                {evidence.value}
-              </p>
-            </div>
-          ))}
-        </div>
-      </SidebarSection>
-
       <SidebarSection title="기술 스택">
         <div className="flex flex-wrap gap-2">
           {project.primaryTechStack.map((tech) => (
@@ -181,12 +143,6 @@ function CaseStudySidebar({
           ))}
         </div>
       </SidebarSection>
-
-      {portfolioCase.measurementEnvironment?.length ? (
-        <SidebarSection title="측정 환경">
-          <SidebarDefinitionList items={portfolioCase.measurementEnvironment} />
-        </SidebarSection>
-      ) : null}
 
       <SidebarSection title="한계와 다음 검증">
         <SidebarList items={portfolioCase.limitations} />
@@ -202,6 +158,30 @@ function CaseStudySidebar({
         </a>
       </Button>
     </aside>
+  );
+}
+
+function MeasurementList({
+  title,
+  items,
+}: {
+  title: string;
+  items: { label: string; value: string }[];
+}) {
+  return (
+    <div className="border-border bg-card mt-4 rounded-md border p-4">
+      <h3 className="text-foreground font-semibold">{title}</h3>
+      <dl className="mt-3 grid gap-3">
+        {items.map((item) => (
+          <div key={item.label} className="grid gap-1 sm:grid-cols-[160px_1fr]">
+            <dt className="text-primary text-sm font-semibold">{item.label}</dt>
+            <dd className="text-muted-foreground text-sm leading-6 [overflow-wrap:anywhere]">
+              {item.value}
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </div>
   );
 }
 
@@ -262,22 +242,5 @@ function SidebarList({ items }: { items: string[] }) {
         </li>
       ))}
     </ul>
-  );
-}
-
-function SidebarDefinitionList({
-  items,
-}: {
-  items: { label: string; value: string }[];
-}) {
-  return (
-    <dl className="text-muted-foreground flex flex-col gap-2 text-xs leading-5">
-      {items.map((item) => (
-        <div key={item.label} className="flex flex-col gap-1">
-          <dt className="text-foreground font-semibold">{item.label}</dt>
-          <dd className="[overflow-wrap:anywhere]">{item.value}</dd>
-        </div>
-      ))}
-    </dl>
   );
 }

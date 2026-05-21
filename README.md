@@ -66,7 +66,7 @@ The production site is deployed on Vercel from the `main` branch.
 
 - Description: `Java/Spring 백엔드 포트폴리오 - 동시성, 이벤트 정합성, 실시간 메시징, 과금/정산 사례를 수치와 테스트로 정리한 사이트`
 - Website: `https://new-portfolio-smoky-one-41.vercel.app`
-- Topics: `backend`, `portfolio`, `java`, `spring-boot`, `kafka`, `redis`, `postgresql`, `testcontainers`, `k6`, `event-driven`, `idempotency`, `outbox-pattern`, `nextjs`
+- Topics: `backend`, `portfolio`, `java`, `spring-boot`, `kafka`, `redis`, `postgresql`, `testcontainers`, `k6`, `event-driven`, `idempotency`, `outbox-pattern`, `websocket`, `nextjs`
 
 ## Content Rule
 

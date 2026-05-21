@@ -9,6 +9,11 @@ export type MeasurementEnvironmentItem = {
   value: string;
 };
 
+export type PortfolioCaseMeasurement = {
+  scenarios?: MeasurementEnvironmentItem[];
+  executionEnvironment?: MeasurementEnvironmentItem[];
+};
+
 export type PortfolioDiagramMarker =
   | "transaction"
   | "async"
@@ -61,7 +66,7 @@ export type PortfolioCase = {
   solution: string[];
   result: string[];
   evidence: ProjectEvidence[];
-  measurementEnvironment?: MeasurementEnvironmentItem[];
+  measurement?: PortfolioCaseMeasurement;
   implementationDetails: string[];
   limitations: string[];
   interviewQuestions: string[];
@@ -122,16 +127,18 @@ export const featuredPortfolioCases: PortfolioCase[] = [
       "분산 좌석 예약",
       "Testcontainers 검증 시나리오",
     ]),
-    measurementEnvironment: [
-      {
-        label: "동일 좌석 경합 시나리오",
-        value: "동일 좌석 100 concurrent requests",
-      },
-      {
-        label: "분산 좌석 예약 시나리오",
-        value: "서로 다른 좌석 50명 동시 예약",
-      },
-    ],
+    measurement: {
+      scenarios: [
+        {
+          label: "동일 좌석 경합 시나리오",
+          value: "동일 좌석 100 concurrent requests",
+        },
+        {
+          label: "분산 좌석 예약 시나리오",
+          value: "서로 다른 좌석 50명 동시 예약",
+        },
+      ],
+    },
     implementationDetails: [
       "좌석 경합은 DB transaction 안의 락과 idempotency check가 같은 경계에 있도록 정리했습니다.",
       "Redis는 빠른 조회와 queue 역할을 맡지만 좌석/예약 상태의 최종 기준 데이터로 두지 않았습니다.",
@@ -465,16 +472,18 @@ export const featuredPortfolioCases: PortfolioCase[] = [
       "메시지 전달 지연 시간",
       "WebSocket 전달 완전성",
     ]),
-    measurementEnvironment: [
-      {
-        label: "조회 API 시나리오",
-        value: "채팅방 조회 API 개선 전후 비교",
-      },
-      {
-        label: "쿼리 수 변화",
-        value: "2N+1회 -> 1회",
-      },
-    ],
+    measurement: {
+      scenarios: [
+        {
+          label: "조회 API 시나리오",
+          value: "채팅방 조회 API 개선 전후 비교",
+        },
+        {
+          label: "쿼리 수 변화",
+          value: "2N+1회 -> 1회",
+        },
+      ],
+    },
     implementationDetails: [
       "조회 성능 사례는 WebSocket delivery 성능과 분리해 API 병목 개선으로 설명합니다.",
       "roomId 기반 Kafka ordering, Redis presence, reconnect sync는 프로젝트 맥락으로 연결하되 측정하지 않은 지표는 pending으로 둡니다.",
@@ -751,16 +760,18 @@ export const featuredPortfolioCases: PortfolioCase[] = [
       "쿼리 수",
       "예약 정합성",
     ]),
-    measurementEnvironment: [
-      {
-        label: "조회 API 시나리오",
-        value: "상품 목록 조회 API 개선 전후 비교",
-      },
-      {
-        label: "쿼리 수 변화",
-        value: "201 queries -> 3 queries",
-      },
-    ],
+    measurement: {
+      scenarios: [
+        {
+          label: "조회 API 시나리오",
+          value: "상품 목록 조회 API 개선 전후 비교",
+        },
+        {
+          label: "쿼리 수 변화",
+          value: "201 queries -> 3 queries",
+        },
+      ],
+    },
     implementationDetails: [
       "이 사례는 백엔드 기본기인 조회 병목 발견과 N+1 제거를 대표 사례로 분리합니다.",
       "팀 프로젝트 맥락은 협업과 의사결정 설명에 쓰고, 수치는 상품 목록 조회 개선에 집중합니다.",
@@ -863,6 +874,24 @@ export const legacyCaseStudyAliases: Record<string, string> = {
   "ai-usage-billing-gateway": "billing-idempotency-webhook-ledger",
   "msa-shop": "/projects#msa-shop",
 };
+
+export const featuredPortfolioProjectSlugs = Array.from(
+  new Set(
+    featuredPortfolioCases.map((portfolioCase) => portfolioCase.projectSlug),
+  ),
+);
+
+export function isFeaturedPortfolioProject(projectSlug: string) {
+  return featuredPortfolioProjectSlugs.includes(projectSlug);
+}
+
+export function getSupportingProjects<TProject extends { slug: string }>(
+  projects: TProject[],
+) {
+  return projects.filter(
+    (project) => !isFeaturedPortfolioProject(project.slug),
+  );
+}
 
 export function getPortfolioCaseBySlug(slug: string) {
   return featuredPortfolioCases.find(

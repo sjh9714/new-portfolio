@@ -179,11 +179,19 @@ describe("portfolio project content", () => {
     );
 
     expect(caseStudySource).toContain("lg:sticky");
-    expect(caseStudySource).toContain("근거");
+    expect(caseStudySource).toContain("검증 근거 / 측정 정보");
     expect(caseStudySource).toContain("기술 스택");
-    expect(caseStudySource).toContain("측정 환경");
     expect(caseStudySource).toContain("한계와 다음 검증");
     expect(caseStudySource).toContain("예상 면접 질문");
+    expect(caseStudySource).toContain("GitHub 저장소");
+    expect(caseStudySource).not.toContain('SidebarSection title="근거"');
+    expect(caseStudySource).not.toContain('SidebarSection title="측정 환경"');
+    expect(caseStudySource).not.toContain(
+      'ContentSection title="한계와 다음 검증"',
+    );
+    expect(caseStudySource).not.toContain(
+      'ContentSection title="예상 면접 질문"',
+    );
   });
 
   it("keeps evidence status enums internal while rendering Korean badge labels", () => {
@@ -234,6 +242,24 @@ describe("portfolio project content", () => {
 
     expect(resumeSource).toContain("resume-sung-jinhyuk-backend.pdf");
     expect(resumeSource).not.toContain('"public", "resume.pdf"');
+  });
+
+  it("keeps README repository topics aligned with backend evidence areas", () => {
+    const readmeSource = readFileSync(join(process.cwd(), "README.md"), "utf8");
+
+    for (const topic of [
+      "redis",
+      "kafka",
+      "postgresql",
+      "testcontainers",
+      "k6",
+      "idempotency",
+      "outbox-pattern",
+      "event-driven",
+      "websocket",
+    ]) {
+      expect(readmeSource).toContain(`\`${topic}\``);
+    }
   });
 
   it("does not expose draft-only or internal strategy phrasing", () => {

@@ -19,7 +19,10 @@ import { ProjectRow } from "@/components/project-card";
 import { SectionHeader } from "@/components/section-header";
 import { StatusBadge } from "@/components/status-badge";
 import { Button } from "@/components/ui/button";
-import { featuredPortfolioCases } from "@/content/portfolio-cases";
+import {
+  featuredPortfolioCases,
+  getSupportingProjects,
+} from "@/content/portfolio-cases";
 import { additionalProjects, getProjectBySlug } from "@/content/projects";
 import { profile } from "@/content/profile";
 
@@ -119,6 +122,7 @@ const snapshotItems = [
 
 const portfolioPurpose =
   "이 포트폴리오는 이력서에 한 줄로 압축한 문제 해결 경험을 구조도, 문제 원인, 해결 과정, 검증 결과로 확장한 문서입니다.";
+const supportingAdditionalProjects = getSupportingProjects(additionalProjects);
 
 export default function Home() {
   return (
@@ -282,7 +286,7 @@ export default function Home() {
             }
           />
           <div className="border-border border-y">
-            {additionalProjects.map((project) => (
+            {supportingAdditionalProjects.map((project) => (
               <ProjectRow key={project.slug} project={project} />
             ))}
           </div>

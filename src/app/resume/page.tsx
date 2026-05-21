@@ -7,7 +7,10 @@ import { ProjectRow } from "@/components/project-card";
 import { SectionHeader } from "@/components/section-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { featuredPortfolioCases } from "@/content/portfolio-cases";
+import {
+  featuredPortfolioCases,
+  getSupportingProjects,
+} from "@/content/portfolio-cases";
 import { additionalProjects, getProjectBySlug } from "@/content/projects";
 import { profile } from "@/content/profile";
 
@@ -36,6 +39,7 @@ const coreSkillGroups = [
 ];
 
 const resumePdfFileName = "resume-sung-jinhyuk-backend.pdf";
+const supportingAdditionalProjects = getSupportingProjects(additionalProjects);
 
 export default function ResumePage() {
   const resumeExists = existsSync(
@@ -152,7 +156,7 @@ export default function ResumePage() {
       <section className="flex flex-col gap-5 print:hidden">
         <SectionHeader title="추가 프로젝트" />
         <div className="border-border border-y">
-          {additionalProjects.map((project) => (
+          {supportingAdditionalProjects.map((project) => (
             <ProjectRow key={project.slug} project={project} />
           ))}
         </div>

@@ -3,12 +3,17 @@ import type { Metadata } from "next";
 import { PortfolioCaseCard } from "@/components/portfolio-case-card";
 import { ProjectRow } from "@/components/project-card";
 import { SectionHeader } from "@/components/section-header";
-import { featuredPortfolioCases } from "@/content/portfolio-cases";
+import {
+  featuredPortfolioCases,
+  getSupportingProjects,
+} from "@/content/portfolio-cases";
 import {
   additionalProjects,
   archiveProjects,
   getProjectBySlug,
 } from "@/content/projects";
+
+const supportingAdditionalProjects = getSupportingProjects(additionalProjects);
 
 export const metadata: Metadata = {
   title: "프로젝트",
@@ -51,7 +56,7 @@ export default function ProjectsPage() {
       <ProjectRowSection
         title="추가 프로젝트"
         description="대표 사례를 보완하는 팀 협업, 제품 구현, 캐싱, AI 서비스 경험입니다."
-        projects={additionalProjects}
+        projects={supportingAdditionalProjects}
       />
 
       <ProjectRowSection
@@ -70,7 +75,7 @@ function ProjectRowSection({
 }: {
   title: string;
   description: string;
-  projects: typeof additionalProjects;
+  projects: typeof supportingAdditionalProjects;
 }) {
   return (
     <section className="flex flex-col gap-4">

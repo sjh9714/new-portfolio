@@ -4,10 +4,12 @@ import { describe, expect, it } from "vitest";
 
 import {
   featuredPortfolioCases,
+  featuredPortfolioProjectSlugs,
+  getSupportingProjects,
   getPortfolioCaseBySlug,
   legacyCaseStudyAliases,
 } from "./portfolio-cases";
-import { getProjectBySlug } from "./projects";
+import { additionalProjects, getProjectBySlug } from "./projects";
 
 describe("PDF-style portfolio cases", () => {
   it("uses five resume-line problem solving cases in the final order", () => {
@@ -26,6 +28,23 @@ describe("PDF-style portfolio cases", () => {
     expect(
       featuredPortfolioCases.map((portfolioCase) => portfolioCase.projectSlug),
     ).not.toContain("msa-shop");
+  });
+
+  it("exposes featured project slugs so additional lists can avoid duplicates", () => {
+    expect(featuredPortfolioProjectSlugs).toEqual([
+      "concert-booking",
+      "realtime-chat",
+      "ai-usage-billing-gateway",
+      "borrow-me",
+    ]);
+    expect(
+      getSupportingProjects(additionalProjects).map((project) => project.slug),
+    ).toEqual([
+      "msa-shop",
+      "timedeal-service",
+      "running-app",
+      "ai-interview-coach",
+    ]);
   });
 
   it("structures every case as problem, solution, result, and evidence", () => {
@@ -59,7 +78,22 @@ describe("PDF-style portfolio cases", () => {
 
   it("does not render placeholder measurement environment rows", () => {
     for (const portfolioCase of featuredPortfolioCases) {
-      for (const item of portfolioCase.measurementEnvironment ?? []) {
+      expect("measurementEnvironment" in portfolioCase).toBe(false);
+
+      for (const group of [
+        ...(portfolioCase.measurement?.scenarios ?? []),
+        ...(portfolioCase.measurement?.executionEnvironment ?? []),
+      ]) {
+        expect(group.label).not.toBe("");
+        expect(group.label).not.toContain("추가 기입 예정");
+        expect(group.label).not.toContain("TBD");
+        expect(group.value).not.toBe("");
+        expect(group.value).not.toContain("추가 기입 예정");
+        expect(group.value).not.toContain("TBD");
+      }
+
+      for (const item of portfolioCase.measurement?.executionEnvironment ??
+        []) {
         expect(item.value).not.toBe("");
         expect(item.value).not.toContain("추가 기입 예정");
         expect(item.value).not.toContain("TBD");
@@ -97,6 +131,32 @@ describe("PDF-style portfolio cases", () => {
     expect(homeSource).toContain("featuredPortfolioCases");
     expect(caseIndexSource).toContain("featuredPortfolioCases");
     expect(sitemapSource).toContain("featuredPortfolioCases");
+  });
+
+  it("uses duplicate-safe supporting project lists on public project summaries", () => {
+    for (const file of [
+      "src/app/page.tsx",
+      "src/app/projects/page.tsx",
+      "src/app/resume/page.tsx",
+    ]) {
+      const source = readFileSync(join(process.cwd(), file), "utf8");
+
+      expect(source).toContain("getSupportingProjects");
+      expect(source).not.toContain("{additionalProjects.map(");
+    }
+  });
+
+  it("renders portfolio case flow as a readable table instead of edge cards", () => {
+    const diagramSource = readFileSync(
+      join(process.cwd(), "src/components/portfolio-case-diagram.tsx"),
+      "utf8",
+    );
+
+    expect(diagramSource).toContain("<table");
+    expect(diagramSource).toContain("From");
+    expect(diagramSource).toContain("To");
+    expect(diagramSource).toContain("설명");
+    expect(diagramSource).toContain("표식");
   });
 
   it("can resolve every published case by slug", () => {
