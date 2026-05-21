@@ -111,10 +111,24 @@ describe("architecture diagram content", () => {
     expect(labels).not.toContain(legacyDeadReplayLabel);
     expect(labels).not.toContain(legacyCompensationLabel);
     expect(labels).not.toContain(legacyRelayRetryLabel);
-    expect(labels).toEqual(expect.arrayContaining(["DEAD 상태 → 수동 처리"]));
+    expect(labels).toEqual(expect.arrayContaining(["DEAD 상태 → 수동 재처리"]));
     expect(labels).toEqual(
       expect.arrayContaining(["결제 실패 → 재고 예약 취소"]),
     );
-    expect(labels).toEqual(expect.arrayContaining(["Outbox relay 실패"]));
+    expect(labels).toEqual(
+      expect.arrayContaining(["Outbox relay 실패 → 재시도"]),
+    );
+  });
+
+  it("hides kind badges when the edge label already includes the final action wording", () => {
+    const source = readFileSync(
+      join(process.cwd(), "src/components/architecture-diagram/index.tsx"),
+      "utf8",
+    );
+
+    expect(source).toContain("hideKindBadgeEdgeIds");
+    expect(source).toContain('"dead-replay"');
+    expect(source).toContain('"compensate-stock"');
+    expect(source).toContain('"relay-retry"');
   });
 });

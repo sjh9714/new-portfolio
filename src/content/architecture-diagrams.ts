@@ -209,7 +209,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         id: "dead-replay",
         from: "consumer",
         to: "outbox",
-        label: "DEAD 상태 → 수동 처리",
+        label: "DEAD 상태 → 수동 재처리",
         kind: "replay",
         evidenceLabel: "Testcontainers 검증 시나리오",
       },
@@ -803,7 +803,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         id: "relay-retry",
         from: "outbox",
         to: "rabbitmq",
-        label: "Outbox relay 실패",
+        label: "Outbox relay 실패 → 재시도",
         kind: "retry",
       },
       {

@@ -59,6 +59,12 @@ const edgeIcons: Record<ArchitectureEdgeKind, typeof ArrowRight> = {
   compensation: RefreshCw,
 };
 
+const hideKindBadgeEdgeIds = new Set([
+  "dead-replay",
+  "compensate-stock",
+  "relay-retry",
+]);
+
 export function ArchitectureDiagram({ slug }: { slug: string }) {
   const diagram = architectureDiagrams[slug];
 
@@ -264,9 +270,11 @@ function EdgePanel({
                 <div className="text-muted-foreground flex flex-wrap items-center gap-2">
                   <Icon aria-hidden="true" className="size-4" />
                   <span className="[overflow-wrap:anywhere]">{edge.label}</span>
-                  <Badge variant="outline" className="rounded-md">
-                    {edgeKindLabel[edge.kind]}
-                  </Badge>
+                  {hideKindBadgeEdgeIds.has(edge.id) ? null : (
+                    <Badge variant="outline" className="rounded-md">
+                      {edgeKindLabel[edge.kind]}
+                    </Badge>
+                  )}
                 </div>
               </div>
             );
