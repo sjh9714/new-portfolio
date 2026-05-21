@@ -215,6 +215,66 @@ describe("PDF-style portfolio cases", () => {
     expect(articleSource).toContain("stateTransitions");
   });
 
+  it("requires every featured portfolio case to expose a visual diagram", () => {
+    const supportedTypes = ["flow", "before-after", "state-machine"];
+
+    for (const portfolioCase of featuredPortfolioCases) {
+      expect(portfolioCase.visualDiagram).toBeDefined();
+      expect(supportedTypes).toContain(portfolioCase.visualDiagram?.type);
+    }
+  });
+
+  it("keeps the Outbox visual state machine aligned with state transitions", () => {
+    const outboxCase = getPortfolioCaseBySlug("concert-outbox-dlt-recovery");
+
+    expect(outboxCase?.visualDiagram?.type).toBe("state-machine");
+
+    if (
+      outboxCase?.visualDiagram?.type !== "state-machine" ||
+      !outboxCase.stateTransitions
+    ) {
+      throw new Error("Outbox case must have a state-machine visual diagram");
+    }
+
+    expect(
+      outboxCase.visualDiagram.transitions.map(({ from, to }) => ({
+        from,
+        to,
+      })),
+    ).toEqual(
+      outboxCase.stateTransitions.map(({ from, to }) => ({ from, to })),
+    );
+  });
+
+  it("renders a TSX visual diagram before the flow detail table", () => {
+    const diagramSource = readFileSync(
+      join(process.cwd(), "src/components/portfolio-case-diagram.tsx"),
+      "utf8",
+    );
+    const visualSource = readFileSync(
+      join(process.cwd(), "src/components/portfolio-case-visual-diagram.tsx"),
+      "utf8",
+    );
+
+    expect(diagramSource).toContain("흐름 세부");
+    expect(diagramSource).toContain("<table");
+    expect(diagramSource).toContain("PortfolioCaseVisualDiagram");
+    expect(visualSource).toContain("한눈에 보는 구조");
+    expect(visualSource).toContain("<figure");
+    expect(visualSource).toContain("<figcaption");
+    expect(visualSource).toContain("aria-label");
+
+    for (const forbidden of [
+      ".png",
+      ".jpg",
+      "<img",
+      "next/image",
+      "gradient",
+    ]) {
+      expect(visualSource).not.toContain(forbidden);
+    }
+  });
+
   it("can resolve every published case by slug", () => {
     for (const portfolioCase of featuredPortfolioCases) {
       expect(getPortfolioCaseBySlug(portfolioCase.slug)).toEqual(portfolioCase);

@@ -19,7 +19,7 @@ export function CaseStudyArticle({
           <p className="text-muted-foreground text-sm font-semibold tracking-[0.18em] uppercase">
             문제 해결 포트폴리오 / {portfolioCase.domain}
           </p>
-          <h1 className="text-foreground max-w-5xl text-4xl leading-tight font-bold tracking-tight md:text-6xl">
+          <h1 className="text-foreground max-w-5xl text-4xl leading-tight font-bold tracking-tight [overflow-wrap:anywhere] md:text-6xl">
             {portfolioCase.title}
           </h1>
           <p className="text-muted-foreground max-w-4xl text-lg leading-8">

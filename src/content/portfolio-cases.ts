@@ -62,6 +62,54 @@ export type PortfolioDiagram = {
   edges: PortfolioDiagramEdge[];
 };
 
+export type PortfolioVisualDiagramNode = {
+  id: string;
+  label: string;
+  description?: string;
+  markers?: PortfolioDiagramMarker[];
+};
+
+export type PortfolioVisualDiagramEdge = {
+  from: string;
+  to: string;
+  label: string;
+  markers?: PortfolioDiagramMarker[];
+};
+
+export type PortfolioBeforeAfterItem = {
+  label: string;
+  value?: string;
+  markers?: PortfolioDiagramMarker[];
+};
+
+export type PortfolioBeforeAfterColumn = {
+  title: string;
+  items: PortfolioBeforeAfterItem[];
+};
+
+export type PortfolioVisualDiagram =
+  | {
+      type: "flow";
+      title: string;
+      summary?: string;
+      nodes: PortfolioVisualDiagramNode[];
+      edges: PortfolioVisualDiagramEdge[];
+    }
+  | {
+      type: "before-after";
+      title: string;
+      summary?: string;
+      before: PortfolioBeforeAfterColumn;
+      after: PortfolioBeforeAfterColumn;
+    }
+  | {
+      type: "state-machine";
+      title: string;
+      summary?: string;
+      states: string[];
+      transitions: PortfolioVisualDiagramEdge[];
+    };
+
 export type PortfolioCase = {
   slug: string;
   title: string;
@@ -77,6 +125,7 @@ export type PortfolioCase = {
   stateTransitions?: PortfolioStateTransition[];
   limitations: string[];
   interviewQuestions: string[];
+  visualDiagram: PortfolioVisualDiagram;
   diagram: PortfolioDiagram;
 };
 
@@ -160,6 +209,99 @@ export const featuredPortfolioCases: PortfolioCase[] = [
       "낙관적 락과 비관적 락, Redis distributed lock의 선택 기준은 무엇인가요?",
       "Outbox가 exactly-once를 보장하지 않는다면 중복은 어디서 흡수했나요?",
     ],
+    visualDiagram: {
+      type: "flow",
+      title: "동일 좌석 예매 요청 흐름",
+      summary:
+        "동일 좌석 요청을 대기열, 예약 transaction, Outbox, Kafka, 복구 경로로 분리해 좌석 상태를 PostgreSQL 기준으로 설명합니다.",
+      nodes: [
+        {
+          id: "client",
+          label: "Client",
+          description: "동일 좌석 예약 요청",
+        },
+        {
+          id: "queue",
+          label: "Queue Token",
+          description: "userId + scheduleId 검증",
+        },
+        {
+          id: "reservation",
+          label: "Reservation Transaction",
+          description: "Idempotency-Key / Seat Lock / Reservation Insert",
+          markers: ["transaction"],
+        },
+        {
+          id: "outbox",
+          label: "Outbox Table",
+          description: "이벤트 발행 의도 저장",
+          markers: ["source"],
+        },
+        {
+          id: "kafka",
+          label: "Kafka",
+          description: "예약/만료 이벤트 발행",
+          markers: ["async"],
+        },
+        {
+          id: "consumer",
+          label: "Consumer + DLT",
+          description: "중복 소비 흡수 / 실패 격리",
+          markers: ["failure"],
+        },
+        {
+          id: "postgres",
+          label: "PostgreSQL",
+          description: "좌석·예약 최종 기준 데이터",
+          markers: ["source"],
+        },
+        {
+          id: "reconciliation",
+          label: "Redis Reconciliation",
+          description: "Redis 보조 상태를 DB 기준으로 복구",
+          markers: ["failure"],
+        },
+      ],
+      edges: [
+        { from: "client", to: "queue", label: "대기열 토큰 검증" },
+        {
+          from: "queue",
+          to: "reservation",
+          label: "예약 요청",
+          markers: ["transaction"],
+        },
+        {
+          from: "reservation",
+          to: "outbox",
+          label: "이벤트 의도 저장",
+          markers: ["transaction"],
+        },
+        {
+          from: "outbox",
+          to: "kafka",
+          label: "commit 이후 발행",
+          markers: ["async"],
+        },
+        {
+          from: "kafka",
+          to: "consumer",
+          label: "consumer 처리 / DLT 격리",
+          markers: ["failure"],
+        },
+        {
+          from: "consumer",
+          to: "postgres",
+          label: "상태 반영",
+          markers: ["source"],
+        },
+        {
+          from: "postgres",
+          to: "reconciliation",
+          label: "DB 기준 복구",
+          markers: ["source", "failure"],
+        },
+      ],
+    },
     diagram: {
       title: "동일 좌석 예매 정합성 구조",
       summary:
@@ -361,6 +503,58 @@ export const featuredPortfolioCases: PortfolioCase[] = [
       "manual replay가 중복 발행을 만들 때 어디서 idempotency를 보장하나요?",
       "DLT에 쌓인 이벤트를 어떤 기준으로 다시 처리해야 하나요?",
     ],
+    visualDiagram: {
+      type: "state-machine",
+      title: "Outbox / DLT 상태 전이",
+      summary:
+        "발행 성공, consumer 처리, 재시도, DEAD 격리, 수동 재처리 경로를 상태 전이로 분리합니다.",
+      states: [
+        "PENDING",
+        "PUBLISHED",
+        "CONSUMED",
+        "RETRYING",
+        "DEAD",
+        "MANUAL_REPLAY",
+      ],
+      transitions: [
+        {
+          from: "PENDING",
+          to: "PUBLISHED",
+          label: "relay 성공",
+          markers: ["async"],
+        },
+        {
+          from: "PUBLISHED",
+          to: "CONSUMED",
+          label: "consumer 처리 성공",
+          markers: ["async"],
+        },
+        {
+          from: "PENDING",
+          to: "RETRYING",
+          label: "relay 실패",
+          markers: ["failure"],
+        },
+        {
+          from: "RETRYING",
+          to: "DEAD",
+          label: "재시도 초과",
+          markers: ["failure"],
+        },
+        {
+          from: "DEAD",
+          to: "MANUAL_REPLAY",
+          label: "운영자 수동 재처리",
+          markers: ["failure"],
+        },
+        {
+          from: "MANUAL_REPLAY",
+          to: "PUBLISHED",
+          label: "재발행 성공",
+          markers: ["async"],
+        },
+      ],
+    },
     diagram: {
       title: "Outbox / DLT 복구 흐름",
       summary:
@@ -537,6 +731,30 @@ export const featuredPortfolioCases: PortfolioCase[] = [
       "채팅방 조회 API 성능과 실시간 메시지 전달 지연은 왜 별도 지표인가요?",
       "roomId key ordering은 Kafka partition과 어떤 관계가 있나요?",
     ],
+    visualDiagram: {
+      type: "before-after",
+      title: "채팅방 조회 API 개선 전후",
+      summary:
+        "실시간 delivery claim과 분리해, 측정된 조회 API 병목 개선을 쿼리 수와 응답 지표로 보여줍니다.",
+      before: {
+        title: "Before",
+        items: [
+          { label: "Chat Room API" },
+          { label: "2N+1 queries", markers: ["failure"] },
+          { label: "937 RPS" },
+          { label: "p95 212.85ms" },
+        ],
+      },
+      after: {
+        title: "After",
+        items: [
+          { label: "Chat Room API" },
+          { label: "1 query", markers: ["source"] },
+          { label: "1,598 RPS" },
+          { label: "p95 149.22ms" },
+        ],
+      },
+    },
     diagram: {
       title: "채팅방 조회 API 개선 흐름",
       summary:
@@ -662,6 +880,93 @@ export const featuredPortfolioCases: PortfolioCase[] = [
       "Webhook duplicate와 conflict는 어떤 기준으로 구분하나요?",
       "append-only ledger가 있어도 정산 중복 집계는 어디서 막아야 하나요?",
     ],
+    visualDiagram: {
+      type: "flow",
+      title: "멀티테넌트 사용량 과금 흐름",
+      summary:
+        "API Key 인증부터 usage idempotency, webhook 중복 처리, append-only ledger, audit log까지 tenant 경계 안에서 연결합니다.",
+      nodes: [
+        {
+          id: "client",
+          label: "Client",
+          description: "tenant 사용량 요청",
+        },
+        {
+          id: "api-key",
+          label: "API Key",
+          description: "raw value 1회 반환 / hash 저장",
+        },
+        {
+          id: "gateway",
+          label: "Usage Gateway",
+          description: "tenant isolation / 인증",
+          markers: ["transaction"],
+        },
+        {
+          id: "usage",
+          label: "Usage Event",
+          description: "사용량 중복 처리",
+          markers: ["transaction"],
+        },
+        {
+          id: "invoice",
+          label: "Invoice",
+          description: "tenant별 청구 단위",
+        },
+        {
+          id: "webhook",
+          label: "Webhook",
+          description: "duplicate / conflict 구분",
+          markers: ["failure"],
+        },
+        {
+          id: "ledger",
+          label: "Append-only Ledger",
+          description: "ledger invariant 검증",
+          markers: ["source"],
+        },
+        {
+          id: "audit",
+          label: "Audit Log",
+          description: "감사 가능성 확보",
+          markers: ["source"],
+        },
+      ],
+      edges: [
+        { from: "client", to: "api-key", label: "API Key 제출" },
+        {
+          from: "api-key",
+          to: "gateway",
+          label: "hash 인증",
+          markers: ["transaction"],
+        },
+        {
+          from: "gateway",
+          to: "usage",
+          label: "usage idempotency",
+          markers: ["transaction"],
+        },
+        { from: "usage", to: "invoice", label: "청구 집계" },
+        {
+          from: "invoice",
+          to: "webhook",
+          label: "결제 이벤트 처리",
+          markers: ["failure"],
+        },
+        {
+          from: "webhook",
+          to: "ledger",
+          label: "append-only 기록",
+          markers: ["source"],
+        },
+        {
+          from: "ledger",
+          to: "audit",
+          label: "감사 로그",
+          markers: ["source"],
+        },
+      ],
+    },
     diagram: {
       title: "멀티테넌트 과금 정합성 흐름",
       summary:
@@ -825,6 +1130,28 @@ export const featuredPortfolioCases: PortfolioCase[] = [
       "p95가 평균 응답 시간보다 이 사례에서 더 중요한 이유는 무엇인가요?",
       "팀 프로젝트에서 성능 개선 우선순위는 어떻게 합의했나요?",
     ],
+    visualDiagram: {
+      type: "before-after",
+      title: "상품 목록 조회 개선 전후",
+      summary:
+        "상품 목록 API의 반복 조회를 줄여 쿼리 수와 p95 응답 시간을 함께 낮춘 변화를 보여줍니다.",
+      before: {
+        title: "Before",
+        items: [
+          { label: "Product List API" },
+          { label: "201 queries", markers: ["failure"] },
+          { label: "p95 1,010ms" },
+        ],
+      },
+      after: {
+        title: "After",
+        items: [
+          { label: "Product List API" },
+          { label: "3 queries", markers: ["source"] },
+          { label: "p95 23ms" },
+        ],
+      },
+    },
     diagram: {
       title: "상품 목록 조회 개선 흐름",
       summary:

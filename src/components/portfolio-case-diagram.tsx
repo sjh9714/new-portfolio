@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/badge";
+import { PortfolioCaseVisualDiagram } from "@/components/portfolio-case-visual-diagram";
 import type {
   PortfolioCase,
   PortfolioDiagramMarker,
@@ -66,6 +67,8 @@ export function PortfolioCaseDiagram({
         </div>
       </div>
 
+      <PortfolioCaseVisualDiagram diagram={portfolioCase.visualDiagram} />
+
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
         {diagram.nodes.map((node) => (
           <div
@@ -110,7 +113,7 @@ export function PortfolioCaseDiagram({
 
       <section className="border-border bg-background flex flex-col gap-3 rounded-md border p-4">
         <h3 className="text-muted-foreground text-sm font-semibold tracking-[0.16em] uppercase">
-          요청/복구 흐름
+          흐름 세부
         </h3>
 
         <div className="border-border rounded-md border">
