@@ -14,6 +14,12 @@ export type PortfolioCaseMeasurement = {
   executionEnvironment?: MeasurementEnvironmentItem[];
 };
 
+export type PortfolioStateTransition = {
+  from: string;
+  to: string;
+  description: string;
+};
+
 export type PortfolioDiagramMarker =
   | "transaction"
   | "async"
@@ -68,6 +74,7 @@ export type PortfolioCase = {
   evidence: ProjectEvidence[];
   measurement?: PortfolioCaseMeasurement;
   implementationDetails: string[];
+  stateTransitions?: PortfolioStateTransition[];
   limitations: string[];
   interviewQuestions: string[];
   diagram: PortfolioDiagram;
@@ -312,6 +319,38 @@ export const featuredPortfolioCases: PortfolioCase[] = [
       "Outbox Table은 이벤트 발행 성공 여부와 재처리 상태를 추적하는 복구 기준으로 둡니다.",
       "DLT와 DEAD 상태는 자동 재시도로 해결되지 않는 이벤트를 운영자가 확인 가능한 대상으로 분리합니다.",
       "Redis stock은 빠른 조회를 위한 보조 상태이며, reconciliation은 PostgreSQL 기준으로 수행합니다.",
+    ],
+    stateTransitions: [
+      {
+        from: "PENDING",
+        to: "PUBLISHED",
+        description: "Outbox relay가 Kafka 발행에 성공한 상태",
+      },
+      {
+        from: "PUBLISHED",
+        to: "CONSUMED",
+        description: "consumer idempotency를 통과해 처리 완료된 상태",
+      },
+      {
+        from: "PENDING",
+        to: "RETRYING",
+        description: "일시적 발행 실패 후 재시도 대상으로 남긴 상태",
+      },
+      {
+        from: "RETRYING",
+        to: "DEAD",
+        description: "자동 재시도로 복구하지 못해 격리한 상태",
+      },
+      {
+        from: "DEAD",
+        to: "MANUAL_REPLAY",
+        description: "운영자 확인 후 수동 재처리 대상으로 올린 상태",
+      },
+      {
+        from: "MANUAL_REPLAY",
+        to: "PUBLISHED",
+        description: "수동 재처리 이벤트가 다시 발행된 상태",
+      },
     ],
     limitations: [
       "Outbox relay 재시도 주기, DEAD 전환 기준, 운영 알림은 추가 문서화가 필요합니다.",

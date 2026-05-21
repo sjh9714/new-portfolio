@@ -247,6 +247,8 @@ describe("portfolio project content", () => {
   it("keeps README repository topics aligned with backend evidence areas", () => {
     const readmeSource = readFileSync(join(process.cwd(), "README.md"), "utf8");
 
+    expect(readmeSource).toContain("실제 GitHub About topics");
+
     for (const topic of [
       "redis",
       "kafka",

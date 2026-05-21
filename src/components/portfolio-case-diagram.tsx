@@ -1,5 +1,3 @@
-import { ArrowRight } from "lucide-react";
-
 import { Badge } from "@/components/ui/badge";
 import type {
   PortfolioCase,
@@ -28,6 +26,9 @@ const nodeKindLabel: Record<PortfolioDiagramNodeKind, string> = {
   ledger: "Ledger",
   external: "External",
 };
+
+const flowCellClass =
+  "block py-2 before:mb-1 before:block before:text-xs before:font-semibold before:text-muted-foreground md:table-cell md:px-3 md:py-3 md:before:hidden [overflow-wrap:anywhere]";
 
 export function PortfolioCaseDiagram({
   portfolioCase,
@@ -112,9 +113,9 @@ export function PortfolioCaseDiagram({
           요청/복구 흐름
         </h3>
 
-        <div className="border-border hidden overflow-x-auto rounded-md border md:block">
-          <table className="w-full min-w-[720px] border-collapse text-left text-sm">
-            <thead className="bg-card text-muted-foreground">
+        <div className="border-border rounded-md border">
+          <table className="block w-full border-collapse text-left text-sm md:table">
+            <thead className="bg-card text-muted-foreground sr-only md:not-sr-only md:table-header-group">
               <tr>
                 <th className="border-border border-b px-3 py-2 font-semibold">
                   From
@@ -130,55 +131,52 @@ export function PortfolioCaseDiagram({
                 </th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="block md:table-row-group">
               {flowRows.map(({ edge, from, to }) => (
                 <tr
                   key={edge.id}
-                  className="border-border border-b last:border-0"
+                  className="border-border bg-card m-3 block rounded-md border p-3 last:mb-3 md:m-0 md:table-row md:rounded-none md:border-0 md:border-b md:bg-transparent md:p-0 md:last:border-b-0"
                 >
-                  <td className="text-foreground px-3 py-3 font-medium [overflow-wrap:anywhere]">
+                  <td
+                    data-label="From"
+                    className={cn(
+                      flowCellClass,
+                      "text-foreground font-medium before:content-[attr(data-label)]",
+                    )}
+                  >
                     {from?.label}
                   </td>
-                  <td className="text-foreground px-3 py-3 font-medium [overflow-wrap:anywhere]">
+                  <td
+                    data-label="To"
+                    className={cn(
+                      flowCellClass,
+                      "text-foreground font-medium before:content-[attr(data-label)]",
+                    )}
+                  >
                     {to?.label}
                   </td>
-                  <td className="text-muted-foreground px-3 py-3 [overflow-wrap:anywhere]">
+                  <td
+                    data-label="설명"
+                    className={cn(
+                      flowCellClass,
+                      "text-muted-foreground before:content-[attr(data-label)]",
+                    )}
+                  >
                     {edge.label}
                   </td>
-                  <td className="px-3 py-3">
+                  <td
+                    data-label="표식"
+                    className={cn(
+                      flowCellClass,
+                      "before:content-[attr(data-label)]",
+                    )}
+                  >
                     <MarkerBadges markers={edge.markers} />
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-        </div>
-
-        <div className="grid gap-3 md:hidden">
-          {flowRows.map(({ edge, from, to }) => (
-            <div
-              key={edge.id}
-              className="border-border bg-card flex flex-col gap-3 rounded-md border p-3 text-sm"
-            >
-              <div className="grid gap-2">
-                <FlowMobileField label="From" value={from?.label} />
-                <div className="text-muted-foreground flex items-center gap-2 text-xs">
-                  <ArrowRight aria-hidden="true" className="size-4" />
-                  <span>흐름</span>
-                </div>
-                <FlowMobileField label="To" value={to?.label} />
-              </div>
-              <FlowMobileField label="설명" value={edge.label} />
-              {edge.markers?.length ? (
-                <div className="flex flex-col gap-2">
-                  <span className="text-muted-foreground text-xs font-semibold">
-                    표식
-                  </span>
-                  <MarkerBadges markers={edge.markers} />
-                </div>
-              ) : null}
-            </div>
-          ))}
         </div>
       </section>
     </section>
@@ -201,19 +199,6 @@ function MarkerBadges({ markers }: { markers?: PortfolioDiagramMarker[] }) {
           {markerLabel[marker]}
         </Badge>
       ))}
-    </div>
-  );
-}
-
-function FlowMobileField({ label, value }: { label: string; value?: string }) {
-  return (
-    <div className="flex flex-col gap-1">
-      <span className="text-muted-foreground text-xs font-semibold">
-        {label}
-      </span>
-      <span className="text-foreground font-medium [overflow-wrap:anywhere]">
-        {value}
-      </span>
     </div>
   );
 }

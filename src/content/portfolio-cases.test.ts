@@ -157,6 +157,62 @@ describe("PDF-style portfolio cases", () => {
     expect(diagramSource).toContain("To");
     expect(diagramSource).toContain("설명");
     expect(diagramSource).toContain("표식");
+    expect(diagramSource).not.toContain("FlowMobileField");
+    expect(diagramSource).not.toContain("md:hidden");
+    expect(diagramSource).not.toContain("hidden overflow-x-auto");
+  });
+
+  it("adds Outbox state transitions only to the Outbox/DLT portfolio case", () => {
+    const outboxCase = getPortfolioCaseBySlug("concert-outbox-dlt-recovery");
+
+    expect(outboxCase?.stateTransitions).toEqual([
+      {
+        from: "PENDING",
+        to: "PUBLISHED",
+        description: "Outbox relay가 Kafka 발행에 성공한 상태",
+      },
+      {
+        from: "PUBLISHED",
+        to: "CONSUMED",
+        description: "consumer idempotency를 통과해 처리 완료된 상태",
+      },
+      {
+        from: "PENDING",
+        to: "RETRYING",
+        description: "일시적 발행 실패 후 재시도 대상으로 남긴 상태",
+      },
+      {
+        from: "RETRYING",
+        to: "DEAD",
+        description: "자동 재시도로 복구하지 못해 격리한 상태",
+      },
+      {
+        from: "DEAD",
+        to: "MANUAL_REPLAY",
+        description: "운영자 확인 후 수동 재처리 대상으로 올린 상태",
+      },
+      {
+        from: "MANUAL_REPLAY",
+        to: "PUBLISHED",
+        description: "수동 재처리 이벤트가 다시 발행된 상태",
+      },
+    ]);
+
+    for (const portfolioCase of featuredPortfolioCases.filter(
+      (item) => item.slug !== "concert-outbox-dlt-recovery",
+    )) {
+      expect(portfolioCase.stateTransitions).toBeUndefined();
+    }
+  });
+
+  it("renders the Outbox state transition section on case study detail pages", () => {
+    const articleSource = readFileSync(
+      join(process.cwd(), "src/components/case-study-article.tsx"),
+      "utf8",
+    );
+
+    expect(articleSource).toContain("Outbox 상태 전이");
+    expect(articleSource).toContain("stateTransitions");
   });
 
   it("can resolve every published case by slug", () => {

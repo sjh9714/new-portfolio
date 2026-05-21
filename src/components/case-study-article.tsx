@@ -57,6 +57,12 @@ export function CaseStudyArticle({
           <ContentSection title="상세 구현">
             <OrderedList items={portfolioCase.implementationDetails} />
           </ContentSection>
+
+          {portfolioCase.stateTransitions?.length ? (
+            <StateTransitionTable
+              transitions={portfolioCase.stateTransitions}
+            />
+          ) : null}
         </section>
 
         <CaseStudySidebar portfolioCase={portfolioCase} project={project} />
@@ -182,6 +188,52 @@ function MeasurementList({
         ))}
       </dl>
     </div>
+  );
+}
+
+function StateTransitionTable({
+  transitions,
+}: {
+  transitions: NonNullable<PortfolioCase["stateTransitions"]>;
+}) {
+  return (
+    <ContentSection title="Outbox 상태 전이">
+      <div className="border-border overflow-hidden rounded-md border">
+        <table className="w-full border-collapse text-left text-sm">
+          <thead className="bg-card text-muted-foreground">
+            <tr>
+              <th className="border-border border-b px-3 py-2 font-semibold">
+                From
+              </th>
+              <th className="border-border border-b px-3 py-2 font-semibold">
+                To
+              </th>
+              <th className="border-border border-b px-3 py-2 font-semibold">
+                설명
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {transitions.map((transition) => (
+              <tr
+                key={`${transition.from}-${transition.to}`}
+                className="border-border border-b last:border-0"
+              >
+                <td className="text-foreground px-3 py-3 font-semibold [overflow-wrap:anywhere]">
+                  {transition.from}
+                </td>
+                <td className="text-foreground px-3 py-3 font-semibold [overflow-wrap:anywhere]">
+                  {transition.to}
+                </td>
+                <td className="text-muted-foreground px-3 py-3 leading-6 [overflow-wrap:anywhere]">
+                  {transition.description}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </ContentSection>
   );
 }
 
