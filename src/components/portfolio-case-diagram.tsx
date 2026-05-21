@@ -58,58 +58,18 @@ export function PortfolioCaseDiagram({
         <p className="text-muted-foreground text-xs font-semibold tracking-[0.16em] uppercase">
           범례
         </p>
-        <div className="flex flex-wrap gap-2">
+        <ul aria-label="구조도 범례" className="flex flex-wrap gap-2">
           {Object.values(markerLabel).map((label) => (
-            <Badge key={label} variant="outline" className="rounded-md">
-              {label}
-            </Badge>
+            <li key={label}>
+              <Badge variant="outline" className="rounded-md">
+                {label}
+              </Badge>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
 
       <PortfolioCaseVisualDiagram diagram={portfolioCase.visualDiagram} />
-
-      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-        {diagram.nodes.map((node) => (
-          <div
-            key={node.id}
-            className={cn(
-              "border-border bg-background flex min-h-36 flex-col gap-3 rounded-md border p-4",
-              node.markers?.includes("source")
-                ? "border-primary/45 bg-primary/5"
-                : null,
-              node.markers?.includes("pending") ? "border-dashed" : null,
-            )}
-          >
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex min-w-0 flex-col gap-2">
-                <Badge variant="outline" className="w-fit rounded-md">
-                  {nodeKindLabel[node.kind]}
-                </Badge>
-                <h3 className="text-foreground leading-6 font-semibold [overflow-wrap:anywhere]">
-                  {node.label}
-                </h3>
-              </div>
-            </div>
-            <p className="text-muted-foreground text-sm leading-6 [overflow-wrap:anywhere]">
-              {node.description}
-            </p>
-            {node.markers && node.markers.length > 0 ? (
-              <div className="mt-auto flex flex-wrap gap-2">
-                {node.markers.map((marker) => (
-                  <Badge
-                    key={marker}
-                    variant="outline"
-                    className="rounded-md text-[11px]"
-                  >
-                    {markerLabel[marker]}
-                  </Badge>
-                ))}
-              </div>
-            ) : null}
-          </div>
-        ))}
-      </div>
 
       <section className="border-border bg-background flex flex-col gap-3 rounded-md border p-4">
         <h3 className="text-muted-foreground text-sm font-semibold tracking-[0.16em] uppercase">
@@ -182,6 +142,41 @@ export function PortfolioCaseDiagram({
           </table>
         </div>
       </section>
+
+      <details className="border-border bg-background rounded-md border p-4">
+        <summary className="text-foreground cursor-pointer text-sm font-semibold">
+          구성 요소 설명
+        </summary>
+        <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {diagram.nodes.map((node) => (
+            <div
+              key={node.id}
+              className={cn(
+                "border-border bg-card flex min-h-36 flex-col gap-3 rounded-md border p-4",
+                node.markers?.includes("source")
+                  ? "border-primary/45 bg-primary/5"
+                  : null,
+                node.markers?.includes("pending") ? "border-dashed" : null,
+              )}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex min-w-0 flex-col gap-2">
+                  <Badge variant="outline" className="w-fit rounded-md">
+                    {nodeKindLabel[node.kind]}
+                  </Badge>
+                  <h3 className="text-foreground leading-6 font-semibold [overflow-wrap:anywhere]">
+                    {node.label}
+                  </h3>
+                </div>
+              </div>
+              <p className="text-muted-foreground text-sm leading-6 [overflow-wrap:anywhere]">
+                {node.description}
+              </p>
+              <MarkerBadges markers={node.markers} />
+            </div>
+          ))}
+        </div>
+      </details>
     </section>
   );
 }
@@ -192,16 +187,14 @@ function MarkerBadges({ markers }: { markers?: PortfolioDiagramMarker[] }) {
   }
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <ul aria-label="표식" className="flex flex-wrap gap-2">
       {markers.map((marker) => (
-        <Badge
-          key={marker}
-          variant="outline"
-          className="rounded-md text-[11px]"
-        >
-          {markerLabel[marker]}
-        </Badge>
+        <li key={marker}>
+          <Badge variant="outline" className="rounded-md text-[11px]">
+            {markerLabel[marker]}
+          </Badge>
+        </li>
       ))}
-    </div>
+    </ul>
   );
 }

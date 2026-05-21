@@ -16,6 +16,10 @@ const markerLabel: Record<PortfolioDiagramMarker, string> = {
   pending: "추가 검증 예정",
 };
 
+function getStep(index: number) {
+  return String(index + 1);
+}
+
 export function PortfolioCaseVisualDiagram({
   diagram,
 }: {
@@ -62,7 +66,7 @@ function FlowVisual({
   const edgeByFrom = new Map(diagram.edges.map((edge) => [edge.from, edge]));
 
   return (
-    <ol className="grid gap-3">
+    <ul role="list" className="grid gap-3">
       {diagram.nodes.map((node, index) => {
         const edge = edgeByFrom.get(node.id);
         const nextNode = edge
@@ -71,21 +75,21 @@ function FlowVisual({
 
         return (
           <li key={node.id} className="grid gap-2">
-            <VisualNodeCard node={node} index={index + 1} />
+            <VisualNodeCard node={node} step={getStep(index)} />
             {edge && nextNode ? <VisualConnector edge={edge} /> : null}
           </li>
         );
       })}
-    </ol>
+    </ul>
   );
 }
 
 function VisualNodeCard({
   node,
-  index,
+  step,
 }: {
   node: PortfolioVisualDiagramNode;
-  index: number;
+  step: string;
 }) {
   return (
     <div
@@ -97,9 +101,11 @@ function VisualNodeCard({
         node.markers?.includes("pending") ? "border-dashed" : null,
       )}
     >
-      <span className="border-border text-muted-foreground flex size-7 items-center justify-center rounded-md border text-xs font-semibold">
-        {index}
-      </span>
+      <span
+        aria-hidden="true"
+        data-step={step}
+        className="border-border text-muted-foreground flex size-7 items-center justify-center rounded-md border text-xs font-semibold before:content-[attr(data-step)]"
+      />
       <div className="grid gap-2">
         <h4 className="text-foreground font-semibold [overflow-wrap:anywhere]">
           {node.label}
@@ -159,16 +165,18 @@ function BeforeAfterColumn({
       )}
     >
       <h4 className="text-foreground font-semibold">{column.title}</h4>
-      <ol className="mt-4 grid gap-3">
+      <ul role="list" className="mt-4 grid gap-3">
         {column.items.map((item, index) => (
           <li
             key={`${item.label}-${index}`}
             className="border-border bg-background rounded-md border p-3"
           >
             <div className="flex items-start gap-3">
-              <span className="border-border text-muted-foreground flex size-6 shrink-0 items-center justify-center rounded-md border text-xs font-semibold">
-                {index + 1}
-              </span>
+              <span
+                aria-hidden="true"
+                data-step={getStep(index)}
+                className="border-border text-muted-foreground flex size-6 shrink-0 items-center justify-center rounded-md border text-xs font-semibold before:content-[attr(data-step)]"
+              />
               <div className="grid gap-1">
                 <span className="text-foreground text-sm font-semibold [overflow-wrap:anywhere]">
                   {item.label}
@@ -183,7 +191,7 @@ function BeforeAfterColumn({
             </div>
           </li>
         ))}
-      </ol>
+      </ul>
     </section>
   );
 }
@@ -204,7 +212,7 @@ function StateMachineVisual({
           </Badge>
         ))}
       </div>
-      <ol className="grid gap-3 md:grid-cols-2">
+      <ul role="list" className="grid gap-3 md:grid-cols-2">
         {transitions.map((transition, index) => (
           <li
             key={`${transition.from}-${transition.to}-${index}`}
@@ -227,7 +235,7 @@ function StateMachineVisual({
             <MarkerBadges markers={transition.markers} />
           </li>
         ))}
-      </ol>
+      </ul>
     </div>
   );
 }
@@ -244,16 +252,17 @@ function MarkerBadges({
   }
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <ul aria-label="표식" className="flex flex-wrap gap-2">
       {markers.map((marker) => (
-        <Badge
-          key={marker}
-          variant="outline"
-          className={cn("rounded-md", compact ? "text-[11px]" : "text-xs")}
-        >
-          {markerLabel[marker]}
-        </Badge>
+        <li key={marker}>
+          <Badge
+            variant="outline"
+            className={cn("rounded-md", compact ? "text-[11px]" : "text-xs")}
+          >
+            {markerLabel[marker]}
+          </Badge>
+        </li>
       ))}
-    </div>
+    </ul>
   );
 }

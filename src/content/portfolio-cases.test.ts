@@ -275,6 +275,33 @@ describe("PDF-style portfolio cases", () => {
     }
   });
 
+  it("keeps visual diagram numbering decorative and marker groups semantic", () => {
+    const visualSource = readFileSync(
+      join(process.cwd(), "src/components/portfolio-case-visual-diagram.tsx"),
+      "utf8",
+    );
+
+    expect(visualSource).toContain('role="list"');
+    expect(visualSource).toContain("data-step");
+    expect(visualSource).toContain("before:content-[attr(data-step)]");
+    expect(visualSource).toContain('aria-hidden="true"');
+    expect(visualSource).toContain('aria-label="표식"');
+    expect(visualSource).not.toContain("{index + 1}");
+  });
+
+  it("keeps diagram legend semantic and moves node cards behind details", () => {
+    const diagramSource = readFileSync(
+      join(process.cwd(), "src/components/portfolio-case-diagram.tsx"),
+      "utf8",
+    );
+
+    expect(diagramSource).toContain('aria-label="구조도 범례"');
+    expect(diagramSource).toContain("<details");
+    expect(diagramSource).toContain("<summary");
+    expect(diagramSource).toContain("구성 요소 설명");
+    expect(diagramSource).toContain("흐름 세부");
+  });
+
   it("can resolve every published case by slug", () => {
     for (const portfolioCase of featuredPortfolioCases) {
       expect(getPortfolioCaseBySlug(portfolioCase.slug)).toEqual(portfolioCase);
