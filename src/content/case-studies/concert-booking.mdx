@@ -30,7 +30,7 @@ Outbox는 exactly-once를 약속하는 장치가 아닙니다. 대신 DB commit 
 
 ## 검증 결과
 
-동일 좌석 경합은 동일 좌석 100 concurrent requests에서 success 1, fail 99, overselling 0으로 기록했습니다. 분산 좌석 예약은 50명이 서로 다른 좌석을 예약하는 시나리오에서 pessimistic 50/50, Redis distributed lock 50/50 결과를 확인했습니다. 혼합 부하는 200 VU, 45초 기준 총 RPS 약 969~1,005 범위를 기록했습니다.
+동일 좌석 경합은 동일 좌석 100 concurrent requests에서 success 1, fail 99, overselling 0으로 기록했습니다. 분산 좌석 예약은 50명이 서로 다른 좌석을 예약하는 시나리오에서 pessimistic 50/50, Redis distributed lock 50/50 결과를 확인했습니다. 혼합 부하 테스트는 200 VU, 45초 기준 총 RPS 약 969~1,005 범위를 기록했습니다.
 
 Testcontainers 검증은 예약 idempotency, 결제 idempotency, 결제/만료 race condition, DLT replay, Redis stock reconciliation을 포함합니다. 사이트에서는 측정 수치와 시나리오 검증을 분리해 표시하고, 수치가 아닌 것은 시나리오 검증으로만 표현합니다.
 

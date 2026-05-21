@@ -148,7 +148,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
           "대기열과 빠른 재고 조회를 맡지만 최종 진실 원천은 아닙니다.",
         kind: "cache",
         sourceOfTruth: false,
-        evidenceLabel: "혼합 부하",
+        evidenceLabel: "혼합 부하 테스트",
         status: "measured",
       },
       {
@@ -350,7 +350,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         label: "Latency Benchmark",
         description: "send-to-receive p50/p95/p99를 별도 측정합니다.",
         kind: "external",
-        evidenceLabel: "송신-수신 지연 시간",
+        evidenceLabel: "메시지 전달 지연 시간",
         status: "pending",
       },
     ],
@@ -427,7 +427,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         to: "latency-benchmark",
         label: "send-to-receive 샘플링",
         kind: "sync",
-        evidenceLabel: "송신-수신 지연 시간",
+        evidenceLabel: "메시지 전달 지연 시간",
       },
     ],
     boundaries: [
@@ -466,7 +466,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         label: "추가 검증 예정",
         description:
           "실제 메시지 지연과 전달 완전성은 별도 benchmark에서 공개 수치로 채워야 합니다.",
-        evidenceLabel: "송신-수신 지연 시간",
+        evidenceLabel: "메시지 전달 지연 시간",
       },
     ],
   },
@@ -527,7 +527,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
           "debit/credit balance와 currency invariant의 최종 진실 원천입니다.",
         kind: "ledger",
         sourceOfTruth: true,
-        evidenceLabel: "Append-only ledger 불변식",
+        evidenceLabel: "Append-only Ledger 불변성",
         status: "verified",
       },
       {
@@ -552,7 +552,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         description:
           "운영형 성능 claim은 공개 가능한 데이터와 함께만 표시합니다.",
         kind: "external",
-        evidenceLabel: "운영 성능 데이터",
+        evidenceLabel: "운영 성능 주장",
         status: "pending",
       },
     ],
@@ -601,7 +601,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         to: "ledger",
         label: "charge/payment ledger 추가",
         kind: "transaction",
-        evidenceLabel: "Append-only ledger 불변식",
+        evidenceLabel: "Append-only Ledger 불변성",
       },
       {
         id: "audit-entry",
@@ -624,7 +624,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         to: "ledger",
         label: "운영형 성능 근거",
         kind: "sync",
-        evidenceLabel: "운영 성능 데이터",
+        evidenceLabel: "운영 성능 주장",
       },
     ],
     boundaries: [

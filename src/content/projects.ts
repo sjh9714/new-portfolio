@@ -68,7 +68,7 @@ export const projects: Project[] = [
         status: "measured",
       },
       {
-        label: "혼합 부하",
+        label: "혼합 부하 테스트",
         value: "200 VU, 45초 기준 총 RPS 약 969~1,005",
         status: "measured",
       },
@@ -145,7 +145,7 @@ export const projects: Project[] = [
         status: "measured",
       },
       {
-        label: "송신-수신 지연 시간",
+        label: "메시지 전달 지연 시간",
         value: "p50/p95/p99 benchmark pending",
         status: "pending",
       },
@@ -210,7 +210,7 @@ export const projects: Project[] = [
         status: "verified",
       },
       {
-        label: "Append-only ledger 불변식",
+        label: "Append-only Ledger 불변성",
         value:
           "debit/credit balance, single currency, positive amount invariant 검증",
         status: "verified",
@@ -221,7 +221,7 @@ export const projects: Project[] = [
         status: "pending",
       },
       {
-        label: "운영 성능 데이터",
+        label: "운영 성능 주장",
         value: "operational performance data pending",
         status: "pending",
       },

@@ -37,13 +37,33 @@ const bannedSubmissionPhrases = [
 const sourceFilesWithPublicCopy = [
   "src/content/projects.ts",
   "src/content/profile.ts",
+  "README.md",
   "src/app/page.tsx",
   "src/app/case-studies/page.tsx",
+  "src/app/projects/page.tsx",
   "src/app/about/page.tsx",
   "src/app/resume/page.tsx",
   "src/app/sitemap.ts",
+  "src/components/architecture-diagram/index.tsx",
+  "src/components/evidence-matrix.tsx",
+  "src/content/architecture-diagrams.ts",
+  "src/content/case-studies/concert-booking.mdx",
+  "src/content/case-studies/realtime-chat.mdx",
   "src/content/case-studies/ai-usage-billing-gateway.mdx",
   "src/content/case-studies/msa-shop.mdx",
+];
+
+const legacyPublicStrings = [
+  ["Hot", " Seat", " Contention"].join(""),
+  ["Chat room", " API RPS"].join(""),
+  ["Usage", " idempotency"].join(""),
+  ["k6 mixed", " usage scenario"].join(""),
+  ["SAGA", " compensation flow"].join(""),
+  ["RabbitMQ", " event flow"].join(""),
+  ["Gateway", " boundary"].join(""),
+  ["재처리", " 재처리"].join(""),
+  ["보상", " 보상"].join(""),
+  ["재시도", " 재시도"].join(""),
 ];
 
 describe("portfolio project content", () => {
@@ -176,6 +196,26 @@ describe("portfolio project content", () => {
     expect(evidenceMatrixSource).not.toContain("<code");
   });
 
+  it("uses the final Korean evidence labels for submission-facing project data", () => {
+    const evidenceLabels = projects.flatMap((project) =>
+      project.evidence.map((evidence) => evidence.label),
+    );
+
+    expect(evidenceLabels).toEqual(
+      expect.arrayContaining([
+        "동일 좌석 경합",
+        "혼합 부하 테스트",
+        "채팅방 조회 API RPS",
+        "메시지 전달 지연 시간",
+        "Append-only Ledger 불변성",
+        "운영 성능 주장",
+        "SAGA 보상 흐름",
+        "RabbitMQ 이벤트 흐름",
+        "Gateway 접근 경계",
+      ]),
+    );
+  });
+
   it("hides the resume PDF button unless the submission PDF filename exists", () => {
     const resumeSource = readFileSync(
       join(process.cwd(), "src/app/resume/page.tsx"),
@@ -192,6 +232,16 @@ describe("portfolio project content", () => {
       .join("\n");
 
     for (const phrase of bannedSubmissionPhrases) {
+      expect(combinedSource).not.toContain(phrase);
+    }
+  });
+
+  it("does not expose legacy English labels or duplicated recovery wording", () => {
+    const combinedSource = sourceFilesWithPublicCopy
+      .map((file) => readFileSync(join(process.cwd(), file), "utf8"))
+      .join("\n");
+
+    for (const phrase of legacyPublicStrings) {
       expect(combinedSource).not.toContain(phrase);
     }
   });
@@ -237,7 +287,7 @@ describe("portfolio project content", () => {
     expect(realtime?.evidence).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          label: "송신-수신 지연 시간",
+          label: "메시지 전달 지연 시간",
           status: "pending",
         }),
         expect.objectContaining({
@@ -254,7 +304,7 @@ describe("portfolio project content", () => {
           status: "pending",
         }),
         expect.objectContaining({
-          label: "운영 성능 데이터",
+          label: "운영 성능 주장",
           status: "pending",
         }),
       ]),

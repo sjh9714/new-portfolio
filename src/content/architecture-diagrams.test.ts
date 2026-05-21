@@ -5,6 +5,10 @@ import { join } from "node:path";
 import { featuredProjects } from "./projects";
 import { architectureDiagrams } from "./architecture-diagrams";
 
+const legacyDeadReplayLabel = ["DEAD 상태와", "수동 재처리"].join(" ");
+const legacyCompensationLabel = ["결제 실패", "보상"].join(" ");
+const legacyRelayRetryLabel = ["relay", "재시도"].join(" ");
+
 describe("architecture diagram content", () => {
   it("defines a diagram for every featured project", () => {
     expect(Object.keys(architectureDiagrams).sort()).toEqual(
@@ -104,9 +108,9 @@ describe("architecture diagram content", () => {
       diagram.edges.map((edge) => edge.label),
     );
 
-    expect(labels).not.toContain("DEAD 상태와 수동 재처리");
-    expect(labels).not.toContain("결제 실패 보상");
-    expect(labels).not.toContain("relay 재시도");
+    expect(labels).not.toContain(legacyDeadReplayLabel);
+    expect(labels).not.toContain(legacyCompensationLabel);
+    expect(labels).not.toContain(legacyRelayRetryLabel);
     expect(labels).toEqual(expect.arrayContaining(["DEAD 상태 → 수동 처리"]));
     expect(labels).toEqual(
       expect.arrayContaining(["결제 실패 → 재고 예약 취소"]),
