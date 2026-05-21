@@ -32,20 +32,20 @@ const nodeKindLabel: Record<ArchitectureNodeKind, string> = {
 };
 
 const edgeKindLabel: Record<ArchitectureEdgeKind, string> = {
-  sync: "sync",
-  async: "async boundary",
-  transaction: "tx boundary",
-  failure: "failure path",
-  retry: "retry",
-  replay: "retry / replay",
-  compensation: "compensation",
+  sync: "동기 호출",
+  async: "비동기 경계",
+  transaction: "트랜잭션 경계",
+  failure: "실패/복구 경로",
+  retry: "재시도",
+  replay: "재처리",
+  compensation: "보상 처리",
 };
 
 const boundaryKindLabel: Record<ArchitectureBoundaryKind, string> = {
-  transaction: "transaction boundary",
-  async: "async boundary",
-  failure: "failure path",
-  source: "source of truth",
+  transaction: "트랜잭션 경계",
+  async: "비동기 경계",
+  failure: "실패/복구 경로",
+  source: "최종 기준 데이터",
 };
 
 const edgeIcons: Record<ArchitectureEdgeKind, typeof ArrowRight> = {
@@ -98,27 +98,27 @@ function ArchitectureDiagramView({
         </p>
       </div>
 
-      <div className="flex flex-wrap gap-2" aria-label="Diagram legend">
+      <div className="flex flex-wrap gap-2" aria-label="구조도 범례">
         <Badge variant="outline" className="rounded-md">
-          transaction boundary
+          트랜잭션 경계
         </Badge>
         <Badge variant="outline" className="rounded-md">
-          async boundary
+          비동기 경계
         </Badge>
         <Badge variant="outline" className="rounded-md">
-          failure path
+          실패/복구 경로
         </Badge>
         <Badge variant="outline" className="rounded-md">
-          source of truth
+          최종 기준 데이터
         </Badge>
         <Badge variant="outline" className="rounded-md">
-          pending marker
+          추가 검증 예정
         </Badge>
       </div>
 
       <section className="flex flex-col gap-3">
         <h4 className="text-muted-foreground text-sm font-semibold tracking-[0.16em] uppercase">
-          System Flow
+          시스템 흐름
         </h4>
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {diagram.nodes.map((node) => (
@@ -148,12 +148,12 @@ function ArchitectureDiagramView({
               </p>
               {node.sourceOfTruth ? (
                 <span className="text-primary mt-auto text-xs font-semibold tracking-[0.16em] uppercase">
-                  source of truth
+                  최종 기준 데이터
                 </span>
               ) : null}
               {node.status === "pending" ? (
                 <span className="text-muted-foreground mt-auto text-xs font-semibold tracking-[0.16em] uppercase">
-                  pending marker
+                  추가 검증 예정
                 </span>
               ) : null}
             </div>
@@ -162,23 +162,19 @@ function ArchitectureDiagramView({
       </section>
 
       <div className="grid gap-4 lg:grid-cols-2">
+        <EdgePanel title="주요 흐름" diagram={diagram} edges={primaryEdges} />
         <EdgePanel
-          title="Primary Flow"
-          diagram={diagram}
-          edges={primaryEdges}
-        />
-        <EdgePanel
-          title="Failure / Recovery Paths"
+          title="실패/복구 경로"
           diagram={diagram}
           edges={recoveryEdges}
-          emptyText="장애 복구 경로는 boundary와 callout에서 별도로 설명합니다."
+          emptyText="장애 복구 경로는 경계와 검토 포인트에서 별도로 설명합니다."
         />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
         <section className="border-border bg-background flex flex-col gap-3 rounded-md border p-4">
           <h4 className="text-muted-foreground text-sm font-semibold tracking-[0.16em] uppercase">
-            Boundaries
+            경계
           </h4>
           <div className="flex flex-col gap-2">
             {diagram.boundaries.map((boundary) => (
@@ -204,7 +200,7 @@ function ArchitectureDiagramView({
 
         <section className="border-border bg-background flex flex-col gap-3 rounded-md border p-4">
           <h4 className="text-muted-foreground text-sm font-semibold tracking-[0.16em] uppercase">
-            Review Callouts
+            검토 포인트
           </h4>
           {diagram.callouts.map((callout) => (
             <div key={callout.label} className="flex flex-col gap-1">

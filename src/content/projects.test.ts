@@ -98,7 +98,7 @@ describe("portfolio project content", () => {
       expect.arrayContaining([
         expect.objectContaining({
           href: "/case-studies",
-          label: "Case Studies",
+          label: "문제 해결 사례",
         }),
       ]),
     );
@@ -122,7 +122,7 @@ describe("portfolio project content", () => {
       expect(homeSource).not.toContain("Writing Queue");
       expect(homeSource).not.toContain("blogTopics");
     }
-    expect(homeSource).toContain("Evidence Snapshot");
+    expect(homeSource).toContain("핵심 검증 근거");
   });
 
   it("keeps project cards structured for a 30-second technical scan", () => {
@@ -131,10 +131,11 @@ describe("portfolio project content", () => {
       "utf8",
     );
 
-    expect(projectCardSource).toContain('LabeledText label="Problem"');
-    expect(projectCardSource).toContain('LabeledText label="Design"');
-    expect(projectCardSource).toContain('LabeledText label="Result"');
-    expect(projectCardSource).toContain("Evidence");
+    expect(projectCardSource).toContain('LabeledText label="문제"');
+    expect(projectCardSource).toContain('LabeledText label="설계"');
+    expect(projectCardSource).toContain('LabeledText label="결과"');
+    expect(projectCardSource).toContain("근거");
+    expect(projectCardSource).toContain("대표 1순위");
     expect(projectCardSource).toContain("primaryTechStack");
     expect(projectCardSource).not.toContain("!compact");
   });
@@ -146,10 +147,28 @@ describe("portfolio project content", () => {
     );
 
     expect(caseStudySource).toContain("lg:sticky");
-    expect(caseStudySource).toContain("Evidence");
-    expect(caseStudySource).toContain("Tech Stack");
-    expect(caseStudySource).toContain("Limitations");
-    expect(caseStudySource).toContain("Interview Questions");
+    expect(caseStudySource).toContain("근거");
+    expect(caseStudySource).toContain("기술 스택");
+    expect(caseStudySource).toContain("한계와 다음 검증");
+    expect(caseStudySource).toContain("예상 면접 질문");
+  });
+
+  it("keeps evidence status enums internal while rendering Korean badge labels", () => {
+    const statusBadgeSource = readFileSync(
+      join(process.cwd(), "src/components/status-badge.tsx"),
+      "utf8",
+    );
+    const evidenceMatrixSource = readFileSync(
+      join(process.cwd(), "src/components/evidence-matrix.tsx"),
+      "utf8",
+    );
+
+    expect(statusBadgeSource).toContain('measured: "측정 완료"');
+    expect(statusBadgeSource).toContain('verified: "시나리오 검증"');
+    expect(statusBadgeSource).toContain('pending: "추가 측정 예정"');
+    expect(evidenceMatrixSource).toContain("측정 완료");
+    expect(evidenceMatrixSource).toContain("시나리오 검증");
+    expect(evidenceMatrixSource).toContain("추가 측정 예정");
   });
 
   it("does not expose draft-only or internal strategy phrasing", () => {

@@ -12,7 +12,7 @@ export default function NotFound() {
         페이지를 찾을 수 없습니다.
       </h1>
       <p className="text-muted-foreground text-sm leading-7">
-        존재하지 않는 case study이거나 아직 공개하지 않은 페이지입니다.
+        존재하지 않는 문제 해결 사례이거나 아직 공개하지 않은 페이지입니다.
       </p>
       <div>
         <Button asChild>

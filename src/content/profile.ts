@@ -1,7 +1,7 @@
 export const profile = {
   initials: "SJH",
   name: "성진혁",
-  role: "Backend Engineer",
+  role: "백엔드 개발자",
   githubUrl: "https://github.com/sjh9714",
   email: "jinhyuk9714@gmail.com",
   blogUrl: "",
@@ -12,8 +12,8 @@ export const profile = {
 } as const;
 
 export const navigationItems = [
-  { href: "/case-studies", label: "Case Studies" },
-  { href: "/projects", label: "Projects" },
-  { href: "/resume", label: "Resume" },
-  { href: "/about", label: "Contact" },
+  { href: "/case-studies", label: "문제 해결 사례" },
+  { href: "/projects", label: "프로젝트" },
+  { href: "/resume", label: "이력서" },
+  { href: "/about", label: "연락처" },
 ] as const;

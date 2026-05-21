@@ -5,8 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { blogTopics } from "@/content/blog";
 
 export const metadata: Metadata = {
-  title: "Blog",
-  description: "Coming soon backend deep-dive blog topics.",
+  title: "글",
+  description: "공개 예정인 백엔드 딥다이브 글 주제.",
   robots: {
     index: false,
     follow: false,
@@ -17,7 +17,7 @@ export default function BlogPage() {
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-8 px-5 py-12 md:px-8 md:py-16">
       <SectionHeader
-        title="Writing Queue"
+        title="작성 예정 글"
         description="아직 글이 공개되지 않았으므로 허위 링크를 만들지 않고, 면접 질문을 유도할 예정 주제만 보여줍니다."
       />
       <div className="grid gap-4">
@@ -29,7 +29,7 @@ export default function BlogPage() {
             <div className="flex items-start justify-between gap-4">
               <topic.icon aria-hidden="true" />
               <Badge variant="outline" className="rounded-md">
-                Coming soon
+                공개 예정
               </Badge>
             </div>
             <h2 className="text-foreground text-xl leading-7 font-semibold">

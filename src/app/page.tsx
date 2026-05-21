@@ -27,7 +27,7 @@ import { profile } from "@/content/profile";
 
 const focusCards = [
   {
-    title: "Concurrency & Consistency",
+    title: "동시성·정합성",
     icon: LockKeyhole,
     items: [
       "동시성 제어(락, 낙관적 락, 버전)",
@@ -37,7 +37,7 @@ const focusCards = [
     ],
   },
   {
-    title: "Event-driven Architecture",
+    title: "이벤트 기반 복구",
     icon: Boxes,
     items: [
       "도메인 이벤트 설계",
@@ -47,7 +47,7 @@ const focusCards = [
     ],
   },
   {
-    title: "Realtime Messaging",
+    title: "실시간 메시징",
     icon: MessageSquare,
     items: [
       "WebSocket + STOMP",
@@ -57,7 +57,7 @@ const focusCards = [
     ],
   },
   {
-    title: "Billing & Tenant Security",
+    title: "과금·테넌트 보안",
     icon: ShieldCheck,
     items: [
       "사용량 수집과 과금 집계",
@@ -127,10 +127,10 @@ export default function Home() {
           <div className="flex max-w-4xl flex-col gap-7">
             <div className="flex flex-col gap-4">
               <p className="text-primary text-sm font-semibold tracking-[0.2em] uppercase">
-                Java / Spring Backend Portfolio
+                Java/Spring 백엔드 포트폴리오
               </p>
               <h1 className="text-foreground text-5xl leading-tight font-bold tracking-tight md:text-7xl">
-                Backend Engineer
+                Java/Spring 백엔드 개발자 성진혁
               </h1>
               <p className="text-muted-foreground max-w-3xl text-xl leading-9">
                 {profile.headline}
@@ -139,12 +139,12 @@ export default function Home() {
             <div className="flex flex-col gap-3 sm:flex-row">
               <Button asChild>
                 <Link href="/resume">
-                  <BookOpen data-icon="inline-start" aria-hidden="true" />
-                  Web Resume
+                  <BookOpen data-icon="inline-start" aria-hidden="true" />웹
+                  이력서
                 </Link>
               </Button>
               <Button asChild variant="outline">
-                <Link href="/case-studies">Case Studies</Link>
+                <Link href="/case-studies">문제 해결 사례</Link>
               </Button>
               <Button asChild variant="outline">
                 <a href={profile.githubUrl} target="_blank" rel="noreferrer">
@@ -155,7 +155,7 @@ export default function Home() {
               <Button asChild variant="outline">
                 <a href={`mailto:${profile.email}`}>
                   <Mail data-icon="inline-start" aria-hidden="true" />
-                  Email
+                  이메일
                 </a>
               </Button>
             </div>
@@ -164,7 +164,7 @@ export default function Home() {
           <aside className="border-border bg-card flex flex-col gap-5 border p-5">
             <div className="flex flex-col gap-1">
               <p className="text-primary text-sm font-semibold">
-                Evidence Snapshot
+                핵심 검증 근거
               </p>
               <h2 className="text-foreground text-2xl font-semibold tracking-tight">
                 대표 사례는 수치와 검증 상태로 먼저 읽힙니다.
@@ -231,11 +231,11 @@ export default function Home() {
 
         <section className="flex flex-col gap-6">
           <SectionHeader
-            title="Featured Case Studies"
+            title="대표 문제 해결 사례"
             description="면접 질문을 유도할 4개 문제 해결 사례를 먼저 읽히도록 구성했습니다."
             action={
               <Button asChild variant="ghost">
-                <Link href="/case-studies">전체 Case Studies 보기</Link>
+                <Link href="/case-studies">전체 사례 보기</Link>
               </Button>
             }
           />
@@ -248,7 +248,7 @@ export default function Home() {
 
         <section className="flex flex-col gap-6">
           <SectionHeader
-            title="Evidence Matrix"
+            title="검증 기준"
             description="측정한 수치, 재현 가능한 검증, 아직 채워야 하는 항목을 같은 색으로 뭉개지 않습니다."
           />
           <EvidenceMatrix />
@@ -256,7 +256,7 @@ export default function Home() {
 
         <section className="flex flex-col gap-5">
           <SectionHeader
-            title="Additional Projects"
+            title="추가 프로젝트"
             description="대표 사례를 보완하는 팀 협업, 제품 구현, 캐싱, AI 서비스 경험을 짧게 정리합니다."
             action={
               <Button asChild variant="ghost">

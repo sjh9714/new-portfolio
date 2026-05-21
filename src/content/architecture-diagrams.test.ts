@@ -75,9 +75,9 @@ describe("architecture diagram content", () => {
       "utf8",
     );
 
-    expect(source).toContain("source of truth");
-    expect(source).toContain("failure path");
-    expect(source).toContain("async boundary");
-    expect(source).toContain("pending marker");
+    expect(source).toContain("최종 기준 데이터");
+    expect(source).toContain("실패/복구 경로");
+    expect(source).toContain("비동기 경계");
+    expect(source).toContain("추가 검증 예정");
   });
 });

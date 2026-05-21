@@ -1,26 +1,26 @@
-## TL;DR
+## 요약
 
 Concert Booking은 콘서트 좌석 예매에서 동시에 몰리는 예약 요청, 대기열 우회, 중복 결제 요청, 만료 race, Kafka 발행 실패를 하나의 흐름으로 다룬 백엔드 사례입니다. 핵심은 빠른 Redis 상태를 최종 기준으로 삼지 않고, PostgreSQL transaction과 Outbox 기록을 최종 복구 기준으로 둔 점입니다.
 
 동일 좌석 100개 동시 요청은 success 1, fail 99, overselling 0으로 측정했고, 서로 다른 좌석 50개 예약에서는 pessimistic lock과 Redis distributed lock 모두 50/50 성공을 기록했습니다. 예약, 결제, 만료, DLT replay, stock reconciliation은 Testcontainers 시나리오로 검증했습니다.
 
-## Problem
+## 문제
 
 좌석 예매는 단순한 CRUD처럼 보이지만 실제로는 여러 실패가 한 요청 안에서 겹칩니다. 사용자는 같은 좌석을 동시에 누를 수 있고, 네트워크 timeout 때문에 같은 요청을 다시 보낼 수 있으며, 결제 승인과 예약 만료가 거의 같은 시점에 들어올 수 있습니다. 여기에 Kafka 발행 실패가 섞이면 DB에는 예약이 남았는데 consumer는 좌석 해제 이벤트를 받지 못하는 상태도 생깁니다.
 
 이 문제에서 가장 피해야 하는 결과는 좌석 오버셀링입니다. 두 번째로 피해야 하는 것은 실패가 조용히 묻혀 운영자가 복구할 근거를 잃는 것입니다. 그래서 설계의 중심을 “빠른 성공”보다 “중복과 실패를 다시 설명할 수 있는 상태”에 두었습니다.
 
-## Naive Approach
+## 단순 구현에서의 문제
 
 가장 단순한 구현은 좌석 row를 읽고, 남아 있으면 예약 row를 만들고, 결제가 완료되면 Kafka 이벤트를 바로 발행하는 방식입니다. 이 방식은 구현은 짧지만 동시에 들어온 요청이 같은 좌석을 통과할 수 있고, client retry가 중복 예약이나 중복 결제로 이어질 수 있습니다.
 
 Redis stock을 먼저 줄이고 DB를 나중에 맞추는 방식도 매력적이지만, Redis가 최종 기준이 되면 장애 후 어떤 상태가 진짜인지 설명하기 어려워집니다. 이 프로젝트에서는 Redis를 대기열, 빠른 조회, reconciliation 대상에는 쓰되, 좌석과 예약의 최종 기준은 DB로 유지했습니다.
 
-## Architecture / Flow
+## 구조와 흐름
 
 <ArchitectureDiagram />
 
-## Design Decisions
+## 설계 판단
 
 대기열 token은 userId와 scheduleId에 묶어 우회 사용을 막습니다. Reservation API는 idempotency key를 먼저 확인하고, 좌석 락과 예약 상태 변경을 transaction 경계 안에서 처리합니다. 결제와 만료 race는 예약 상태 전이를 기준으로 흡수하고, 이벤트 발행은 Outbox table에 intent를 남긴 뒤 relay가 Kafka로 전달합니다.
 
@@ -28,12 +28,12 @@ Outbox는 exactly-once를 약속하는 장치가 아닙니다. 대신 DB commit 
 
 락 전략은 한 가지 답을 전제하지 않고 비교했습니다. 동일 좌석 경합은 오버셀링 방지가 핵심이고, 서로 다른 좌석 예약은 불필요한 충돌을 줄이는 것이 핵심입니다. 그래서 pessimistic lock, optimistic lock, Redis distributed lock을 각각 경합 패턴과 실패 양상 기준으로 비교했습니다.
 
-## Evidence Notes
+## 검증 결과
 
 Hot Seat Contention은 동일 좌석 100 concurrent requests에서 success 1, fail 99, overselling 0으로 기록했습니다. Distributed Reservation은 50명이 서로 다른 좌석을 예약하는 시나리오에서 pessimistic 50/50, Redis distributed lock 50/50 결과를 확인했습니다. Mixed Load는 200 VU, 45초 기준 총 RPS 약 969~1,005 범위를 기록했습니다.
 
-Testcontainers 검증은 예약 idempotency, 결제 idempotency, 결제/만료 race condition, DLT replay, Redis stock reconciliation을 포함합니다. 사이트에서는 측정 수치와 시나리오 검증을 분리해 표시하고, 수치가 아닌 것은 Verified로만 표현합니다.
+Testcontainers 검증은 예약 idempotency, 결제 idempotency, 결제/만료 race condition, DLT replay, Redis stock reconciliation을 포함합니다. 사이트에서는 측정 수치와 시나리오 검증을 분리해 표시하고, 수치가 아닌 것은 시나리오 검증으로만 표현합니다.
 
-## Limitations
+## 한계와 다음 검증
 
 운영 알림, tracing, SLO, runbook은 별도 운영 문서로 확장할 영역입니다. Redis 장애 시 fail-open/fail-closed 선택도 서비스 정책에 따라 달라지므로, 단순히 “항상 닫는다”가 아니라 예매 도메인의 사용자 피해와 운영 복구 비용을 기준으로 시나리오를 나눠야 합니다.

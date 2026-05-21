@@ -22,7 +22,7 @@ export async function generateMetadata({
 
   if (!project || project.category !== "featured") {
     return {
-      title: "Case Study",
+      title: "문제 해결 사례",
     };
   }
 

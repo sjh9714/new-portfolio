@@ -1,26 +1,26 @@
-## TL;DR
+## 요약
 
 Realtime Chat은 WebSocket 연결 자체보다 다중 인스턴스 환경에서 권한, 순서, presence, reconnect 복구가 어떻게 흔들리는지에 초점을 둔 채팅 백엔드 사례입니다. STOMP subscribe authorization, Kafka ACK/NACK, roomId key ordering, Redis presence, reconnect sync API, DLT replay를 각각 분리해 설계했습니다.
 
 채팅방 조회 API는 937 RPS에서 1,598 RPS로 개선했고, p95 응답 시간은 212.85ms에서 149.22ms로 줄였습니다. N+1 쿼리는 2N+1회에서 1회로 제거했습니다. WebSocket connection smoke는 2대 합산 1,158 sessions, 연결 체크 성공률 100%를 기록했습니다.
 
-## Problem
+## 문제
 
 단일 인스턴스 채팅은 WebSocket 연결과 메모리 상태만으로도 어느 정도 동작합니다. 하지만 인스턴스가 둘 이상이 되면 client A가 App #1에 붙고 client B가 App #2에 붙는 순간부터 문제가 바뀝니다. 구독 권한은 연결 시점이 아니라 subscribe 시점에도 검증해야 하고, 메시지는 같은 방 안에서 순서가 흔들리지 않아야 하며, presence는 프로세스 메모리에만 둘 수 없습니다.
 
-또한 네트워크가 끊겼다가 reconnect되는 사용자는 마지막으로 어디까지 받았는지 기준이 필요합니다. “연결이 살아 있었다”와 “모든 메시지를 받았다”는 다른 주장입니다. 그래서 이 프로젝트는 연결 smoke와 API 성능 수치를 먼저 공개하고, 실제 send-to-receive latency와 delivery completeness는 별도 Pending evidence로 남겼습니다.
+또한 네트워크가 끊겼다가 reconnect되는 사용자는 마지막으로 어디까지 받았는지 기준이 필요합니다. “연결이 살아 있었다”와 “모든 메시지를 받았다”는 다른 주장입니다. 그래서 이 프로젝트는 연결 smoke와 API 성능 수치를 먼저 공개하고, 실제 send-to-receive latency와 delivery completeness는 별도 추가 측정 예정 근거로 남겼습니다.
 
-## Naive Approach
+## 단순 구현에서의 문제
 
 가장 단순한 구현은 WebSocket session registry를 한 인스턴스 메모리에 두고, 메시지를 그 registry에 바로 fan-out하는 방식입니다. 이 방식은 로컬에서는 빠르게 보이지만 인스턴스가 늘면 다른 서버에 붙은 구독자를 찾지 못합니다. subscribe authorization을 생략하면 방 멤버가 아닌 사용자가 topic을 직접 구독할 수도 있습니다.
 
 Kafka를 붙여도 roomId key를 고려하지 않으면 같은 방 메시지 순서를 설명하기 어렵습니다. Redis presence도 TTL과 heartbeat 기준이 없으면 “온라인처럼 보이지만 실제로는 끊긴 사용자”가 남습니다. 그래서 각 역할을 단순 연결이 아니라 실패 가능한 경계로 나눴습니다.
 
-## Architecture / Flow
+## 구조와 흐름
 
 <ArchitectureDiagram />
 
-## Design Decisions
+## 설계 판단
 
 STOMP subscribe authorization은 사용자가 특정 room topic을 구독할 권한이 있는지 확인합니다. 메시지 publish는 Kafka producer ACK/NACK 결과를 기준으로 성공과 실패를 분리하고, roomId를 key로 사용해 같은 방의 순서를 하나의 partition 안에서 유지하도록 설계했습니다.
 
@@ -28,12 +28,12 @@ Redis presence는 최종 진실 원천이 아니라 짧게 살아 있는 접속 
 
 읽음 상태와 메시지 목록 조회는 N+1이 발생하기 쉬운 영역입니다. 이 부분은 조회 API 성능 개선으로 먼저 측정했고, 실시간 전달 경로의 지연과 완전성은 별도 benchmark로 분리했습니다. 이렇게 나누면 “조회 API는 측정됨”과 “실시간 전달 품질은 아직 측정 전”을 혼동하지 않습니다.
 
-## Evidence Notes
+## 검증 결과
 
-Measured evidence는 채팅방 조회 API RPS 937 -> 1,598, p95 212.85ms -> 149.22ms, N+1 2N+1 queries -> 1 query, WebSocket connection smoke 1,158 sessions / 100% success입니다.
+측정 완료 근거는 채팅방 조회 API RPS 937 -> 1,598, p95 212.85ms -> 149.22ms, N+1 2N+1 queries -> 1 query, WebSocket connection smoke 1,158 sessions / 100% success입니다.
 
-Pending evidence는 send-to-receive p50/p95/p99와 1,000 concurrent sessions 기준 delivery completeness입니다. 이 두 수치는 실제 메시징 품질을 말할 때 꼭 필요한 값이므로, 사이트에서는 숨기지 않고 Pending으로 보여줍니다.
+추가 측정 예정 근거는 send-to-receive p50/p95/p99와 1,000 concurrent sessions 기준 delivery completeness입니다. 이 두 수치는 실제 메시징 품질을 말할 때 꼭 필요한 값이므로, 사이트에서는 숨기지 않고 추가 측정 예정으로 보여줍니다.
 
-## Limitations
+## 한계와 다음 검증
 
 연결 smoke는 “연결 가능”을 확인할 뿐 “모든 메시지 전달”을 보장하지 않습니다. 다음 측정은 producer timestamp와 client receive timestamp를 기준으로 latency histogram을 만들고, consumer failure 후 DLT replay로 누락 메시지가 복구되는지를 별도 시나리오에서 확인하는 방식이 적절합니다.

@@ -6,7 +6,7 @@ export function SiteFooter() {
   return (
     <footer className="border-border bg-background border-t">
       <div className="text-muted-foreground mx-auto flex max-w-7xl flex-col gap-3 px-5 py-8 text-sm md:flex-row md:items-center md:justify-between md:px-8">
-        <p>{profile.name} Backend Portfolio</p>
+        <p>{profile.name} 백엔드 포트폴리오</p>
         <div className="flex flex-wrap gap-4">
           {navigationItems.map((item) => (
             <Link
@@ -26,7 +26,7 @@ export function SiteFooter() {
             GitHub
           </a>
           <a href={`mailto:${profile.email}`} className="hover:text-foreground">
-            Email
+            이메일
           </a>
         </div>
       </div>

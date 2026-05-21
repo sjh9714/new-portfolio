@@ -18,7 +18,7 @@ export function CaseStudyArticle({
       <header className="border-border flex flex-col gap-6 border-b pb-10">
         <div className="flex flex-col gap-3">
           <p className="text-muted-foreground text-sm font-semibold tracking-[0.18em] uppercase">
-            Case Study / {project.domain}
+            문제 해결 사례 / {project.domain}
           </p>
           <h1 className="text-foreground max-w-4xl text-4xl font-bold tracking-tight md:text-6xl">
             {project.title}
@@ -57,11 +57,11 @@ export function CaseStudyArticle({
 function CaseStudySidebar({ project }: { project: Project }) {
   return (
     <aside
-      aria-label={`${project.title} evidence summary`}
+      aria-label={`${project.title} 근거 요약`}
       className="border-border bg-card flex flex-col gap-6 rounded-md border p-5 lg:sticky lg:top-6"
     >
       <div className="flex flex-col gap-3">
-        <p className="text-primary text-sm font-semibold">Evidence</p>
+        <p className="text-primary text-sm font-semibold">근거</p>
         <div className="flex flex-col gap-3">
           {project.evidence.map((evidence) => (
             <div
@@ -82,7 +82,7 @@ function CaseStudySidebar({ project }: { project: Project }) {
         </div>
       </div>
 
-      <SidebarSection title="Tech Stack">
+      <SidebarSection title="기술 스택">
         <div className="flex flex-wrap gap-2">
           {project.primaryTechStack.map((tech) => (
             <Badge key={tech} variant="outline" className="rounded-md">
@@ -92,17 +92,17 @@ function CaseStudySidebar({ project }: { project: Project }) {
         </div>
       </SidebarSection>
 
-      <SidebarSection title="Limitations">
+      <SidebarSection title="한계와 다음 검증">
         <SidebarList items={project.limitations} />
       </SidebarSection>
 
-      <SidebarSection title="Interview Questions">
+      <SidebarSection title="예상 면접 질문">
         <SidebarList items={project.interviewQuestions} />
       </SidebarSection>
 
       <Button asChild className="w-full">
         <a href={project.repoUrl} target="_blank" rel="noreferrer">
-          GitHub Repository
+          GitHub 저장소
         </a>
       </Button>
     </aside>

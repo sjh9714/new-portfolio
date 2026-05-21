@@ -30,6 +30,11 @@ export function ProjectCard({
           {project.domain}
         </p>
         <div className="flex flex-col gap-1">
+          {project.slug === "concert-booking" ? (
+            <Badge variant="outline" className="w-fit rounded-md">
+              대표 1순위
+            </Badge>
+          ) : null}
           <h3
             className={cn(
               "text-primary font-semibold tracking-tight",
@@ -45,14 +50,14 @@ export function ProjectCard({
       </div>
 
       <div className="flex flex-1 flex-col gap-4 text-sm leading-6">
-        <LabeledText label="Problem" value={project.problem} />
-        <LabeledText label="Design" value={project.solution} />
-        <LabeledText label="Result" value={project.result} />
+        <LabeledText label="문제" value={project.problem} />
+        <LabeledText label="설계" value={project.solution} />
+        <LabeledText label="결과" value={project.result} />
       </div>
 
       <div className="flex flex-col gap-2">
         <p className="text-muted-foreground text-xs font-semibold tracking-[0.16em] uppercase">
-          Evidence
+          근거
         </p>
         <div className="flex flex-col gap-2">
           {evidencePreview.map((evidence) => (
@@ -82,13 +87,13 @@ export function ProjectCard({
           <Button asChild className="flex-1">
             <Link href={`/case-studies/${project.slug}`}>
               <FileText data-icon="inline-start" aria-hidden="true" />
-              Case Study
+              사례 보기
             </Link>
           </Button>
         ) : (
           <Button disabled variant="outline" className="flex-1">
             <FileText data-icon="inline-start" aria-hidden="true" />
-            Case Study
+            사례 보기
           </Button>
         )}
         <Button asChild variant="outline" className="flex-1">
@@ -127,7 +132,7 @@ export function ProjectRow({ project }: { project: Project }) {
           aria-label={`${project.title} GitHub`}
         >
           <ExternalLink data-icon="inline-end" aria-hidden="true" />
-          Repo
+          저장소
         </a>
       </Button>
     </article>

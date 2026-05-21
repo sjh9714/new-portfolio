@@ -16,20 +16,20 @@ Primary positioning:
 
 - Do not invent metrics.
 - Use only metrics explicitly present in `src/content/projects.ts` or MDX files.
-- If a result is not measured, label it as `Pending` or `Verified`, never `Measured`.
+- If a result is not measured, label it as `추가 측정 예정` or `시나리오 검증`, never `측정 완료`.
 - Do not overuse animations.
 - Do not make the site look like a designer portfolio.
 - Do not use vague copy such as "passionate developer" or "I love clean code".
 - Prefer problem-solution-result-domain wording.
 - All featured case studies must include:
-  - TL;DR
-  - Problem
-  - Naive Approach
-  - Architecture / Flow
-  - Design Decisions
-  - Evidence
-  - Limitations
-  - Interview Questions
+  - 요약
+  - 문제
+  - 단순 구현에서의 문제
+  - 구조와 흐름
+  - 설계 판단
+  - 검증 결과
+  - 한계와 다음 검증
+  - 예상 면접 질문
 
 ## Tech Stack
 
@@ -60,17 +60,18 @@ npm run build
 - Dense but scannable cards
 - Mobile-first
 - Diagrams over screenshots
-- Evidence badges: Measured, Verified, Pending
+- Evidence badges: 측정 완료, 시나리오 검증, 추가 측정 예정
 
 ## Content Rules
 
 Project cards should show:
 
-1. problem
-2. solution
-3. evidence
-4. tech stack, max 5 visible items
-5. links to case study and GitHub
+1. 문제
+2. 설계
+3. 결과
+4. 근거
+5. 기술 스택, max 5 visible items
+6. links to case study and GitHub
 
 Case study pages should avoid long marketing copy.
 They should read like an engineering design review.

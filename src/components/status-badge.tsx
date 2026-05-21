@@ -3,9 +3,9 @@ import { cn } from "@/lib/utils";
 import type { EvidenceStatus } from "@/content/projects";
 
 const statusCopy: Record<EvidenceStatus, string> = {
-  measured: "Measured",
-  verified: "Verified",
-  pending: "Pending",
+  measured: "측정 완료",
+  verified: "시나리오 검증",
+  pending: "추가 측정 예정",
 };
 
 const statusClasses: Record<EvidenceStatus, string> = {
