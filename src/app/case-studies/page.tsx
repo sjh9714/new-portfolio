@@ -17,7 +17,7 @@ export default function CaseStudiesPage() {
         title="Case Studies"
         description="면접 질문으로 이어지기 쉬운 4개 백엔드 문제 해결 사례를 모았습니다."
       />
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2">
         {featuredProjects.map((project) => (
           <ProjectCard key={project.slug} project={project} />
         ))}

@@ -120,8 +120,6 @@ const snapshotItems = [
 });
 
 export default function Home() {
-  const [primaryProject, ...secondaryProjects] = featuredProjects;
-
   return (
     <div className="bg-background">
       <section className="border-border border-b">
@@ -241,15 +239,10 @@ export default function Home() {
               </Button>
             }
           />
-          <div className="grid gap-4 lg:grid-cols-[1.08fr_1fr]">
-            {primaryProject ? (
-              <ProjectCard project={primaryProject} emphasis />
-            ) : null}
-            <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-1">
-              {secondaryProjects.map((project) => (
-                <ProjectCard key={project.slug} project={project} compact />
-              ))}
-            </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            {featuredProjects.map((project) => (
+              <ProjectCard key={project.slug} project={project} />
+            ))}
           </div>
         </section>
 
