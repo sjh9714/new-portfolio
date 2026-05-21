@@ -57,23 +57,23 @@ export const projects: Project[] = [
     ],
     evidence: [
       {
-        label: "Hot Seat Contention",
+        label: "동일 좌석 경합",
         value: "100 concurrent requests -> success 1, fail 99, overselling 0",
         status: "measured",
       },
       {
-        label: "Distributed Reservation",
+        label: "분산 좌석 예약",
         value:
           "50명 서로 다른 좌석 예매 -> pessimistic 50/50, Redis distributed lock 50/50",
         status: "measured",
       },
       {
-        label: "Mixed Load",
+        label: "혼합 부하",
         value: "200 VU, 45초 기준 총 RPS 약 969~1,005",
         status: "measured",
       },
       {
-        label: "Testcontainers scenarios",
+        label: "Testcontainers 검증 시나리오",
         value:
           "reservation/payment idempotency, race condition, DLT replay, stock reconciliation 검증",
         status: "verified",
@@ -125,32 +125,32 @@ export const projects: Project[] = [
     ],
     evidence: [
       {
-        label: "Chat room API RPS",
+        label: "채팅방 조회 API RPS",
         value: "937 -> 1,598 RPS",
         status: "measured",
       },
       {
-        label: "p95 response time",
+        label: "p95 응답 시간",
         value: "212.85ms -> 149.22ms",
         status: "measured",
       },
       {
-        label: "N+1 query removal",
+        label: "N+1 쿼리 제거",
         value: "2N+1 queries -> 1 query",
         status: "measured",
       },
       {
-        label: "WebSocket connection smoke",
+        label: "WebSocket 연결 스모크 테스트",
         value: "2대 합산 1,158 sessions, 연결 체크 성공률 100%",
         status: "measured",
       },
       {
-        label: "Send-to-receive latency",
+        label: "송신-수신 지연 시간",
         value: "p50/p95/p99 benchmark pending",
         status: "pending",
       },
       {
-        label: "WebSocket delivery completeness",
+        label: "WebSocket 전달 완전성",
         value:
           "1,000 concurrent sessions recovery and loss-rate benchmark pending",
         status: "pending",
@@ -195,33 +195,33 @@ export const projects: Project[] = [
     ],
     evidence: [
       {
-        label: "API Key storage",
+        label: "API Key 저장 방식",
         value: "raw key 1회 반환, DB에는 prefix/hash 저장",
         status: "verified",
       },
       {
-        label: "Usage idempotency",
+        label: "사용량 중복 처리",
         value: "중복 usage event 처리와 request hash mismatch 구분",
         status: "verified",
       },
       {
-        label: "Webhook duplicate handling",
+        label: "Webhook 중복 처리",
         value: "providerEventId와 payload hash로 duplicate/conflict 구분",
         status: "verified",
       },
       {
-        label: "Append-only ledger invariant",
+        label: "Append-only ledger 불변식",
         value:
           "debit/credit balance, single currency, positive amount invariant 검증",
         status: "verified",
       },
       {
-        label: "k6 mixed usage scenario",
+        label: "혼합 사용량 부하 테스트",
         value: "throughput/latency/error-rate benchmark pending",
         status: "pending",
       },
       {
-        label: "Production performance claim",
+        label: "운영 성능 데이터",
         value: "operational performance data pending",
         status: "pending",
       },
@@ -282,23 +282,23 @@ export const projects: Project[] = [
     ],
     evidence: [
       {
-        label: "SAGA compensation flow",
+        label: "SAGA 보상 흐름",
         value:
           "주문 실패 시 재고 보상, 주문 저장 실패 시 Outbox 보상 흐름 구성",
         status: "verified",
       },
       {
-        label: "RabbitMQ event flow",
+        label: "RabbitMQ 이벤트 흐름",
         value: "Order, Product, Payment, Settlement 간 이벤트 흐름 구성",
         status: "verified",
       },
       {
-        label: "Gateway boundary",
+        label: "Gateway 접근 경계",
         value: "Gateway 인증과 rate limit 경계 구성",
         status: "verified",
       },
       {
-        label: "Observability stack",
+        label: "관측성 스택",
         value: "Prometheus/Grafana/Zipkin 구성",
         status: "verified",
       },
@@ -347,12 +347,12 @@ export const projects: Project[] = [
     ],
     evidence: [
       {
-        label: "Concurrency strategy",
+        label: "동시성 전략",
         value: "락 전략과 Redis 기반 타임딜 주문 경합 검증",
         status: "verified",
       },
       {
-        label: "Resilience stack",
+        label: "레질리언스 구성",
         value: "Caffeine, Resilience4j, Prometheus/Grafana 구성",
         status: "verified",
       },
@@ -384,17 +384,17 @@ export const projects: Project[] = [
     allTechStack: ["Java", "Spring Boot", "JPA", "MySQL", "OAuth", "k6"],
     evidence: [
       {
-        label: "Product list p95",
+        label: "상품 목록 p95",
         value: "1,010ms -> 23ms",
         status: "measured",
       },
       {
-        label: "Query count",
+        label: "쿼리 수",
         value: "201 queries -> 3 queries",
         status: "measured",
       },
       {
-        label: "Reservation consistency",
+        label: "예약 정합성",
         value: "동시 예약 재고 초과 방지",
         status: "verified",
       },
@@ -433,12 +433,12 @@ export const projects: Project[] = [
     ],
     evidence: [
       {
-        label: "Product scope",
+        label: "제품 범위",
         value: "러닝 기록, 챌린지, 트레이닝 플랜, 이벤트 처리 포함",
         status: "verified",
       },
       {
-        label: "Caching",
+        label: "캐싱",
         value: "Redis 캐싱 적용",
         status: "verified",
       },
@@ -477,12 +477,12 @@ export const projects: Project[] = [
     ],
     evidence: [
       {
-        label: "Service topology",
+        label: "서비스 구성",
         value: "5개 Spring Boot 서비스와 Next.js 구성",
         status: "verified",
       },
       {
-        label: "Backend focus",
+        label: "백엔드 초점",
         value: "SSE timeout, heap/ZGC, N+1, Redis caching 중심 확장 항목",
         status: "pending",
       },
@@ -513,7 +513,7 @@ export const projects: Project[] = [
     allTechStack: ["Java", "Spring Boot", "JWT", "S3", "Swagger", "k6"],
     evidence: [
       {
-        label: "Early backend stack",
+        label: "초기 백엔드 스택",
         value: "JWT, S3, Swagger, k6, N+1 개선 경험",
         status: "verified",
       },

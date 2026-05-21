@@ -2,7 +2,7 @@
 
 MSA Shop은 User, Product, Order, Payment, Settlement, Gateway로 서비스를 나눴을 때 하나의 로컬 transaction으로 처리할 수 없는 주문 흐름을 SAGA/Outbox와 RabbitMQ 이벤트로 설명하는 프로젝트입니다. 목적은 대규모 운영을 주장하는 것이 아니라, 서비스 경계와 보상 트랜잭션을 질문 가능한 형태로 보여주는 것입니다.
 
-시나리오 검증 근거는 SAGA compensation flow, RabbitMQ event flow, Gateway boundary, Observability stack입니다. 주문 실패 시 재고 보상, 주문 저장 실패 시 Outbox 보상, Gateway 인증/rate limit, Prometheus/Grafana/Zipkin 구성을 분리해 보여줍니다.
+시나리오 검증 근거는 SAGA 보상 흐름, RabbitMQ 이벤트 흐름, Gateway 접근 경계, 관측성 스택입니다. 주문 실패 시 재고 보상, 주문 저장 실패 시 Outbox 보상, Gateway 인증/rate limit, Prometheus/Grafana/Zipkin 구성을 분리해 보여줍니다.
 
 ## 문제
 
@@ -26,11 +26,11 @@ Gateway는 인증과 rate limit의 공통 경계를 맡고, Order Service는 Sag
 
 RabbitMQ는 서비스 간 이벤트 전달 경계이고, Service Outbox는 로컬 DB commit 이후 이벤트 발행 의도를 남기는 장치입니다. Outbox relay가 멈추면 이벤트가 사라지는 것이 아니라 재시도 가능한 상태로 남아야 합니다. 보상 실패는 다시 관찰 가능한 상태와 재처리 기준을 가져야 합니다.
 
-Observability stack은 “운영했다”는 장식이 아니라 장애 경계를 보기 위한 최소 구성입니다. Prometheus/Grafana/Zipkin은 주문 생성부터 결제/정산까지 흐름의 지연과 실패 지점을 설명하는 근거로 배치했습니다.
+관측성 스택은 “운영했다”는 장식이 아니라 장애 경계를 보기 위한 최소 구성입니다. Prometheus/Grafana/Zipkin은 주문 생성부터 결제/정산까지 흐름의 지연과 실패 지점을 설명하는 근거로 배치했습니다.
 
 ## 검증 결과
 
-SAGA compensation flow는 주문 실패 시 재고 보상과 주문 저장 실패 시 Outbox 보상 흐름을 검증 항목으로 둡니다. RabbitMQ event flow는 Order, Product, Payment, Settlement 간 이벤트 연결을 확인합니다. Gateway boundary는 인증과 rate limit 경계를, Observability stack은 Prometheus/Grafana/Zipkin 구성을 의미합니다.
+SAGA 보상 흐름은 주문 실패 시 재고 보상과 주문 저장 실패 시 Outbox 보상 흐름을 검증 항목으로 둡니다. RabbitMQ 이벤트 흐름은 Order, Product, Payment, Settlement 간 이벤트 연결을 확인합니다. Gateway 접근 경계는 인증과 rate limit 경계를, 관측성 스택은 Prometheus/Grafana/Zipkin 구성을 의미합니다.
 
 이 사례는 measured throughput보다 distributed transaction reasoning에 초점을 둡니다. 그래서 수치가 없는 항목은 시나리오 검증으로만 표시하고, 운영 규모 표현은 사용하지 않습니다.
 

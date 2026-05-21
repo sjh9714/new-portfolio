@@ -99,22 +99,31 @@ function ArchitectureDiagramView({
         </p>
       </div>
 
-      <div className="flex flex-wrap gap-2" aria-label="구조도 범례">
-        <Badge variant="outline" className="rounded-md">
-          트랜잭션 경계
-        </Badge>
-        <Badge variant="outline" className="rounded-md">
-          비동기 경계
-        </Badge>
-        <Badge variant="outline" className="rounded-md">
-          실패/복구 경로
-        </Badge>
-        <Badge variant="outline" className="rounded-md">
-          최종 기준 데이터
-        </Badge>
-        <Badge variant="outline" className="rounded-md">
-          추가 검증 예정
-        </Badge>
+      <div
+        className="border-border bg-background flex flex-col gap-3 rounded-md border p-3"
+        aria-label="구조도 범례"
+      >
+        <p className="text-muted-foreground text-xs font-semibold tracking-[0.16em] uppercase">
+          범례
+        </p>
+        <div className="flex flex-wrap gap-x-3 gap-y-2" role="list">
+          {[
+            "트랜잭션 경계",
+            "비동기 경계",
+            "실패/복구 경로",
+            "최종 기준 데이터",
+            "추가 검증 예정",
+          ].map((label) => (
+            <Badge
+              key={label}
+              variant="outline"
+              className="rounded-md"
+              role="listitem"
+            >
+              {label}
+            </Badge>
+          ))}
+        </div>
       </div>
 
       <section className="flex flex-col gap-3">

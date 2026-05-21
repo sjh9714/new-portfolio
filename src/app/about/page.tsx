@@ -16,19 +16,19 @@ export default function AboutPage() {
     {
       project: "Concert Booking",
       evidence: getProjectBySlug("concert-booking")?.evidence.find(
-        (item) => item.label === "Hot Seat Contention",
+        (item) => item.label === "동일 좌석 경합",
       ),
     },
     {
       project: "Realtime Chat",
       evidence: getProjectBySlug("realtime-chat")?.evidence.find(
-        (item) => item.label === "Chat room API RPS",
+        (item) => item.label === "채팅방 조회 API RPS",
       ),
     },
     {
       project: "AI Usage Billing Gateway",
       evidence: getProjectBySlug("ai-usage-billing-gateway")?.evidence.find(
-        (item) => item.label === "Usage idempotency",
+        (item) => item.label === "사용량 중복 처리",
       ),
     },
   ].filter((item) => item.evidence);

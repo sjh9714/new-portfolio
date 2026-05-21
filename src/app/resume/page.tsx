@@ -34,9 +34,11 @@ const coreSkillGroups = [
   },
 ];
 
+const resumePdfFileName = "resume-sung-jinhyuk-backend.pdf";
+
 export default function ResumePage() {
   const resumeExists = existsSync(
-    path.join(process.cwd(), "public", "resume.pdf"),
+    path.join(process.cwd(), "public", resumePdfFileName),
   );
 
   return (
@@ -59,7 +61,10 @@ export default function ResumePage() {
         </div>
         {resumeExists ? (
           <Button asChild>
-            <a href="/resume.pdf" download="sung-jinhyuk-resume.pdf">
+            <a
+              href={`/${resumePdfFileName}`}
+              download="sung-jinhyuk-resume.pdf"
+            >
               PDF 다운로드
             </a>
           </Button>

@@ -62,6 +62,12 @@ The production site is deployed on Vercel from the `main` branch.
 - Build: `npm run build`
 - Production URL: [new-portfolio-smoky-one-41.vercel.app](https://new-portfolio-smoky-one-41.vercel.app)
 
+## GitHub Repository Metadata
+
+- Description: `Java/Spring 백엔드 포트폴리오 - 동시성, 이벤트 정합성, 실시간 메시징, 과금/정산 사례를 수치와 테스트로 정리한 사이트`
+- Website: `https://new-portfolio-smoky-one-41.vercel.app`
+- Topics: `backend`, `portfolio`, `java`, `spring-boot`, `kafka`, `redis`, `postgresql`, `testcontainers`, `k6`, `event-driven`, `idempotency`, `outbox-pattern`, `nextjs`
+
 ## Content Rule
 
 All project evidence is sourced from `src/content/projects.ts`.
@@ -73,4 +79,4 @@ All project evidence is sourced from `src/content/projects.ts`.
 Do not invent metrics.
 Benchmark numbers must come from committed/source-backed project evidence only.
 
-The resume PDF button is shown only when `public/resume.pdf` exists.
+The resume PDF button is shown only when `public/resume-sung-jinhyuk-backend.pdf` exists.

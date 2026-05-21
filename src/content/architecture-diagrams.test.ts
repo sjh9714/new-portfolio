@@ -92,9 +92,25 @@ describe("architecture diagram content", () => {
       "utf8",
     );
 
+    expect(source).toContain("범례");
     expect(source).toContain("최종 기준 데이터");
     expect(source).toContain("실패/복구 경로");
     expect(source).toContain("비동기 경계");
     expect(source).toContain("추가 검증 예정");
+  });
+
+  it("keeps recovery edge labels free of duplicated badge wording", () => {
+    const labels = Object.values(architectureDiagrams).flatMap((diagram) =>
+      diagram.edges.map((edge) => edge.label),
+    );
+
+    expect(labels).not.toContain("DEAD 상태와 수동 재처리");
+    expect(labels).not.toContain("결제 실패 보상");
+    expect(labels).not.toContain("relay 재시도");
+    expect(labels).toEqual(expect.arrayContaining(["DEAD 상태 → 수동 처리"]));
+    expect(labels).toEqual(
+      expect.arrayContaining(["결제 실패 → 재고 예약 취소"]),
+    );
+    expect(labels).toEqual(expect.arrayContaining(["Outbox relay 실패"]));
   });
 });

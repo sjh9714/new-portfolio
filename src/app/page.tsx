@@ -95,17 +95,17 @@ const snapshotItems = [
   {
     projectSlug: "concert-booking",
     projectName: "Concert Booking",
-    evidenceLabel: "Hot Seat Contention",
+    evidenceLabel: "동일 좌석 경합",
   },
   {
     projectSlug: "realtime-chat",
     projectName: "Realtime Chat",
-    evidenceLabel: "Chat room API RPS",
+    evidenceLabel: "채팅방 조회 API RPS",
   },
   {
     projectSlug: "ai-usage-billing-gateway",
     projectName: "AI Billing",
-    evidenceLabel: "Usage idempotency",
+    evidenceLabel: "사용량 중복 처리",
   },
 ].map((item) => {
   const project = getProjectBySlug(item.projectSlug);

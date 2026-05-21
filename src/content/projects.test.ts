@@ -123,6 +123,9 @@ describe("portfolio project content", () => {
       expect(homeSource).not.toContain("blogTopics");
     }
     expect(homeSource).toContain("핵심 검증 근거");
+    expect(homeSource).toContain('evidenceLabel: "동일 좌석 경합"');
+    expect(homeSource).toContain('evidenceLabel: "채팅방 조회 API RPS"');
+    expect(homeSource).toContain('evidenceLabel: "사용량 중복 처리"');
   });
 
   it("keeps project cards structured for a 30-second technical scan", () => {
@@ -169,6 +172,18 @@ describe("portfolio project content", () => {
     expect(evidenceMatrixSource).toContain("측정 완료");
     expect(evidenceMatrixSource).toContain("시나리오 검증");
     expect(evidenceMatrixSource).toContain("추가 측정 예정");
+    expect(evidenceMatrixSource).not.toContain('"status": "measured"');
+    expect(evidenceMatrixSource).not.toContain("<code");
+  });
+
+  it("hides the resume PDF button unless the submission PDF filename exists", () => {
+    const resumeSource = readFileSync(
+      join(process.cwd(), "src/app/resume/page.tsx"),
+      "utf8",
+    );
+
+    expect(resumeSource).toContain("resume-sung-jinhyuk-backend.pdf");
+    expect(resumeSource).not.toContain('"public", "resume.pdf"');
   });
 
   it("does not expose draft-only or internal strategy phrasing", () => {
@@ -222,11 +237,11 @@ describe("portfolio project content", () => {
     expect(realtime?.evidence).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          label: "Send-to-receive latency",
+          label: "송신-수신 지연 시간",
           status: "pending",
         }),
         expect.objectContaining({
-          label: "WebSocket delivery completeness",
+          label: "WebSocket 전달 완전성",
           status: "pending",
         }),
       ]),
@@ -235,11 +250,11 @@ describe("portfolio project content", () => {
     expect(billing?.evidence).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          label: "k6 mixed usage scenario",
+          label: "혼합 사용량 부하 테스트",
           status: "pending",
         }),
         expect.objectContaining({
-          label: "Production performance claim",
+          label: "운영 성능 데이터",
           status: "pending",
         }),
       ]),

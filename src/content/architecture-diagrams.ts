@@ -95,7 +95,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         description:
           "idempotency check, seat lock, reservation insert를 같은 경계에서 처리합니다.",
         kind: "service",
-        evidenceLabel: "Hot Seat Contention",
+        evidenceLabel: "동일 좌석 경합",
         status: "measured",
       },
       {
@@ -104,7 +104,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         description:
           "결제 승인, 취소, 만료 race를 예약 상태와 맞춰 처리합니다.",
         kind: "service",
-        evidenceLabel: "Testcontainers scenarios",
+        evidenceLabel: "Testcontainers 검증 시나리오",
         status: "verified",
       },
       {
@@ -114,7 +114,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
           "DB commit 이후 발행할 이벤트를 transaction 안에 남깁니다.",
         kind: "database",
         sourceOfTruth: true,
-        evidenceLabel: "Testcontainers scenarios",
+        evidenceLabel: "Testcontainers 검증 시나리오",
         status: "verified",
       },
       {
@@ -129,7 +129,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         description:
           "consumer idempotency, DEAD 상태, manual replay 경로를 둡니다.",
         kind: "worker",
-        evidenceLabel: "Testcontainers scenarios",
+        evidenceLabel: "Testcontainers 검증 시나리오",
         status: "verified",
       },
       {
@@ -138,7 +138,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         description: "좌석, 예약, 결제 상태의 최종 기준 데이터입니다.",
         kind: "database",
         sourceOfTruth: true,
-        evidenceLabel: "Distributed Reservation",
+        evidenceLabel: "분산 좌석 예약",
         status: "measured",
       },
       {
@@ -148,7 +148,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
           "대기열과 빠른 재고 조회를 맡지만 최종 진실 원천은 아닙니다.",
         kind: "cache",
         sourceOfTruth: false,
-        evidenceLabel: "Mixed Load",
+        evidenceLabel: "혼합 부하",
         status: "measured",
       },
       {
@@ -156,7 +156,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         label: "Reconciliation Job",
         description: "Redis와 DB 차이를 DB 기준으로 복구합니다.",
         kind: "worker",
-        evidenceLabel: "Testcontainers scenarios",
+        evidenceLabel: "Testcontainers 검증 시나리오",
         status: "verified",
       },
     ],
@@ -174,7 +174,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         to: "reservation",
         label: "Idempotency-Key 기반 예약 요청",
         kind: "transaction",
-        evidenceLabel: "Hot Seat Contention",
+        evidenceLabel: "동일 좌석 경합",
       },
       {
         id: "payment-state",
@@ -182,7 +182,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         to: "payment",
         label: "결제/취소/만료 race 처리",
         kind: "transaction",
-        evidenceLabel: "Testcontainers scenarios",
+        evidenceLabel: "Testcontainers 검증 시나리오",
       },
       {
         id: "write-outbox",
@@ -209,9 +209,9 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         id: "dead-replay",
         from: "consumer",
         to: "outbox",
-        label: "DEAD 상태와 수동 재처리",
+        label: "DEAD 상태 → 수동 처리",
         kind: "replay",
-        evidenceLabel: "Testcontainers scenarios",
+        evidenceLabel: "Testcontainers 검증 시나리오",
       },
       {
         id: "persist-state",
@@ -219,7 +219,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         to: "postgres",
         label: "DB 최종 정합성",
         kind: "transaction",
-        evidenceLabel: "Distributed Reservation",
+        evidenceLabel: "분산 좌석 예약",
       },
       {
         id: "redis-check",
@@ -227,7 +227,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         to: "reconciliation",
         label: "재고 불일치 스캔",
         kind: "retry",
-        evidenceLabel: "Testcontainers scenarios",
+        evidenceLabel: "Testcontainers 검증 시나리오",
       },
       {
         id: "reconcile-db",
@@ -268,13 +268,13 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         label: "최종 기준 데이터",
         description:
           "Redis는 빠른 조회와 큐 역할만 맡고, 좌석/예약 상태는 PostgreSQL과 Outbox 기록으로 복구합니다.",
-        evidenceLabel: "Testcontainers scenarios",
+        evidenceLabel: "Testcontainers 검증 시나리오",
       },
       {
         label: "실패/복구 경로",
         description:
           "Kafka 발행 실패와 consumer 실패는 DEAD 상태와 manual replay로 다시 처리합니다.",
-        evidenceLabel: "Testcontainers scenarios",
+        evidenceLabel: "Testcontainers 검증 시나리오",
       },
     ],
   },
@@ -295,7 +295,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         label: "WebSocket App #1",
         description: "STOMP 구독 인가와 producer ACK/NACK를 처리합니다.",
         kind: "service",
-        evidenceLabel: "WebSocket connection smoke",
+        evidenceLabel: "WebSocket 연결 스모크 테스트",
         status: "measured",
       },
       {
@@ -303,7 +303,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         label: "WebSocket App #2",
         description: "다른 인스턴스의 client에도 room event를 전달합니다.",
         kind: "service",
-        evidenceLabel: "WebSocket connection smoke",
+        evidenceLabel: "WebSocket 연결 스모크 테스트",
         status: "measured",
       },
       {
@@ -326,7 +326,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         description: "message와 read state의 최종 기준 데이터입니다.",
         kind: "database",
         sourceOfTruth: true,
-        evidenceLabel: "N+1 query removal",
+        evidenceLabel: "N+1 쿼리 제거",
         status: "measured",
       },
       {
@@ -342,7 +342,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         label: "Reconnect Sync API",
         description: "마지막 수신 위치 이후 message를 다시 조회합니다.",
         kind: "service",
-        evidenceLabel: "WebSocket delivery completeness",
+        evidenceLabel: "WebSocket 전달 완전성",
         status: "pending",
       },
       {
@@ -350,7 +350,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         label: "Latency Benchmark",
         description: "send-to-receive p50/p95/p99를 별도 측정합니다.",
         kind: "external",
-        evidenceLabel: "Send-to-receive latency",
+        evidenceLabel: "송신-수신 지연 시간",
         status: "pending",
       },
     ],
@@ -382,7 +382,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         to: "message-db",
         label: "message/read state 저장",
         kind: "transaction",
-        evidenceLabel: "N+1 query removal",
+        evidenceLabel: "N+1 쿼리 제거",
       },
       {
         id: "presence",
@@ -404,7 +404,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         to: "client",
         label: "구독자 전달",
         kind: "sync",
-        evidenceLabel: "WebSocket delivery completeness",
+        evidenceLabel: "WebSocket 전달 완전성",
       },
       {
         id: "reconnect",
@@ -412,7 +412,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         to: "sync-api",
         label: "마지막 수신 cursor",
         kind: "retry",
-        evidenceLabel: "WebSocket delivery completeness",
+        evidenceLabel: "WebSocket 전달 완전성",
       },
       {
         id: "sync-read",
@@ -427,7 +427,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         to: "latency-benchmark",
         label: "send-to-receive 샘플링",
         kind: "sync",
-        evidenceLabel: "Send-to-receive latency",
+        evidenceLabel: "송신-수신 지연 시간",
       },
     ],
     boundaries: [
@@ -460,13 +460,13 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
       {
         label: "측정 완료 API 경로",
         description: "채팅방 조회 API는 RPS, p95, N+1 제거 수치가 있습니다.",
-        evidenceLabel: "Chat room API RPS",
+        evidenceLabel: "채팅방 조회 API RPS",
       },
       {
         label: "추가 검증 예정",
         description:
           "실제 메시지 지연과 전달 완전성은 별도 benchmark에서 공개 수치로 채워야 합니다.",
-        evidenceLabel: "Send-to-receive latency",
+        evidenceLabel: "송신-수신 지연 시간",
       },
     ],
   },
@@ -487,7 +487,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         label: "API Key",
         description: "raw key는 최초 1회 반환하고 prefix/hash만 저장합니다.",
         kind: "gateway",
-        evidenceLabel: "API Key storage",
+        evidenceLabel: "API Key 저장 방식",
         status: "verified",
       },
       {
@@ -502,7 +502,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         description:
           "idempotency key와 request hash로 중복과 충돌을 구분합니다.",
         kind: "service",
-        evidenceLabel: "Usage idempotency",
+        evidenceLabel: "사용량 중복 처리",
         status: "verified",
       },
       {
@@ -517,7 +517,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         description:
           "providerEventId와 payload hash로 duplicate/conflict를 구분합니다.",
         kind: "external",
-        evidenceLabel: "Webhook duplicate handling",
+        evidenceLabel: "Webhook 중복 처리",
         status: "verified",
       },
       {
@@ -527,7 +527,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
           "debit/credit balance와 currency invariant의 최종 진실 원천입니다.",
         kind: "ledger",
         sourceOfTruth: true,
-        evidenceLabel: "Append-only ledger invariant",
+        evidenceLabel: "Append-only ledger 불변식",
         status: "verified",
       },
       {
@@ -543,7 +543,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         description:
           "throughput, latency, error rate를 공개 측정으로 남길 항목입니다.",
         kind: "external",
-        evidenceLabel: "k6 mixed usage scenario",
+        evidenceLabel: "혼합 사용량 부하 테스트",
         status: "pending",
       },
       {
@@ -552,7 +552,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         description:
           "운영형 성능 claim은 공개 가능한 데이터와 함께만 표시합니다.",
         kind: "external",
-        evidenceLabel: "Production performance claim",
+        evidenceLabel: "운영 성능 데이터",
         status: "pending",
       },
     ],
@@ -563,7 +563,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         to: "api-key",
         label: "tenant auth / key 발급",
         kind: "sync",
-        evidenceLabel: "API Key storage",
+        evidenceLabel: "API Key 저장 방식",
       },
       {
         id: "gateway-check",
@@ -578,7 +578,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         to: "usage",
         label: "idempotent usage 저장",
         kind: "transaction",
-        evidenceLabel: "Usage idempotency",
+        evidenceLabel: "사용량 중복 처리",
       },
       {
         id: "usage-invoice",
@@ -593,7 +593,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         to: "invoice",
         label: "결제 상태 callback",
         kind: "retry",
-        evidenceLabel: "Webhook duplicate handling",
+        evidenceLabel: "Webhook 중복 처리",
       },
       {
         id: "ledger-entry",
@@ -601,7 +601,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         to: "ledger",
         label: "charge/payment ledger 추가",
         kind: "transaction",
-        evidenceLabel: "Append-only ledger invariant",
+        evidenceLabel: "Append-only ledger 불변식",
       },
       {
         id: "audit-entry",
@@ -616,7 +616,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         to: "gateway",
         label: "mixed usage scenario 측정",
         kind: "sync",
-        evidenceLabel: "k6 mixed usage scenario",
+        evidenceLabel: "혼합 사용량 부하 테스트",
       },
       {
         id: "ops-target",
@@ -624,7 +624,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         to: "ledger",
         label: "운영형 성능 근거",
         kind: "sync",
-        evidenceLabel: "Production performance claim",
+        evidenceLabel: "운영 성능 데이터",
       },
     ],
     boundaries: [
@@ -658,13 +658,13 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         label: "중복 입력은 정상 입력",
         description:
           "usage와 webhook은 재시도와 중복 delivery를 정상 입력으로 보고 hash mismatch만 conflict로 다룹니다.",
-        evidenceLabel: "Usage idempotency",
+        evidenceLabel: "사용량 중복 처리",
       },
       {
         label: "추가 검증 예정",
         description:
           "mixed usage benchmark와 운영형 성능 근거는 측정 완료 전까지 별도 상태로 보입니다.",
-        evidenceLabel: "k6 mixed usage scenario",
+        evidenceLabel: "혼합 사용량 부하 테스트",
       },
     ],
   },
@@ -679,7 +679,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         label: "Gateway",
         description: "인증과 rate limit의 공통 진입 경계입니다.",
         kind: "gateway",
-        evidenceLabel: "Gateway boundary",
+        evidenceLabel: "Gateway 접근 경계",
         status: "verified",
       },
       {
@@ -687,7 +687,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         label: "Order Service",
         description: "주문 생성과 Saga 상태를 관리합니다.",
         kind: "service",
-        evidenceLabel: "SAGA compensation flow",
+        evidenceLabel: "SAGA 보상 흐름",
         status: "verified",
       },
       {
@@ -707,7 +707,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         label: "RabbitMQ",
         description: "서비스 간 이벤트 전달과 보상 이벤트를 연결합니다.",
         kind: "broker",
-        evidenceLabel: "RabbitMQ event flow",
+        evidenceLabel: "RabbitMQ 이벤트 흐름",
         status: "verified",
       },
       {
@@ -716,7 +716,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         description: "로컬 commit 이후 이벤트 발행 의도를 남깁니다.",
         kind: "database",
         sourceOfTruth: true,
-        evidenceLabel: "SAGA compensation flow",
+        evidenceLabel: "SAGA 보상 흐름",
         status: "verified",
       },
       {
@@ -724,7 +724,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         label: "Settlement Service",
         description: "결제 완료 이벤트를 정산 집계로 반영합니다.",
         kind: "service",
-        evidenceLabel: "RabbitMQ event flow",
+        evidenceLabel: "RabbitMQ 이벤트 흐름",
         status: "verified",
       },
       {
@@ -739,7 +739,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         label: "Prometheus / Grafana / Zipkin",
         description: "장애 경계와 지연 흐름을 관찰하는 stack입니다.",
         kind: "external",
-        evidenceLabel: "Observability stack",
+        evidenceLabel: "관측성 스택",
         status: "verified",
       },
     ],
@@ -750,7 +750,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         to: "order",
         label: "주문 생성",
         kind: "sync",
-        evidenceLabel: "Gateway boundary",
+        evidenceLabel: "Gateway 접근 경계",
       },
       {
         id: "reserve-stock",
@@ -758,7 +758,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         to: "product",
         label: "재고 예약",
         kind: "async",
-        evidenceLabel: "SAGA compensation flow",
+        evidenceLabel: "SAGA 보상 흐름",
       },
       {
         id: "approve-payment",
@@ -773,7 +773,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         to: "rabbitmq",
         label: "결제 이벤트",
         kind: "async",
-        evidenceLabel: "RabbitMQ event flow",
+        evidenceLabel: "RabbitMQ 이벤트 흐름",
       },
       {
         id: "settlement-event",
@@ -781,7 +781,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         to: "settlement",
         label: "정산 집계",
         kind: "async",
-        evidenceLabel: "RabbitMQ event flow",
+        evidenceLabel: "RabbitMQ 이벤트 흐름",
       },
       {
         id: "write-outbox",
@@ -789,21 +789,21 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         to: "outbox",
         label: "로컬 상태와 이벤트 의도",
         kind: "transaction",
-        evidenceLabel: "SAGA compensation flow",
+        evidenceLabel: "SAGA 보상 흐름",
       },
       {
         id: "compensate-stock",
         from: "payment",
         to: "product",
-        label: "결제 실패 보상",
+        label: "결제 실패 → 재고 예약 취소",
         kind: "compensation",
-        evidenceLabel: "SAGA compensation flow",
+        evidenceLabel: "SAGA 보상 흐름",
       },
       {
         id: "relay-retry",
         from: "outbox",
         to: "rabbitmq",
-        label: "relay 재시도",
+        label: "Outbox relay 실패",
         kind: "retry",
       },
       {
@@ -819,7 +819,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         to: "gateway",
         label: "trace/metric feedback",
         kind: "sync",
-        evidenceLabel: "Observability stack",
+        evidenceLabel: "관측성 스택",
       },
     ],
     boundaries: [
@@ -853,13 +853,13 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         label: "보상 처리 경로",
         description:
           "재고 예약 이후 결제가 실패하면 Product에 보상 이벤트를 보내고 Order Saga 상태를 갱신합니다.",
-        evidenceLabel: "SAGA compensation flow",
+        evidenceLabel: "SAGA 보상 흐름",
       },
       {
         label: "범위 표시",
         description:
           "운영형 MSA claim보다 서비스 경계와 보상 흐름 검증에 초점을 둡니다.",
-        evidenceLabel: "RabbitMQ event flow",
+        evidenceLabel: "RabbitMQ 이벤트 흐름",
       },
     ],
   },
