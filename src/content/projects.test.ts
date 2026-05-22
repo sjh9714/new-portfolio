@@ -32,6 +32,8 @@ const bannedSubmissionPhrases = [
   "보강 필요",
   "실무 준비도를 부풀리지 않습니다",
   "실제 운영 경험처럼 보이지 않게",
+  "pending으로",
+  "measured로",
 ];
 
 const sourceFilesWithPublicCopy = [
@@ -70,6 +72,7 @@ const legacyPublicStrings = [
   ["재시도", " 재시도"].join(""),
   ["source", " of", " truth"].join(""),
   "최종 진실 원천",
+  "최종 복구 기준",
 ];
 
 describe("portfolio project content", () => {
@@ -225,13 +228,28 @@ describe("portfolio project content", () => {
       expect.arrayContaining([
         "동일 좌석 경합",
         "혼합 부하 테스트",
+        "D/E/F 반복 시나리오 검증",
+        "Prometheus actuator metric contract",
+        "Local monitoring evidence harness",
         "채팅방 조회 API RPS",
+        "메시지 전달 지연 시간 로컬 스냅샷",
+        "WebSocket 전달 완전성 로컬 스냅샷",
+        "Receiver matrix by-room guard",
+        "Mixed HTTP probe artifact 분리 검산",
+        "Delivery evidence validator",
         "메시지 전달 지연 시간",
         "Append-only Ledger 불변성",
+        "Full mixed smoke readiness guard",
+        "Full mixed capture rollup guard",
+        "Low-cardinality outcome counters",
         "운영 성능 주장",
         "SAGA 보상 흐름",
         "RabbitMQ 이벤트 흐름",
         "Gateway 접근 경계",
+        "Follow lookup query-count guard",
+        "Ranking HTTP model assembly guard",
+        "Exercise hashtag query-count guard",
+        "Flyway baseline validation",
       ]),
     );
   });
@@ -324,16 +342,46 @@ describe("portfolio project content", () => {
     const billing = projects.find(
       (project) => project.slug === "ai-usage-billing-gateway",
     );
+    const borrowMe = projects.find((project) => project.slug === "borrow-me");
 
     expect(realtime?.evidence).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
+          label: "메시지 전달 지연 시간 로컬 스냅샷",
+          status: "verified",
+          value: expect.stringContaining("500-user repeat3 p95 37-47ms"),
+        }),
+        expect.objectContaining({
+          label: "WebSocket 전달 완전성 로컬 스냅샷",
+          status: "verified",
+          value: expect.stringContaining(
+            "500-user repeat3 each run expected 49,900 / unique 49,900",
+          ),
+        }),
+        expect.objectContaining({
+          label: "Receiver matrix by-room guard",
+          status: "verified",
+          value: expect.stringContaining("summary.byRoom"),
+        }),
+        expect.objectContaining({
+          label: "Mixed HTTP probe artifact 분리 검산",
+          status: "verified",
+          value: expect.stringContaining("mixedHttp summary"),
+        }),
+        expect.objectContaining({
+          label: "Delivery evidence validator",
+          status: "verified",
+          value: expect.stringContaining("manifest.json"),
+        }),
+        expect.objectContaining({
           label: "메시지 전달 지연 시간",
           status: "pending",
+          value: expect.stringContaining("1,000 session"),
         }),
         expect.objectContaining({
           label: "WebSocket 전달 완전성",
           status: "pending",
+          value: expect.stringContaining("1,000 session"),
         }),
       ]),
     );
@@ -341,12 +389,85 @@ describe("portfolio project content", () => {
     expect(billing?.evidence).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
+          label: "Full mixed smoke readiness guard",
+          status: "verified",
+          value: expect.stringContaining("K6_REQUIRE_OPTIONAL_PATHS=true"),
+        }),
+        expect.objectContaining({
+          label: "Full mixed capture rollup guard",
+          status: "verified",
+          value: expect.stringContaining("benchmark aggregate는 만들지 않음"),
+        }),
+        expect.objectContaining({
+          label: "Low-cardinality outcome counters",
+          status: "verified",
+          value: expect.stringContaining("gateway request/rate-limit"),
+        }),
+        expect.objectContaining({
           label: "혼합 사용량 부하 테스트",
           status: "pending",
+          value: expect.stringContaining("추가 측정 예정"),
         }),
         expect.objectContaining({
           label: "운영 성능 주장",
           status: "pending",
+          value: expect.stringContaining("추가 측정 예정"),
+        }),
+      ]),
+    );
+    expect(JSON.stringify(billing)).not.toContain("30.38ms");
+    expect(JSON.stringify(billing)).not.toContain("checks 150/150");
+    expect(JSON.stringify(billing)).not.toContain("측정 완료");
+
+    expect(borrowMe?.evidence).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          label: "상품 목록 p95 원본 기록",
+          status: "pending",
+        }),
+        expect.objectContaining({
+          label: "상품 목록 쿼리 수 원본 기록 + 현재 guard",
+          status: "verified",
+        }),
+        expect.objectContaining({
+          label: "Follow lookup query-count guard",
+          status: "verified",
+          value: expect.stringContaining("SQL 1회"),
+        }),
+        expect.objectContaining({
+          label: "Authenticated product-list follow-aware guard",
+          status: "verified",
+          value: expect.stringContaining("SQL 5회 이하"),
+        }),
+        expect.objectContaining({
+          label: "Ranking data path query-count guard",
+          status: "verified",
+          value: expect.stringContaining("SQL 5회 이하"),
+        }),
+        expect.objectContaining({
+          label: "Ranking HTTP model assembly guard",
+          status: "verified",
+          value: expect.stringContaining("GET /ranking"),
+        }),
+        expect.objectContaining({
+          label: "Exercise hashtag query-count guard",
+          status: "verified",
+          value: expect.stringContaining("SQL 1회"),
+        }),
+        expect.objectContaining({
+          label: "Flyway baseline validation",
+          status: "verified",
+        }),
+      ]),
+    );
+    expect(
+      borrowMe?.evidence.filter((evidence) =>
+        evidence.label.includes("상품 목록"),
+      ),
+    ).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          value: expect.stringContaining("원본 README 기록"),
         }),
       ]),
     );

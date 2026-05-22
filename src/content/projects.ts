@@ -80,6 +80,24 @@ export const projects: Project[] = [
           "reservation/payment idempotency, race condition, DLT replay, stock reconciliation 검증",
         status: "verified",
       },
+      {
+        label: "D/E/F 반복 시나리오 검증",
+        value:
+          "세 전략 x 3회 local repeat: D 216/216, E 234/234, F 144/144 checks passed",
+        status: "verified",
+      },
+      {
+        label: "Prometheus actuator metric contract",
+        value:
+          "alert rule과 Grafana dashboard가 참조하는 metric name을 보호된 /actuator/prometheus 응답과 대조",
+        status: "verified",
+      },
+      {
+        label: "Local monitoring evidence harness",
+        value:
+          "local-monitoring admin bootstrap, bearer-token Prometheus config, Grafana provisioning, capture-summary validator로 실제 scrape artifact 준비",
+        status: "verified",
+      },
     ],
     jdTags: [
       "Concurrency",
@@ -95,7 +113,7 @@ export const projects: Project[] = [
       "Outbox가 exactly-once를 보장하지 않는다면 중복은 어디서 흡수했나요?",
     ],
     limitations: [
-      "운영 알림, tracing, SLO, runbook은 별도 운영 문서로 확장할 예정입니다.",
+      "Actuator metric name contract, alert rule, Grafana template은 시나리오 검증이며 실제 Prometheus server scrape, alert firing, dashboard 운영, tracing, SLO는 별도 보강 예정입니다.",
       "Redis 장애 시 fail-open/fail-closed 정책은 추가 장애 시나리오로 분리해 검증할 수 있습니다.",
     ],
   },
@@ -145,17 +163,46 @@ export const projects: Project[] = [
       {
         label: "WebSocket 연결 스모크 테스트",
         value: "2대 합산 1,158 sessions, 연결 체크 성공률 100%",
-        status: "measured",
+        status: "verified",
+      },
+      {
+        label: "메시지 전달 지연 시간 로컬 스냅샷",
+        value:
+          "50-user repeat3 p95 23-38ms + 500-user repeat3 p95 37-47ms, p99 46-233ms (local receiver matrix, 운영 성능 claim 아님)",
+        status: "verified",
+      },
+      {
+        label: "WebSocket 전달 완전성 로컬 스냅샷",
+        value:
+          "50-user repeat3 each run expected 4,900 / unique 4,900, 500-user repeat3 each run expected 49,900 / unique 49,900, missing 0 / duplicate 0 / completeness 100% (운영 성능 claim 아님)",
+        status: "verified",
+      },
+      {
+        label: "Receiver matrix by-room guard",
+        value:
+          "summary.byRoom으로 room별 denominator와 cross-room unexpected delivery deterministic fixture 검증",
+        status: "verified",
+      },
+      {
+        label: "Mixed HTTP probe artifact 분리 검산",
+        value:
+          "room list / message history / read receipt http.jsonl을 mixedHttp summary로 분리하고 receiver denominator 불변 fixture 검증",
+        status: "verified",
+      },
+      {
+        label: "Delivery evidence validator",
+        value:
+          "2-user local artifact에서 manifest.json, raw JSONL, regenerated summary, byRoom coverage를 검산했고, mixedHttp 포함 artifact는 failed 0 조건으로 승격 전 확인",
+        status: "verified",
       },
       {
         label: "메시지 전달 지연 시간",
-        value: "p50/p95/p99 benchmark pending",
+        value: "1,000 session p50/p95/p99 benchmark 추가 측정 예정",
         status: "pending",
       },
       {
         label: "WebSocket 전달 완전성",
-        value:
-          "1,000 concurrent sessions recovery and loss-rate benchmark pending",
+        value: "1,000 session delivery completeness benchmark 추가 측정 예정",
         status: "pending",
       },
     ],
@@ -166,7 +213,7 @@ export const projects: Project[] = [
       "reconnect sync API가 누락 메시지를 어떻게 판별하나요?",
     ],
     limitations: [
-      "send-to-receive p50/p95/p99와 delivery completeness는 독립 benchmark로 기록할 항목입니다.",
+      "50-user repeat3와 500-user repeat3 local receiver matrix는 시나리오 검증으로만 제시하고, 1,000 session benchmark와 운영 성능 claim은 별도 측정 항목으로 남겨둡니다.",
       "Kafka consumer failure 이후 DLT replay 성공률은 별도 장애 시나리오로 수치화할 수 있습니다.",
     ],
   },
@@ -182,9 +229,9 @@ export const projects: Project[] = [
     problem:
       "organization 단위 사용량 수집, API key 보안, usage 중복 입력, invoice/webhook 중복 처리, ledger 불변성이 함께 필요한 과금 흐름",
     solution:
-      "tenant isolation, API key prefix/hash 저장, usage idempotency, webhook duplicate/conflict 구분, append-only ledger invariant를 구성",
+      "tenant isolation, API key prefix/hash 저장, usage idempotency, quota reservation, invoice scheduler, webhook duplicate/conflict, refund reversal ledger를 구성",
     result:
-      "API key 보안, usage idempotency, webhook 중복 처리, append-only ledger invariant를 검증하고 성능/운영 지표는 공개 측정 전 상태로 구분했습니다.",
+      "API key 보안, usage idempotency, quota reservation, invoice scheduler, webhook 중복 처리, refund reversal ledger를 검증하고 성능/운영 지표는 공개 측정 전 상태로 구분했습니다.",
     primaryTechStack: ["Java", "Spring Boot", "PostgreSQL", "Kafka", "Redis"],
     allTechStack: [
       "Java",
@@ -220,13 +267,49 @@ export const projects: Project[] = [
         status: "verified",
       },
       {
+        label: "Quota reservation",
+        value:
+          "gateway/explicit usage insert와 같은 transaction의 quota_counters reservation 검증",
+        status: "verified",
+      },
+      {
+        label: "Monthly invoice scheduler",
+        value:
+          "active subscription organization deduplication과 monthly invoice scheduler idempotency 검증",
+        status: "verified",
+      },
+      {
+        label: "Refund reversal ledger",
+        value:
+          "refund webhook의 balanced reversal, duplicate idempotency, original ledger group 추적 검증",
+        status: "verified",
+      },
+      {
+        label: "Full mixed smoke readiness guard",
+        value:
+          "K6_REQUIRE_OPTIONAL_PATHS=true에서 모든 check 통과, HTTP failure 0, invoice/webhook branch 실행, optional skip 0건을 threshold와 summary validator로 강제",
+        status: "verified",
+      },
+      {
+        label: "Full mixed capture rollup guard",
+        value:
+          "capture-summary.json이 run별 summary validator 통과 여부와 branch count만 묶고 benchmark aggregate는 만들지 않음",
+        status: "verified",
+      },
+      {
+        label: "Low-cardinality outcome counters",
+        value:
+          "gateway request/rate-limit, idempotency conflict, webhook conflict, ledger group counter 등록과 호출 경로 unit test",
+        status: "verified",
+      },
+      {
         label: "혼합 사용량 부하 테스트",
-        value: "throughput/latency/error-rate benchmark pending",
+        value: "throughput/latency/error-rate 반복 benchmark 추가 측정 예정",
         status: "pending",
       },
       {
         label: "운영 성능 주장",
-        value: "operational performance data pending",
+        value: "dashboard/alerting/tracing/SLO 운영 성능 데이터 추가 측정 예정",
         status: "pending",
       },
     ],
@@ -244,9 +327,9 @@ export const projects: Project[] = [
       "append-only ledger에서 refund reversal은 어떻게 표현해야 하나요?",
     ],
     limitations: [
-      "invoice generation은 manual endpoint에서 scheduler 또는 Spring Batch로 확장할 수 있습니다.",
+      "invoice scheduler, quota reservation, refund reversal ledger는 시나리오 검증 상태이며 회계 compliance claim은 하지 않습니다.",
       "mixed usage benchmark, dashboard, alerting, tracing, SLO는 공개 측정 항목으로 남겨두었습니다.",
-      "strict quota reservation과 refund reversal ledger는 다음 단계의 도메인 확장 지점입니다.",
+      "quota reconciliation job, dashboard, alert rule은 운영 보강 지점으로 남겨두었습니다.",
     ],
   },
   {
@@ -385,23 +468,60 @@ export const projects: Project[] = [
     solution:
       "동시 예약 재고 초과 방지, N+1 제거, 상품 목록 조회 최적화, 해커톤 팀 협업 경험을 짧게 정리",
     result:
-      "상품 목록 p95 1,010ms -> 23ms, 쿼리 201회 -> 3회로 개선하고 동시 예약 재고 초과를 방지했습니다.",
+      "원본 README 기록 기준 상품 목록 p95 1,010ms -> 23ms, 쿼리 201회 -> 3회 개선 사례를 현재 query-count guard, 예약 정합성 테스트, Flyway baseline validation으로 보강했습니다.",
     primaryTechStack: ["Java", "Spring Boot", "JPA", "MySQL", "k6"],
     allTechStack: ["Java", "Spring Boot", "JPA", "MySQL", "OAuth", "k6"],
     evidence: [
       {
-        label: "상품 목록 p95",
-        value: "1,010ms -> 23ms",
-        status: "measured",
+        label: "상품 목록 p95 원본 기록",
+        value:
+          "원본 README 기록: 1,010ms -> 23ms (raw artifact 없음, 현재 재측정 아님)",
+        status: "pending",
       },
       {
-        label: "쿼리 수",
-        value: "201 queries -> 3 queries",
-        status: "measured",
+        label: "상품 목록 쿼리 수 원본 기록 + 현재 guard",
+        value:
+          "원본 README 기록 + 현재 query-count guard: 201 queries -> 3 queries",
+        status: "verified",
+      },
+      {
+        label: "Follow lookup query-count guard",
+        value:
+          "FollowService.getFollowedUserIds 후보 사용자 팔로우 조회 SQL 1회 guard",
+        status: "verified",
+      },
+      {
+        label: "Authenticated product-list follow-aware guard",
+        value:
+          "인증 GET /api/products 응답에서 팔로우 여부 true/false와 SQL 5회 이하 query-count guard",
+        status: "verified",
+      },
+      {
+        label: "Ranking data path query-count guard",
+        value:
+          "상위 사용자, 최근 상품, 팔로우 여부 조회 조합을 SQL 5회 이하로 유지",
+        status: "verified",
+      },
+      {
+        label: "Ranking HTTP model assembly guard",
+        value:
+          "GET /ranking handler/model assembly에서 topUsers/currentUser/recentProducts/followed flag 구성과 SQL 6회 이하 guard",
+        status: "verified",
+      },
+      {
+        label: "Exercise hashtag query-count guard",
+        value: "운동 추천/검색 응답의 exercise hashtag DTO 변환 SQL 1회 guard",
+        status: "verified",
       },
       {
         label: "예약 정합성",
         value: "동시 예약 재고 초과 방지",
+        status: "verified",
+      },
+      {
+        label: "Flyway baseline validation",
+        value:
+          "V1 baseline schema migration + MySQL Testcontainers + Hibernate validate",
         status: "verified",
       },
     ],
@@ -411,7 +531,7 @@ export const projects: Project[] = [
       "p95 개선에서 가장 큰 병목은 N+1이었나요, 인덱스였나요?",
     ],
     limitations: [
-      "해커톤 팀 프로젝트 특성상 장기 운영 지표보다 협업과 성능 개선 결과에 초점을 둡니다.",
+      "상품 목록 p95/쿼리 수는 원본 README 기록 기준이며, 현재 repository에서는 query-count guard와 local snapshot을 분리해 설명합니다.",
     ],
   },
   {

@@ -110,6 +110,30 @@ describe("PDF-style portfolio cases", () => {
     }
   });
 
+  it("keeps final data-source terminology consistent across public case content", () => {
+    const publicCaseSources = [
+      "src/content/portfolio-cases.ts",
+      "src/content/architecture-diagrams.ts",
+      "src/content/case-studies/concert-booking.mdx",
+      "src/content/case-studies/realtime-chat.mdx",
+      "src/content/case-studies/ai-usage-billing-gateway.mdx",
+      "src/content/case-studies/msa-shop.mdx",
+    ]
+      .map((file) => readFileSync(join(process.cwd(), file), "utf8"))
+      .join("\n");
+
+    for (const legacyTerm of [
+      ["source", " of", " truth"].join(""),
+      "최종 진실 원천",
+      "최종 복구 기준",
+      "최종 기준으로",
+      "producer timestamp",
+    ]) {
+      expect(publicCaseSources).not.toContain(legacyTerm);
+    }
+    expect(publicCaseSources).toContain("최종 기준 데이터");
+  });
+
   it("connects the Outbox/DLT case to the measured mixed-load scenario without inventing execution environment", () => {
     const outboxCase = getPortfolioCaseBySlug("concert-outbox-dlt-recovery");
 
@@ -119,9 +143,171 @@ describe("PDF-style portfolio cases", () => {
           label: "혼합 부하 시나리오",
           value: "200 VU, 45초 기준 총 RPS 약 969~1,005",
         },
+        {
+          label: "D/E/F formal local repeat 검증 시나리오",
+          value:
+            "pessimistic/optimistic/distributed 전략 x scenario-d/e/f x 3회",
+        },
+      ]),
+    );
+    expect(outboxCase?.evidence).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          label: "D/E/F 반복 시나리오 검증",
+          status: "verified",
+          value:
+            "세 전략 x 3회 local repeat: D 216/216, E 234/234, F 144/144 checks passed",
+        }),
       ]),
     );
     expect(outboxCase?.measurement?.executionEnvironment).toBeUndefined();
+  });
+
+  it("keeps measured scenario labels explicit without adding execution environment guesses", () => {
+    expect(
+      getPortfolioCaseBySlug("concert-seat-overselling-consistency")
+        ?.measurement?.scenarios,
+    ).toEqual(
+      expect.arrayContaining([
+        {
+          label: "동일 좌석 경합 측정 조건",
+          value:
+            "동일 좌석 100 concurrent requests -> success 1, fail 99, overselling 0",
+        },
+        {
+          label: "분산 좌석 예약 측정 조건",
+          value:
+            "서로 다른 좌석 50명 동시 예약 -> pessimistic 50/50, Redis distributed lock 50/50",
+        },
+      ]),
+    );
+    expect(
+      getPortfolioCaseBySlug("chat-room-n-plus-one-rps")?.measurement
+        ?.scenarios,
+    ).toEqual(
+      expect.arrayContaining([
+        {
+          label: "채팅방 조회 API RPS/p95 개선 조건",
+          value: "RPS 937 -> 1,598, p95 212.85ms -> 149.22ms",
+        },
+        {
+          label: "채팅방 조회 N+1 제거 쿼리 수 변화",
+          value: "2N+1 queries -> 1 query",
+        },
+        {
+          label: "메시지 전달 로컬 스냅샷",
+          value:
+            "50-user repeat3 p95 23-38ms + 500-user repeat3 p95 37-47ms, p99 46-233ms",
+        },
+        {
+          label: "WebSocket 전달 완전성 로컬 스냅샷",
+          value:
+            "50-user repeat3 each run expected 4,900 / unique 4,900, 500-user repeat3 each run expected 49,900 / unique 49,900, missing 0 / duplicate 0 / completeness 100%",
+        },
+        {
+          label: "Room별 delivery matrix guard",
+          value:
+            "summary.byRoom denominator + cross-room unexpected delivery deterministic fixture",
+        },
+      ]),
+    );
+    for (const slug of [
+      "concert-seat-overselling-consistency",
+      "chat-room-n-plus-one-rps",
+    ]) {
+      expect(
+        getPortfolioCaseBySlug(slug)?.measurement?.executionEnvironment,
+      ).toBeUndefined();
+    }
+
+    expect(
+      getPortfolioCaseBySlug("billing-idempotency-webhook-ledger")?.measurement,
+    ).toBeUndefined();
+    expect(
+      getPortfolioCaseBySlug("borrowme-product-list-n-plus-one")?.measurement
+        ?.scenarios,
+    ).toEqual(
+      expect.arrayContaining([
+        {
+          label: "상품 목록 p95 원본 기록",
+          value:
+            "원본 README 기록 기준 p95 1,010ms -> 23ms (raw artifact 없음, 현재 재측정 아님)",
+        },
+        {
+          label: "상품 목록 쿼리 수 원본 기록 + 현재 guard",
+          value:
+            "원본 README 기록 201 queries + 현재 repository guard 3 queries 이하",
+        },
+        {
+          label: "Follow lookup query-count guard",
+          value:
+            "FollowService.getFollowedUserIds 후보 사용자 팔로우 조회 SQL 1회",
+        },
+        {
+          label: "Authenticated product-list follow-aware guard",
+          value:
+            "인증 GET /api/products 응답에서 팔로우 여부 true/false와 SQL 5회 이하",
+        },
+        {
+          label: "Ranking data path query-count guard",
+          value: "상위 사용자, 최근 상품, 팔로우 여부 조회 조합 SQL 5회 이하",
+        },
+        {
+          label: "Exercise hashtag query-count guard",
+          value: "운동 추천/검색 응답의 exercise hashtag DTO 변환 SQL 1회",
+        },
+        {
+          label: "Flyway baseline validation",
+          value:
+            "V1 baseline schema migration + MySQL Testcontainers + Hibernate validate",
+        },
+      ]),
+    );
+    expect(
+      getPortfolioCaseBySlug("borrowme-product-list-n-plus-one")?.evidence,
+    ).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          label: "Flyway baseline validation",
+          status: "verified",
+        }),
+        expect.objectContaining({
+          label: "Follow lookup query-count guard",
+          status: "verified",
+        }),
+        expect.objectContaining({
+          label: "Authenticated product-list follow-aware guard",
+          status: "verified",
+        }),
+        expect.objectContaining({
+          label: "Ranking data path query-count guard",
+          status: "verified",
+        }),
+        expect.objectContaining({
+          label: "Exercise hashtag query-count guard",
+          status: "verified",
+        }),
+      ]),
+    );
+    expect(
+      getPortfolioCaseBySlug("borrowme-product-list-n-plus-one")?.measurement
+        ?.executionEnvironment,
+    ).toBeUndefined();
+  });
+
+  it("keeps BorrowMe original performance records clearly caveated", () => {
+    const borrowMeCase = getPortfolioCaseBySlug(
+      "borrowme-product-list-n-plus-one",
+    );
+
+    expect(borrowMeCase?.title).toContain("원본 기록");
+    expect(borrowMeCase?.resumeLine).toContain("원본 README 기록");
+    expect(JSON.stringify(borrowMeCase)).toContain("현재 query-count guard");
+    expect(JSON.stringify(borrowMeCase)).toContain("현재 guard");
+    expect(JSON.stringify(borrowMeCase)).toContain("원본 기록");
+    expect(JSON.stringify(borrowMeCase)).not.toContain(
+      "상품 목록 p95 응답 시간을 1,010ms에서 23ms로 개선했습니다.",
+    );
   });
 
   it("preserves legacy case study URLs as aliases", () => {

@@ -14,7 +14,7 @@ export const blogTopics: BlogTopic[] = [
     title:
       "Redis를 캐시로만 쓰지 않기 위해 구현한 대기열, 분산 락, Rate Limit, Presence, Reconciliation",
     summary:
-      "Concert Booking의 Sorted Set queue, Realtime Chat의 presence, Redis를 최종 진실로 두지 않은 이유를 연결합니다.",
+      "Concert Booking의 Sorted Set queue, Realtime Chat의 presence, Redis를 최종 기준 데이터로 두지 않은 이유를 연결합니다.",
     status: "coming-soon",
     icon: DatabaseZap,
   },
