@@ -185,7 +185,7 @@ export const featuredPortfolioCases: PortfolioCase[] = [
     problem: [
       "동일 좌석에 여러 사용자가 동시에 접근하면 읽기-수정-쓰기 사이 race condition으로 오버셀링이 발생할 수 있었습니다.",
       "네트워크 timeout과 client retry는 중복 예약 또는 중복 결제로 이어질 수 있었습니다.",
-      "Redis 재고와 DB 예약 상태가 어긋날 때 어떤 데이터를 최종 기준으로 복구할지 명확해야 했습니다.",
+      "Redis 재고와 DB 예약 상태가 어긋날 때 어떤 데이터를 최종 기준 데이터로 삼아 복구할지 명확해야 했습니다.",
     ],
     solution: [
       "Queue token을 userId + scheduleId에 바인딩해 대기열 우회 요청을 제한했습니다.",
@@ -205,12 +205,14 @@ export const featuredPortfolioCases: PortfolioCase[] = [
     measurement: {
       scenarios: [
         {
-          label: "동일 좌석 경합 측정 시나리오",
-          value: "동일 좌석 100 concurrent requests",
+          label: "동일 좌석 경합 측정 조건",
+          value:
+            "동일 좌석 100 concurrent requests -> success 1, fail 99, overselling 0",
         },
         {
-          label: "서로 다른 좌석 예약 측정 시나리오",
-          value: "서로 다른 좌석 50명 동시 예약",
+          label: "분산 좌석 예약 측정 조건",
+          value:
+            "서로 다른 좌석 50명 동시 예약 -> pessimistic 50/50, Redis distributed lock 50/50",
         },
       ],
     },
@@ -479,11 +481,12 @@ export const featuredPortfolioCases: PortfolioCase[] = [
     ],
     result: [
       "예약/결제 idempotency, race condition, DLT replay, stock reconciliation을 Testcontainers로 검증했습니다.",
+      "D/E/F는 세 전략 x 3회 local repeat에서 branch/threshold checks를 모두 통과했습니다.",
       "Kafka publish 실패와 consumer 실패를 정상 처리 흐름 밖으로 격리할 수 있게 구조화했습니다.",
-      "Outbox가 exactly-once를 보장한다는 식의 과장 없이 consumer idempotency를 함께 설명하도록 정리했습니다.",
     ],
     evidence: evidenceSet("concert-booking", [
       "Testcontainers 검증 시나리오",
+      "D/E/F 반복 시나리오 검증",
       "혼합 부하 테스트",
     ]),
     measurement: {
@@ -491,6 +494,11 @@ export const featuredPortfolioCases: PortfolioCase[] = [
         {
           label: "혼합 부하 시나리오",
           value: "200 VU, 45초 기준 총 RPS 약 969~1,005",
+        },
+        {
+          label: "D/E/F formal local repeat 검증 시나리오",
+          value:
+            "pessimistic/optimistic/distributed 전략 x scenario-d/e/f x 3회",
         },
       ],
     },
@@ -733,8 +741,8 @@ export const featuredPortfolioCases: PortfolioCase[] = [
     ],
     solution: [
       "채팅방 조회 경로의 N+1 쿼리를 제거해 필요한 데이터를 1회 쿼리로 조회하도록 재구성했습니다.",
-      "조회 API 개선 수치와 WebSocket 연결 스모크 테스트를 분리해 근거 상태를 표시했습니다.",
-      "send-to-receive latency와 delivery completeness는 아직 추가 측정 예정으로 남겨 과장을 피했습니다.",
+      "조회 API 개선 수치, WebSocket 연결 스모크 테스트, 50-user/500-user receiver matrix local scenario, by-room denominator guard를 서로 다른 근거 상태로 분리했습니다.",
+      "send-to-receive latency와 delivery completeness의 반복 benchmark는 아직 추가 측정 예정으로 남겨 과장을 피했습니다.",
     ],
     result: [
       "채팅방 조회 API 처리량을 937 RPS에서 1,598 RPS로 개선했습니다.",
@@ -745,28 +753,49 @@ export const featuredPortfolioCases: PortfolioCase[] = [
       "채팅방 조회 API RPS",
       "p95 응답 시간",
       "N+1 쿼리 제거",
+      "메시지 전달 지연 시간 로컬 스냅샷",
+      "WebSocket 전달 완전성 로컬 스냅샷",
+      "Receiver matrix by-room guard",
+      "Mixed HTTP probe artifact 분리 검산",
+      "Delivery evidence validator",
       "메시지 전달 지연 시간",
       "WebSocket 전달 완전성",
     ]),
     measurement: {
       scenarios: [
         {
-          label: "채팅방 조회 API 개선 전후 시나리오",
-          value: "채팅방 조회 API 개선 전후 비교",
+          label: "채팅방 조회 API RPS/p95 개선 조건",
+          value: "RPS 937 -> 1,598, p95 212.85ms -> 149.22ms",
         },
         {
-          label: "채팅방 조회 쿼리 수 변화",
-          value: "2N+1회 -> 1회",
+          label: "채팅방 조회 N+1 제거 쿼리 수 변화",
+          value: "2N+1 queries -> 1 query",
+        },
+        {
+          label: "메시지 전달 로컬 스냅샷",
+          value:
+            "50-user repeat3 p95 23-38ms + 500-user repeat3 p95 37-47ms, p99 46-233ms",
+        },
+        {
+          label: "WebSocket 전달 완전성 로컬 스냅샷",
+          value:
+            "50-user repeat3 each run expected 4,900 / unique 4,900, 500-user repeat3 each run expected 49,900 / unique 49,900, missing 0 / duplicate 0 / completeness 100%",
+        },
+        {
+          label: "Room별 delivery matrix guard",
+          value:
+            "summary.byRoom denominator + cross-room unexpected delivery deterministic fixture",
         },
       ],
     },
     implementationDetails: [
       "조회 성능 사례는 WebSocket delivery 성능과 분리해 API 병목 개선으로 설명합니다.",
-      "roomId 기반 Kafka ordering, Redis presence, reconnect sync는 프로젝트 맥락으로 연결하되 측정하지 않은 지표는 pending으로 둡니다.",
+      "roomId 기반 Kafka ordering, Redis presence, reconnect sync는 프로젝트 맥락으로 연결하되 local snapshot과 반복 benchmark의 경계를 분리합니다.",
+      "delivery evidence validator는 manifest, raw JSONL, regenerated summary, byRoom coverage를 대조해 artifact 승격 전 claim boundary를 확인합니다.",
       "면접에서는 N+1 제거 방식과 실시간 전달 지연 측정 계획을 나눠 답변할 수 있게 구성합니다.",
     ],
     limitations: [
-      "send-to-receive p50/p95/p99와 delivery completeness는 아직 공개 측정 결과가 없습니다.",
+      "50-user repeat3와 500-user repeat3 receiver matrix는 local scenario evidence이므로 1,000 session benchmark나 운영 성능 주장으로 사용하지 않습니다.",
       "다중 인스턴스 환경의 reconnect 후 누락 메시지 복구율은 추가 측정 예정입니다.",
     ],
     interviewQuestions: [
@@ -905,8 +934,8 @@ export const featuredPortfolioCases: PortfolioCase[] = [
       "append-only ledger invariant를 두어 debit/credit balance와 audit log를 검증 대상으로 만들었습니다.",
     ],
     result: [
-      "API Key 저장 방식, 사용량 중복 처리, Webhook 중복 처리, Append-only Ledger 불변성을 시나리오로 검증했습니다.",
-      "혼합 사용량 부하 테스트와 운영 성능 주장은 아직 추가 측정 예정으로 분리했습니다.",
+      "API Key 저장 방식, 사용량 중복 처리, quota reservation, invoice scheduler, Webhook 중복 처리, refund reversal ledger를 시나리오로 검증했습니다.",
+      "혼합 사용량 부하 테스트는 반복 protocol을 문서화하고, throughput/latency/error-rate 결과는 아직 추가 측정 예정으로 분리했습니다.",
       "AI 기능 자체보다 SaaS billing backend의 보안과 정합성 문제를 중심으로 설명할 수 있게 정리했습니다.",
     ],
     evidence: evidenceSet("ai-usage-billing-gateway", [
@@ -914,17 +943,27 @@ export const featuredPortfolioCases: PortfolioCase[] = [
       "사용량 중복 처리",
       "Webhook 중복 처리",
       "Append-only Ledger 불변성",
+      "Quota reservation",
+      "Monthly invoice scheduler",
+      "Refund reversal ledger",
+      "Full mixed smoke readiness guard",
+      "Full mixed capture rollup guard",
+      "Low-cardinality outcome counters",
       "혼합 사용량 부하 테스트",
       "운영 성능 주장",
     ]),
     implementationDetails: [
       "tenant isolation은 organization 단위 경계와 API Key 인증 흐름으로 설명합니다.",
       "중복 요청은 예외가 아니라 정상 입력으로 보고 request hash mismatch 같은 conflict를 별도로 다룹니다.",
-      "ledger는 수정 가능한 잔액 컬럼보다 append-only 기록과 invariant 검증을 중심으로 설명합니다.",
+      "quota_counters reservation, monthly invoice scheduler, refund reversal ledger는 통합 테스트로 시나리오 검증하되 운영 compliance claim과 분리합니다.",
+      "gateway request/rate-limit, idempotency conflict, webhook conflict, ledger group counter는 low-cardinality outcome metric으로만 기록하고 운영 dashboard claim과 분리합니다.",
+      "K6_REQUIRE_OPTIONAL_PATHS=true full mixed smoke readiness guard는 모든 branch가 실행되는지 확인하는 용도이며 benchmark 수치로 쓰지 않습니다.",
+      "capture-summary.json rollup은 반복 capture의 guard 통과 여부와 branch count만 묶고 throughput/latency/error-rate aggregate는 만들지 않습니다.",
     ],
     limitations: [
-      "invoice scheduler 또는 Spring Batch, refund reversal ledger, strict quota reservation은 보강 예정입니다.",
-      "k6 mixed usage benchmark, dashboard, alerting, tracing, SLO는 공개 측정 결과가 생긴 뒤에만 measured로 올립니다.",
+      "invoice scheduler, quota reservation, refund reversal ledger는 시나리오 검증 상태이며 회계 compliance claim은 하지 않습니다.",
+      "k6 mixed usage benchmark는 반복 protocol까지만 문서화했고, dashboard, alerting, tracing, SLO는 공개 측정 결과가 생긴 뒤에만 측정 완료로 올립니다.",
+      "quota reconciliation job, dashboard, alert rule은 운영 보강 지점으로 남겨두었습니다.",
     ],
     interviewQuestions: [
       "API Key 원문을 저장하지 않으면 인증은 어떻게 수행하나요?",
@@ -1130,11 +1169,11 @@ export const featuredPortfolioCases: PortfolioCase[] = [
   },
   {
     slug: "borrowme-product-list-n-plus-one",
-    title: "상품 목록 조회 N+1을 제거해 p95 1,010ms→23ms, 쿼리 201회→3회 개선",
+    title: "상품 목록 조회 N+1 개선 원본 기록을 현재 query-count guard로 검증",
     projectSlug: "borrow-me",
     domain: "대여 서비스 / 조회 성능",
     resumeLine:
-      "BorrowMe 상품 목록 조회의 N+1을 제거해 p95 1,010ms→23ms, 쿼리 201회→3회로 개선하고 동시 예약 재고 초과를 방지했습니다.",
+      "BorrowMe 상품 목록 조회는 원본 README 기록 기준 p95 1,010ms→23ms, 쿼리 201회→3회 개선 사례이며, 현재 repo에서는 상품/follow/exercise query-count guard, 인증 상품 목록 follow-aware guard, ranking data path guard, 예약 정합성 테스트, Flyway baseline validation으로 회귀를 확인합니다.",
     architectureSummary: {
       sourceOfTruth: "Product / Image / Reservation DB",
       transactionBoundary: "읽기 전용 조회 경로",
@@ -1148,38 +1187,74 @@ export const featuredPortfolioCases: PortfolioCase[] = [
     ],
     solution: [
       "상품 목록 조회의 N+1 접근을 제거해 필요한 조회를 3회 쿼리로 줄였습니다.",
-      "p95 응답 시간과 쿼리 수를 개선 전후로 기록해 결과 중심으로 설명할 수 있게 했습니다.",
+      "p95 응답 시간과 쿼리 수는 원본 README 기록으로 분리하고, 현재 repo에서는 query-count guard로 회귀를 막습니다.",
       "동시 예약 재고 초과 방지는 별도 정합성 검증 항목으로 분리했습니다.",
     ],
     result: [
-      "상품 목록 p95 응답 시간을 1,010ms에서 23ms로 개선했습니다.",
-      "쿼리 수를 201회에서 3회로 줄였습니다.",
-      "동시 예약 재고 초과 방지를 시나리오로 검증했습니다.",
+      "원본 README 기록 기준 상품 목록 p95 응답 시간은 1,010ms에서 23ms로 개선됐습니다.",
+      "원본 README 기록과 현재 query-count guard 기준 쿼리 수는 201회에서 3회로 정리됩니다.",
+      "동시 예약 재고 초과 방지, follow lookup SQL 1회, 인증 상품 목록 팔로우 여부 응답, ranking data path SQL 5회 이하, ranking model assembly SQL 6회 이하, exercise hashtag SQL 1회, Flyway baseline schema validation을 시나리오로 검증했습니다.",
     ],
     evidence: evidenceSet("borrow-me", [
-      "상품 목록 p95",
-      "쿼리 수",
+      "상품 목록 p95 원본 기록",
+      "상품 목록 쿼리 수 원본 기록 + 현재 guard",
+      "Follow lookup query-count guard",
+      "Authenticated product-list follow-aware guard",
+      "Ranking data path query-count guard",
+      "Ranking HTTP model assembly guard",
+      "Exercise hashtag query-count guard",
       "예약 정합성",
+      "Flyway baseline validation",
     ]),
     measurement: {
       scenarios: [
         {
-          label: "상품 목록 조회 API 개선 전후 시나리오",
-          value: "상품 목록 조회 API 개선 전후 비교",
+          label: "상품 목록 p95 원본 기록",
+          value:
+            "원본 README 기록 기준 p95 1,010ms -> 23ms (raw artifact 없음, 현재 재측정 아님)",
         },
         {
-          label: "상품 목록 쿼리 수 변화",
-          value: "201 queries -> 3 queries",
+          label: "상품 목록 쿼리 수 원본 기록 + 현재 guard",
+          value:
+            "원본 README 기록 201 queries + 현재 repository guard 3 queries 이하",
+        },
+        {
+          label: "Follow lookup query-count guard",
+          value:
+            "FollowService.getFollowedUserIds 후보 사용자 팔로우 조회 SQL 1회",
+        },
+        {
+          label: "Authenticated product-list follow-aware guard",
+          value:
+            "인증 GET /api/products 응답에서 팔로우 여부 true/false와 SQL 5회 이하",
+        },
+        {
+          label: "Ranking data path query-count guard",
+          value: "상위 사용자, 최근 상품, 팔로우 여부 조회 조합 SQL 5회 이하",
+        },
+        {
+          label: "Ranking HTTP model assembly guard",
+          value:
+            "GET /ranking handler/model assembly에서 topUsers/currentUser/recentProducts/followed flag 구성과 SQL 6회 이하",
+        },
+        {
+          label: "Exercise hashtag query-count guard",
+          value: "운동 추천/검색 응답의 exercise hashtag DTO 변환 SQL 1회",
+        },
+        {
+          label: "Flyway baseline validation",
+          value:
+            "V1 baseline schema migration + MySQL Testcontainers + Hibernate validate",
         },
       ],
     },
     implementationDetails: [
       "이 사례는 백엔드 기본기인 조회 병목 발견과 N+1 제거를 대표 사례로 분리합니다.",
-      "팀 프로젝트 맥락은 협업과 의사결정 설명에 쓰고, 수치는 상품 목록 조회 개선에 집중합니다.",
-      "예약 정합성은 Concert Booking보다 낮은 위계의 검증 사례로 연결합니다.",
+      "팀 프로젝트 맥락은 협업과 의사결정 설명에 쓰고, 수치는 원본 기록과 현재 query-count guard의 경계를 함께 표시합니다.",
+      "Flyway baseline validation은 현재 schema를 재현하는 baseline 검증으로만 설명하고, 과거 운영 migration history 복원 claim과 분리합니다.",
     ],
     limitations: [
-      "해커톤 팀 프로젝트 특성상 장기 운영 지표보다 개선 전후 수치와 협업 맥락에 초점을 둡니다.",
+      "p95 1,010ms→23ms와 쿼리 201회→3회는 원본 README 기록이며, raw artifact가 없어 현재 재측정값처럼 주장하지 않습니다.",
       "병목 분석 세부 환경은 공개 가능한 값이 확인될 때만 추가합니다.",
     ],
     interviewQuestions: [
@@ -1191,28 +1266,28 @@ export const featuredPortfolioCases: PortfolioCase[] = [
       type: "before-after",
       title: "상품 목록 조회 개선 전후",
       summary:
-        "상품 목록 API의 반복 조회를 줄여 쿼리 수와 p95 응답 시간을 함께 낮춘 변화를 보여줍니다.",
+        "원본 README 기록의 Before/After 수치와 현재 query-count guard의 경계를 함께 보여줍니다.",
       before: {
         title: "Before",
         items: [
           { label: "Product List API" },
-          { label: "201 queries", markers: ["failure"] },
-          { label: "p95 1,010ms" },
+          { label: "201 queries (원본 기록)", markers: ["failure"] },
+          { label: "p95 1,010ms (원본 기록)" },
         ],
       },
       after: {
         title: "After",
         items: [
           { label: "Product List API" },
-          { label: "3 queries", markers: ["source"] },
-          { label: "p95 23ms" },
+          { label: "3 queries 이하 (현재 guard)", markers: ["source"] },
+          { label: "p95 23ms (원본 기록)" },
         ],
       },
     },
     diagram: {
       title: "상품 목록 조회 개선 흐름",
       summary:
-        "상품 목록 API의 반복 조회 경로를 줄여 p95 응답 시간과 쿼리 수를 개선한 흐름입니다.",
+        "상품 목록 API의 반복 조회 경로를 줄이고 현재 query-count guard로 회귀를 막는 흐름입니다.",
       nodes: [
         {
           id: "client",
@@ -1229,13 +1304,15 @@ export const featuredPortfolioCases: PortfolioCase[] = [
         {
           id: "before",
           label: "Before",
-          description: "반복 조회로 201 queries가 발생했습니다.",
+          description:
+            "원본 README 기록상 반복 조회로 201 queries가 발생했습니다.",
           kind: "service",
         },
         {
           id: "after",
           label: "After",
-          description: "조회 경로를 정리해 3 queries로 줄였습니다.",
+          description:
+            "현재 repository guard는 조회 경로가 3 queries 이하인지 확인합니다.",
           kind: "service",
         },
         {
