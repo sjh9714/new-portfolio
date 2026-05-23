@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="420" viewBox="0 0 900 420" role="img" aria-labelledby="title desc">
+  <title id="title">Outbox DLT recovery problem architecture</title>
+  <desc id="desc">Outbox relay, Kafka, consumer, DLT, DEAD, manual replay, and PostgreSQL recovery path.</desc>
+  <rect width="900" height="420" fill="#ffffff"/>
+  <style>.box{fill:#f8fafc;stroke:#0f172a;stroke-width:1.5;rx:8}.tx{fill:#eff6ff;stroke:#1d4ed8;stroke-width:2;rx:8}.source{fill:#ecfdf5;stroke:#047857;stroke-width:2;rx:8}.fail{fill:#fff7ed;stroke:#c2410c;stroke-width:1.7;rx:8}.text{font:600 15px Arial,sans-serif;fill:#0f172a}.small{font:400 12px Arial,sans-serif;fill:#475569}.line{stroke:#334155;stroke-width:1.7;fill:none;marker-end:url(#arrow)}.dash{stroke:#c2410c;stroke-dasharray:6 5}</style>
+  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="#334155"/></marker></defs>
+  <text x="40" y="42" class="text">Outbox / DLT 복구: 문제 구간 아키텍처</text>
+  <rect x="42" y="118" width="160" height="86" class="tx"/><text x="64" y="154" class="text">Domain Tx</text><text x="64" y="178" class="small">상태 변경 + Outbox</text>
+  <rect x="252" y="118" width="136" height="86" class="source"/><text x="274" y="154" class="text">Outbox</text><text x="274" y="178" class="small">PENDING/DEAD</text>
+  <rect x="438" y="118" width="128" height="86" class="box"/><text x="460" y="154" class="text">Relay</text><text x="460" y="178" class="small">재시도 발행</text>
+  <rect x="616" y="118" width="116" height="86" class="box"/><text x="638" y="154" class="text">Kafka</text><text x="638" y="178" class="small">event</text>
+  <rect x="772" y="118" width="94" height="86" class="box"/><text x="790" y="154" class="text">Consumer</text><text x="790" y="178" class="small">idempotency</text>
+  <rect x="616" y="270" width="116" height="76" class="fail"/><text x="638" y="304" class="text">DLT</text><text x="638" y="328" class="small">실패 격리</text>
+  <rect x="408" y="270" width="142" height="76" class="fail"/><text x="430" y="304" class="text">Manual Replay</text><text x="430" y="328" class="small">확인 후 재처리</text>
+  <rect x="82" y="270" width="170" height="76" class="source"/><text x="104" y="304" class="text">Domain DB</text><text x="104" y="328" class="small">예약/결제 기준 데이터</text>
+  <path d="M202 161H252" class="line"/><path d="M388 161H438" class="line"/><path d="M566 161H616" class="line"/><path d="M732 161H772" class="line"/><path d="M819 204C804 250 756 285 732 302" class="line dash"/><path d="M616 308H550" class="line dash"/><path d="M408 308H252" class="line"/><path d="M167 270V204" class="line"/>
+</svg>

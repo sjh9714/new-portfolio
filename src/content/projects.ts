@@ -8,6 +8,13 @@ export type ProjectEvidence = {
   status: EvidenceStatus;
 };
 
+export type ProjectOverallArchitecture = {
+  projectSlug: string;
+  imageSrc: string;
+  alt: string;
+  caption: string;
+};
+
 export type Project = {
   slug: string;
   title: string;
@@ -684,6 +691,37 @@ export const projects: Project[] = [
     limitations: [
       "현재 대표 사례보다 백엔드 임팩트가 작아 전체 프로젝트 목록에서만 짧게 다룹니다.",
     ],
+  },
+];
+
+export const projectOverallArchitectures: ProjectOverallArchitecture[] = [
+  {
+    projectSlug: "concert-booking",
+    imageSrc: "/architecture/overall/concert-booking.svg",
+    alt: "Concert Booking 전체 흐름: 대기열, 예약 트랜잭션, Outbox, Kafka, DLT, PostgreSQL 복구 기준",
+    caption:
+      "예매 요청이 Queue token, 예약 트랜잭션, Outbox/Kafka, Consumer/DLT, PostgreSQL 기준 복구로 이어지는 전체 흐름입니다.",
+  },
+  {
+    projectSlug: "realtime-chat",
+    imageSrc: "/architecture/overall/realtime-chat.svg",
+    alt: "Realtime Chat 전체 흐름: STOMP 연결, 구독 인가, Kafka roomId ordering, Redis presence, reconnect sync",
+    caption:
+      "다중 인스턴스 채팅에서 연결, 구독 인가, 메시지 순서, presence, reconnect 동기화 경계를 분리한 흐름입니다.",
+  },
+  {
+    projectSlug: "ai-usage-billing-gateway",
+    imageSrc: "/architecture/overall/ai-usage-billing-gateway.svg",
+    alt: "AI Usage Billing Gateway 전체 흐름: API key 인증, usage idempotency, invoice, webhook, append-only ledger",
+    caption:
+      "tenant 인증부터 사용량 중복 처리, invoice/webhook 처리, append-only ledger와 audit log까지의 과금 흐름입니다.",
+  },
+  {
+    projectSlug: "borrow-me",
+    imageSrc: "/architecture/overall/borrowme.svg",
+    alt: "BorrowMe 전체 흐름: 상품 목록 API, 팔로우 조회, 예약 정합성, MySQL 기준 데이터",
+    caption:
+      "상품 목록 조회 최적화와 예약 정합성 검증이 MySQL 기준 데이터 위에서 만나는 흐름입니다.",
   },
 ];
 

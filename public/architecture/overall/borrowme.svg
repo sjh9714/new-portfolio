@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="420" viewBox="0 0 900 420" role="img" aria-labelledby="title desc">
+  <title id="title">BorrowMe overall architecture</title>
+  <desc id="desc">BorrowMe product list and reservation consistency architecture with API, optimized queries, guards, and MySQL.</desc>
+  <rect width="900" height="420" fill="#ffffff"/>
+  <style>.box{fill:#f8fafc;stroke:#0f172a;stroke-width:1.5;rx:8}.key{fill:#ecfdf5;stroke:#047857;stroke-width:1.8;rx:8}.note{fill:#fffbeb;stroke:#b45309;stroke-width:1.6;rx:8}.text{font:600 15px Arial,sans-serif;fill:#0f172a}.small{font:400 12px Arial,sans-serif;fill:#475569}.line{stroke:#334155;stroke-width:1.7;fill:none;marker-end:url(#arrow)}</style>
+  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="#334155"/></marker></defs>
+  <text x="40" y="42" class="text">BorrowMe 전체 아키텍처</text>
+  <rect x="46" y="128" width="130" height="78" class="box"/><text x="68" y="162" class="text">Client</text><text x="68" y="186" class="small">상품 목록</text>
+  <rect x="218" y="128" width="150" height="78" class="key"/><text x="240" y="162" class="text">Product API</text><text x="240" y="186" class="small">목록 응답</text>
+  <rect x="410" y="92" width="160" height="78" class="key"/><text x="432" y="126" class="text">Optimized Read</text><text x="432" y="150" class="small">3 queries guard</text>
+  <rect x="410" y="236" width="160" height="78" class="box"/><text x="432" y="270" class="text">Reservation</text><text x="432" y="294" class="small">재고 초과 방지</text>
+  <rect x="622" y="128" width="132" height="78" class="key"/><text x="644" y="162" class="text">MySQL</text><text x="644" y="186" class="small">Product/Image</text>
+  <rect x="622" y="254" width="190" height="78" class="note"/><text x="644" y="288" class="text">Original record</text><text x="644" y="312" class="small">README 기록과 현재 guard 분리</text>
+  <path d="M176 167H218" class="line"/><path d="M368 152L410 132" class="line"/><path d="M368 184L410 260" class="line"/><path d="M570 131L622 154" class="line"/><path d="M570 274L622 184" class="line"/><path d="M688 206V254" class="line"/>
+</svg>

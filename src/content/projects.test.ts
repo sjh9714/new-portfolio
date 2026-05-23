@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { execFileSync } from "node:child_process";
 
@@ -10,6 +10,7 @@ import {
   archiveProjects,
   featuredProjects,
   getEvidencePreview,
+  projectOverallArchitectures,
   projects,
 } from "./projects";
 
@@ -243,6 +244,41 @@ describe("portfolio project content", () => {
     expect(projectCardSource).toContain("대표 1순위");
     expect(projectCardSource).toContain("primaryTechStack");
     expect(projectCardSource).not.toContain("!compact");
+  });
+
+  it("exposes SVG overall architecture thumbnails only for selected project cards", () => {
+    const expectedProjectSlugs = [
+      "concert-booking",
+      "realtime-chat",
+      "ai-usage-billing-gateway",
+      "borrow-me",
+    ];
+    const forbiddenArchitectureExtensions = /\.(png|jpe?g|webp)$/i;
+
+    expect(projectOverallArchitectures.map((item) => item.projectSlug)).toEqual(
+      expectedProjectSlugs,
+    );
+
+    for (const architecture of projectOverallArchitectures) {
+      expect(architecture.imageSrc).toMatch(
+        /^\/architecture\/overall\/.+\.svg$/,
+      );
+      expect(architecture.imageSrc).not.toMatch(
+        forbiddenArchitectureExtensions,
+      );
+      expect(architecture.alt.trim()).toBeTruthy();
+      expect(architecture.caption.trim()).toBeTruthy();
+
+      expect(
+        existsSync(
+          join(
+            process.cwd(),
+            "public",
+            architecture.imageSrc.replace(/^\//, ""),
+          ),
+        ),
+      ).toBe(true);
+    }
   });
 
   it("renders case study detail as article plus sticky evidence sidebar", () => {

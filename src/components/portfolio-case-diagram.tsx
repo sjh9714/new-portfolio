@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import { PortfolioCaseVisualDiagram } from "@/components/portfolio-case-visual-diagram";
+import { ArchitectureFigure } from "@/components/architecture/architecture-figure";
 import type {
   PortfolioCase,
   PortfolioDiagramMarker,
@@ -54,6 +54,24 @@ export function PortfolioCaseDiagram({
         </p>
       </div>
 
+      <ArchitectureFigure architecture={portfolioCase.problemArchitecture} />
+
+      <section className="border-border bg-background flex flex-col gap-3 rounded-md border p-4">
+        <h3 className="text-muted-foreground text-sm font-semibold tracking-[0.16em] uppercase">
+          그림 읽는 법
+        </h3>
+        <ol className="grid list-decimal gap-2 pl-5 text-sm leading-6">
+          {portfolioCase.problemArchitecture.readingGuide.map((guide) => (
+            <li
+              key={guide}
+              className="text-foreground [overflow-wrap:anywhere]"
+            >
+              {guide}
+            </li>
+          ))}
+        </ol>
+      </section>
+
       <div className="border-border bg-background flex flex-col gap-3 rounded-md border p-3">
         <p className="text-muted-foreground text-xs font-semibold tracking-[0.16em] uppercase">
           범례
@@ -74,8 +92,6 @@ export function PortfolioCaseDiagram({
           ))}
         </ul>
       </div>
-
-      <PortfolioCaseVisualDiagram diagram={portfolioCase.visualDiagram} />
 
       <ArchitectureSummary summary={portfolioCase.architectureSummary} />
 

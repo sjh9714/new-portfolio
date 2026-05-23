@@ -1,4 +1,5 @@
 import { readFileSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
@@ -451,6 +452,34 @@ describe("PDF-style portfolio cases", () => {
     }
   });
 
+  it("requires every featured portfolio case to expose SVG problem architecture metadata", () => {
+    const forbiddenArchitectureExtensions = /\.(png|jpe?g|webp)$/i;
+
+    for (const portfolioCase of featuredPortfolioCases) {
+      expect(portfolioCase.problemArchitecture).toBeDefined();
+      expect(portfolioCase.problemArchitecture?.imageSrc).toMatch(
+        /^\/architecture\/cases\/.+\.svg$/,
+      );
+      expect(portfolioCase.problemArchitecture?.imageSrc).not.toMatch(
+        forbiddenArchitectureExtensions,
+      );
+      expect(portfolioCase.problemArchitecture?.alt.trim()).toBeTruthy();
+      expect(portfolioCase.problemArchitecture?.caption.trim()).toBeTruthy();
+      expect(
+        portfolioCase.problemArchitecture?.readingGuide.length,
+      ).toBeGreaterThan(0);
+
+      const publicPath = portfolioCase.problemArchitecture?.imageSrc.replace(
+        /^\//,
+        "",
+      );
+
+      expect(existsSync(join(process.cwd(), "public", publicPath ?? ""))).toBe(
+        true,
+      );
+    }
+  });
+
   it("keeps the Outbox visual state machine aligned with state transitions", () => {
     const outboxCase = getPortfolioCaseBySlug("concert-outbox-dlt-recovery");
 
@@ -473,7 +502,7 @@ describe("PDF-style portfolio cases", () => {
     );
   });
 
-  it("renders a TSX visual diagram before the flow detail table", () => {
+  it("keeps TSX visual diagram data while case details render the SVG architecture first", () => {
     const diagramSource = readFileSync(
       join(process.cwd(), "src/components/portfolio-case-diagram.tsx"),
       "utf8",
@@ -485,7 +514,8 @@ describe("PDF-style portfolio cases", () => {
 
     expect(diagramSource).toContain("흐름 세부");
     expect(diagramSource).toContain("<table");
-    expect(diagramSource).toContain("PortfolioCaseVisualDiagram");
+    expect(diagramSource).toContain("ArchitectureFigure");
+    expect(diagramSource).not.toContain("PortfolioCaseVisualDiagram");
     expect(visualSource).toContain("한눈에 보는 아키텍처");
     expect(visualSource).toContain("<figure");
     expect(visualSource).toContain("<figcaption");
@@ -500,6 +530,53 @@ describe("PDF-style portfolio cases", () => {
     ]) {
       expect(visualSource).not.toContain(forbidden);
     }
+  });
+
+  it("renders SVG architecture figure before the reading guide and flow detail table", () => {
+    const diagramSource = readFileSync(
+      join(process.cwd(), "src/components/portfolio-case-diagram.tsx"),
+      "utf8",
+    );
+    const figureSource = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/architecture/architecture-figure.tsx",
+      ),
+      "utf8",
+    );
+
+    expect(diagramSource).toContain("문제 구간 아키텍처");
+    expect(diagramSource).toContain("ArchitectureFigure");
+    expect(diagramSource.indexOf("ArchitectureFigure")).toBeLessThan(
+      diagramSource.indexOf("그림 읽는 법"),
+    );
+    expect(diagramSource.indexOf("그림 읽는 법")).toBeLessThan(
+      diagramSource.indexOf("아키텍처 판단 요약"),
+    );
+    expect(diagramSource.indexOf("<ArchitectureSummary")).toBeLessThan(
+      diagramSource.indexOf("흐름 세부"),
+    );
+    expect(diagramSource.indexOf("흐름 세부")).toBeLessThan(
+      diagramSource.indexOf("구성 요소 설명"),
+    );
+    expect(figureSource).toContain("<img");
+    expect(figureSource).toContain("overflow-x-auto");
+    expect(figureSource).toContain("min-w");
+    expect(figureSource).toContain("<figcaption");
+    expect(figureSource).not.toContain("next/image");
+  });
+
+  it("documents the portfolio overall architecture SVG in README", () => {
+    const readmeSource = readFileSync(join(process.cwd(), "README.md"), "utf8");
+
+    expect(readmeSource).toContain(
+      "![new-portfolio 콘텐츠 아키텍처](public/architecture/overall/new-portfolio.svg)",
+    );
+    expect(
+      existsSync(
+        join(process.cwd(), "public/architecture/overall/new-portfolio.svg"),
+      ),
+    ).toBe(true);
   });
 
   it("keeps visual diagram numbering decorative and marker groups semantic", () => {

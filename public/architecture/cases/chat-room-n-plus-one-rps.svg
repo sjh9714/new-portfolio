@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="420" viewBox="0 0 900 420" role="img" aria-labelledby="title desc">
+  <title id="title">Chat room N+1 query problem architecture</title>
+  <desc id="desc">Before and after architecture for chat room list API N+1 query removal.</desc>
+  <rect width="900" height="420" fill="#ffffff"/>
+  <style>.box{fill:#f8fafc;stroke:#0f172a;stroke-width:1.5;rx:8}.bad{fill:#fff7ed;stroke:#c2410c;stroke-width:1.8;rx:8}.good{fill:#ecfdf5;stroke:#047857;stroke-width:1.8;rx:8}.pending{fill:#f8fafc;stroke:#64748b;stroke-dasharray:6 5;rx:8}.text{font:600 15px Arial,sans-serif;fill:#0f172a}.small{font:400 12px Arial,sans-serif;fill:#475569}.line{stroke:#334155;stroke-width:1.7;fill:none;marker-end:url(#arrow)}</style>
+  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="#334155"/></marker></defs>
+  <text x="40" y="42" class="text">채팅방 조회 API N+1: 문제 구간 아키텍처</text>
+  <rect x="50" y="110" width="130" height="80" class="box"/><text x="72" y="144" class="text">Client</text><text x="72" y="168" class="small">방 목록 조회</text>
+  <rect x="230" y="110" width="150" height="80" class="box"/><text x="252" y="144" class="text">Chat Room API</text><text x="252" y="168" class="small">목록 응답</text>
+  <rect x="440" y="72" width="170" height="106" class="bad"/><text x="462" y="108" class="text">Before</text><text x="462" y="132" class="small">2N+1 queries</text><text x="462" y="154" class="small">RPS 937 / p95 212.85ms</text>
+  <rect x="440" y="230" width="170" height="106" class="good"/><text x="462" y="266" class="text">After</text><text x="462" y="290" class="small">1 query</text><text x="462" y="312" class="small">RPS 1,598 / p95 149.22ms</text>
+  <rect x="682" y="110" width="150" height="80" class="good"/><text x="704" y="144" class="text">Message DB</text><text x="704" y="168" class="small">Room/Participant</text>
+  <rect x="682" y="246" width="150" height="80" class="pending"/><text x="704" y="280" class="text">Delivery</text><text x="704" y="304" class="small">production/mixed 예정</text>
+  <path d="M180 150H230" class="line"/><path d="M380 136L440 124" class="line"/><path d="M380 168L440 276" class="line"/><path d="M610 282C652 250 666 194 682 164" class="line"/><path d="M610 282H682" class="line"/>
+</svg>
