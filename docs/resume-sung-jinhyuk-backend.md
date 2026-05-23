@@ -50,7 +50,7 @@ Java/Spring 백엔드 개발자 · 신입 / 주니어
 대학생 물건 대여 / 팀 프로젝트 · 11인 팀 프로젝트
 
 - 원본 README 기록 기준 상품 목록 조회 p95는 1,010ms에서 23ms, 쿼리 수는 201회에서 3회로 개선했습니다.
-- 현재 repository에서는 2026-05-23 clean repeat3 local k6 snapshot과 상품 목록 query-count guard, follow lookup guard, ranking data path guard, Flyway baseline validation으로 회귀를 확인합니다.
+- 2026-05-23 로컬 재측정 기준으로 clean repeat3 k6 snapshot과 상품 목록 query-count guard, follow lookup guard, ranking data path guard, Flyway baseline validation을 회귀 방어 근거로 분리했습니다.
 - 팀 프로젝트 맥락에서는 예약 정합성, 조회 성능 개선, 협업 범위를 분리해 설명합니다.
 
 ## Additional Projects
