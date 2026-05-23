@@ -144,19 +144,19 @@ describe("PDF-style portfolio cases", () => {
           value: "200 VU, 45초 기준 총 RPS 약 969~1,005",
         },
         {
-          label: "D/E/F formal local repeat 검증 시나리오",
+          label: "결제/만료 race·중복 요청·대기열 abuse 검증 조건",
           value:
-            "pessimistic/optimistic/distributed 전략 x scenario-d/e/f x 3회",
+            "pessimistic/optimistic/distributed 전략 x scenario-d/e/f x 3회 local repeat",
         },
       ]),
     );
     expect(outboxCase?.evidence).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          label: "D/E/F 반복 시나리오 검증",
+          label: "결제/만료 race·중복 요청·대기열 abuse 검증",
           status: "verified",
           value:
-            "세 전략 x 3회 local repeat: D 216/216, E 234/234, F 144/144 checks passed",
+            "D/E/F local repeat: 결제/만료 race, idempotency replay/conflict, 대기열 token abuse checks passed",
         }),
       ]),
     );
@@ -197,12 +197,17 @@ describe("PDF-style portfolio cases", () => {
         {
           label: "메시지 전달 로컬 스냅샷",
           value:
-            "50-user repeat3 p95 23-38ms + 500-user repeat3 p95 37-47ms, p99 46-233ms",
+            "50-user repeat3 p95 23-38ms, 500-user repeat3 p95 37-47ms, 1,000-user repeat3 p95 45-50ms",
         },
         {
           label: "WebSocket 전달 완전성 로컬 스냅샷",
           value:
-            "50-user repeat3 each run expected 4,900 / unique 4,900, 500-user repeat3 each run expected 49,900 / unique 49,900, missing 0 / duplicate 0 / completeness 100%",
+            "50-user repeat3 expected 4,900 / unique 4,900, 500-user repeat3 expected 49,900 / unique 49,900, 1,000-user repeat3 expected 99,900 / unique 99,900, missing 0 / duplicate 0 / completeness 100%",
+        },
+        {
+          label: "Room-global ordering 로컬 진단",
+          value:
+            "1,000-user repeat3 persisted message id 기준 room-global out-of-order 0",
         },
         {
           label: "Room별 delivery matrix guard",
@@ -229,9 +234,14 @@ describe("PDF-style portfolio cases", () => {
     ).toEqual(
       expect.arrayContaining([
         {
-          label: "상품 목록 p95 원본 기록",
+          label: "상품 목록 p95 원본 기록(참고)",
           value:
             "원본 README 기록 기준 p95 1,010ms -> 23ms (raw artifact 없음, 현재 재측정 아님)",
+        },
+        {
+          label: "상품 목록 현재 재측정 snapshot",
+          value:
+            "2026-05-23 clean repeat3 local k6: p95 358.1088ms, HTTP failure rate 0, checks 10,683/10,683",
         },
         {
           label: "상품 목록 쿼리 수 원본 기록 + 현재 guard",

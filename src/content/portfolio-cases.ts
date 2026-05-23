@@ -481,12 +481,12 @@ export const featuredPortfolioCases: PortfolioCase[] = [
     ],
     result: [
       "예약/결제 idempotency, race condition, DLT replay, stock reconciliation을 Testcontainers로 검증했습니다.",
-      "D/E/F는 세 전략 x 3회 local repeat에서 branch/threshold checks를 모두 통과했습니다.",
+      "D/E/F local repeat에서 결제/만료 race, idempotency replay/conflict, 대기열 token abuse checks를 통과했습니다.",
       "Kafka publish 실패와 consumer 실패를 정상 처리 흐름 밖으로 격리할 수 있게 구조화했습니다.",
     ],
     evidence: evidenceSet("concert-booking", [
       "Testcontainers 검증 시나리오",
-      "D/E/F 반복 시나리오 검증",
+      "결제/만료 race·중복 요청·대기열 abuse 검증",
       "혼합 부하 테스트",
     ]),
     measurement: {
@@ -496,9 +496,9 @@ export const featuredPortfolioCases: PortfolioCase[] = [
           value: "200 VU, 45초 기준 총 RPS 약 969~1,005",
         },
         {
-          label: "D/E/F formal local repeat 검증 시나리오",
+          label: "결제/만료 race·중복 요청·대기열 abuse 검증 조건",
           value:
-            "pessimistic/optimistic/distributed 전략 x scenario-d/e/f x 3회",
+            "pessimistic/optimistic/distributed 전략 x scenario-d/e/f x 3회 local repeat",
         },
       ],
     },
@@ -741,8 +741,8 @@ export const featuredPortfolioCases: PortfolioCase[] = [
     ],
     solution: [
       "채팅방 조회 경로의 N+1 쿼리를 제거해 필요한 데이터를 1회 쿼리로 조회하도록 재구성했습니다.",
-      "조회 API 개선 수치, WebSocket 연결 스모크 테스트, 50-user/500-user receiver matrix local scenario, by-room denominator guard를 서로 다른 근거 상태로 분리했습니다.",
-      "send-to-receive latency와 delivery completeness의 반복 benchmark는 아직 추가 측정 예정으로 남겨 과장을 피했습니다.",
+      "조회 API 개선 수치, WebSocket 연결 스모크 테스트, 50/500/1,000-user receiver matrix local scenario, by-room denominator guard를 서로 다른 근거 상태로 분리했습니다.",
+      "send-to-receive latency와 delivery completeness는 local scenario와 production/mixed benchmark를 분리해 과장을 피했습니다.",
     ],
     result: [
       "채팅방 조회 API 처리량을 937 RPS에서 1,598 RPS로 개선했습니다.",
@@ -755,11 +755,12 @@ export const featuredPortfolioCases: PortfolioCase[] = [
       "N+1 쿼리 제거",
       "메시지 전달 지연 시간 로컬 스냅샷",
       "WebSocket 전달 완전성 로컬 스냅샷",
+      "Room-global ordering 로컬 진단",
       "Receiver matrix by-room guard",
       "Mixed HTTP probe artifact 분리 검산",
       "Delivery evidence validator",
-      "메시지 전달 지연 시간",
-      "WebSocket 전달 완전성",
+      "Mixed traffic p95 latency",
+      "Production delivery benchmark",
     ]),
     measurement: {
       scenarios: [
@@ -774,12 +775,17 @@ export const featuredPortfolioCases: PortfolioCase[] = [
         {
           label: "메시지 전달 로컬 스냅샷",
           value:
-            "50-user repeat3 p95 23-38ms + 500-user repeat3 p95 37-47ms, p99 46-233ms",
+            "50-user repeat3 p95 23-38ms, 500-user repeat3 p95 37-47ms, 1,000-user repeat3 p95 45-50ms",
         },
         {
           label: "WebSocket 전달 완전성 로컬 스냅샷",
           value:
-            "50-user repeat3 each run expected 4,900 / unique 4,900, 500-user repeat3 each run expected 49,900 / unique 49,900, missing 0 / duplicate 0 / completeness 100%",
+            "50-user repeat3 expected 4,900 / unique 4,900, 500-user repeat3 expected 49,900 / unique 49,900, 1,000-user repeat3 expected 99,900 / unique 99,900, missing 0 / duplicate 0 / completeness 100%",
+        },
+        {
+          label: "Room-global ordering 로컬 진단",
+          value:
+            "1,000-user repeat3 persisted message id 기준 room-global out-of-order 0",
         },
         {
           label: "Room별 delivery matrix guard",
@@ -795,7 +801,7 @@ export const featuredPortfolioCases: PortfolioCase[] = [
       "면접에서는 N+1 제거 방식과 실시간 전달 지연 측정 계획을 나눠 답변할 수 있게 구성합니다.",
     ],
     limitations: [
-      "50-user repeat3와 500-user repeat3 receiver matrix는 local scenario evidence이므로 1,000 session benchmark나 운영 성능 주장으로 사용하지 않습니다.",
+      "50/500/1,000-user receiver matrix는 local scenario evidence이므로 production/mixed benchmark나 운영 성능 주장으로 사용하지 않습니다.",
       "다중 인스턴스 환경의 reconnect 후 누락 메시지 복구율은 추가 측정 예정입니다.",
     ],
     interviewQuestions: [
@@ -935,8 +941,8 @@ export const featuredPortfolioCases: PortfolioCase[] = [
     ],
     result: [
       "API Key 저장 방식, 사용량 중복 처리, quota reservation, invoice scheduler, Webhook 중복 처리, refund reversal ledger를 시나리오로 검증했습니다.",
+      "Audit metadata sanitizer로 민감 metadata redaction 경계를 unit test로 검증했습니다.",
       "혼합 사용량 부하 테스트는 반복 protocol을 문서화하고, throughput/latency/error-rate 결과는 아직 추가 측정 예정으로 분리했습니다.",
-      "AI 기능 자체보다 SaaS billing backend의 보안과 정합성 문제를 중심으로 설명할 수 있게 정리했습니다.",
     ],
     evidence: evidenceSet("ai-usage-billing-gateway", [
       "API Key 저장 방식",
@@ -949,6 +955,7 @@ export const featuredPortfolioCases: PortfolioCase[] = [
       "Full mixed smoke readiness guard",
       "Full mixed capture rollup guard",
       "Low-cardinality outcome counters",
+      "Audit metadata sanitizer",
       "혼합 사용량 부하 테스트",
       "운영 성능 주장",
     ]),
@@ -1192,11 +1199,13 @@ export const featuredPortfolioCases: PortfolioCase[] = [
     ],
     result: [
       "원본 README 기록 기준 상품 목록 p95 응답 시간은 1,010ms에서 23ms로 개선됐습니다.",
+      "2026-05-23 clean repeat3 local k6 snapshot에서는 p95 358.1088ms, HTTP failure rate 0을 기록했습니다.",
       "원본 README 기록과 현재 query-count guard 기준 쿼리 수는 201회에서 3회로 정리됩니다.",
       "동시 예약 재고 초과 방지, follow lookup SQL 1회, 인증 상품 목록 팔로우 여부 응답, ranking data path SQL 5회 이하, ranking model assembly SQL 6회 이하, exercise hashtag SQL 1회, Flyway baseline schema validation을 시나리오로 검증했습니다.",
     ],
     evidence: evidenceSet("borrow-me", [
-      "상품 목록 p95 원본 기록",
+      "상품 목록 p95 원본 기록(참고)",
+      "상품 목록 현재 재측정 snapshot",
       "상품 목록 쿼리 수 원본 기록 + 현재 guard",
       "Follow lookup query-count guard",
       "Authenticated product-list follow-aware guard",
@@ -1209,9 +1218,14 @@ export const featuredPortfolioCases: PortfolioCase[] = [
     measurement: {
       scenarios: [
         {
-          label: "상품 목록 p95 원본 기록",
+          label: "상품 목록 p95 원본 기록(참고)",
           value:
             "원본 README 기록 기준 p95 1,010ms -> 23ms (raw artifact 없음, 현재 재측정 아님)",
+        },
+        {
+          label: "상품 목록 현재 재측정 snapshot",
+          value:
+            "2026-05-23 clean repeat3 local k6: p95 358.1088ms, HTTP failure rate 0, checks 10,683/10,683",
         },
         {
           label: "상품 목록 쿼리 수 원본 기록 + 현재 guard",
