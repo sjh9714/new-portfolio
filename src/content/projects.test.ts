@@ -382,6 +382,11 @@ describe("portfolio project content", () => {
           value: expect.stringContaining("mixedHttp summary"),
         }),
         expect.objectContaining({
+          label: "Mixed traffic local scenario",
+          status: "verified",
+          value: expect.stringContaining("10 rooms x 50 users repeat3"),
+        }),
+        expect.objectContaining({
           label: "Delivery evidence validator",
           status: "verified",
           value: expect.stringContaining("manifest.json"),
@@ -423,8 +428,8 @@ describe("portfolio project content", () => {
         }),
         expect.objectContaining({
           label: "혼합 사용량 부하 테스트",
-          status: "pending",
-          value: expect.stringContaining("추가 측정 예정"),
+          status: "measured",
+          value: expect.stringContaining("local full mixed repeat3"),
         }),
         expect.objectContaining({
           label: "운영 성능 주장",
@@ -434,7 +439,6 @@ describe("portfolio project content", () => {
       ]),
     );
     expect(JSON.stringify(billing)).not.toContain("30.38ms");
-    expect(JSON.stringify(billing)).not.toContain("checks 150/150");
     expect(JSON.stringify(billing)).not.toContain("측정 완료");
 
     expect(borrowMe?.evidence).toEqual(

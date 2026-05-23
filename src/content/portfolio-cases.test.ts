@@ -210,6 +210,11 @@ describe("PDF-style portfolio cases", () => {
             "1,000-user repeat3 persisted message id 기준 room-global out-of-order 0",
         },
         {
+          label: "Mixed traffic local scenario",
+          value:
+            "10 rooms x 50 users repeat3 + mixed HTTP probes: unique 4,900/4,900, missing 0, duplicate 0, receiver p95 18-20ms, mixed HTTP failed 0/30/run",
+        },
+        {
           label: "Room별 delivery matrix guard",
           value:
             "summary.byRoom denominator + cross-room unexpected delivery deterministic fixture",

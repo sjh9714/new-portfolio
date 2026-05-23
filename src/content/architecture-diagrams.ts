@@ -540,12 +540,12 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
       },
       {
         id: "benchmark",
-        label: "Mixed Usage Benchmark",
+        label: "Local Repeat3 Evidence",
         description:
-          "throughput, latency, error rate를 공개 측정으로 남길 항목입니다.",
+          "5 VU, 30s, repeat3로 branch mix와 HTTP 결과를 확인한 local evidence입니다.",
         kind: "external",
         evidenceLabel: "혼합 사용량 부하 테스트",
-        status: "pending",
+        status: "measured",
       },
       {
         id: "ops-data",
@@ -615,7 +615,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         id: "bench-target",
         from: "benchmark",
         to: "gateway",
-        label: "mixed usage scenario 측정",
+        label: "local repeat3 측정",
         kind: "sync",
         evidenceLabel: "혼합 사용량 부하 테스트",
       },
@@ -662,9 +662,9 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         evidenceLabel: "사용량 중복 처리",
       },
       {
-        label: "추가 검증 예정",
+        label: "Local repeat3와 운영 claim 분리",
         description:
-          "mixed usage benchmark와 운영형 성능 근거는 측정 완료 전까지 별도 상태로 보입니다.",
+          "local repeat3 evidence와 운영형 성능 근거를 별도 상태로 보입니다.",
         evidenceLabel: "혼합 사용량 부하 테스트",
       },
     ],

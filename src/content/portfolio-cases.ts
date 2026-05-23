@@ -758,6 +758,7 @@ export const featuredPortfolioCases: PortfolioCase[] = [
       "Room-global ordering 로컬 진단",
       "Receiver matrix by-room guard",
       "Mixed HTTP probe artifact 분리 검산",
+      "Mixed traffic local scenario",
       "Delivery evidence validator",
       "Mixed traffic p95 latency",
       "Production delivery benchmark",
@@ -788,6 +789,11 @@ export const featuredPortfolioCases: PortfolioCase[] = [
             "1,000-user repeat3 persisted message id 기준 room-global out-of-order 0",
         },
         {
+          label: "Mixed traffic local scenario",
+          value:
+            "10 rooms x 50 users repeat3 + mixed HTTP probes: unique 4,900/4,900, missing 0, duplicate 0, receiver p95 18-20ms, mixed HTTP failed 0/30/run",
+        },
+        {
           label: "Room별 delivery matrix guard",
           value:
             "summary.byRoom denominator + cross-room unexpected delivery deterministic fixture",
@@ -797,11 +803,13 @@ export const featuredPortfolioCases: PortfolioCase[] = [
     implementationDetails: [
       "조회 성능 사례는 WebSocket delivery 성능과 분리해 API 병목 개선으로 설명합니다.",
       "roomId 기반 Kafka ordering, Redis presence, reconnect sync는 프로젝트 맥락으로 연결하되 local snapshot과 반복 benchmark의 경계를 분리합니다.",
+      "10 rooms x 50 users mixed traffic local scenario는 WebSocket drain 뒤 HTTP probe를 분리해 receiver denominator와 HTTP 실패율을 함께 검산합니다.",
       "delivery evidence validator는 manifest, raw JSONL, regenerated summary, byRoom coverage를 대조해 artifact 승격 전 claim boundary를 확인합니다.",
       "면접에서는 N+1 제거 방식과 실시간 전달 지연 측정 계획을 나눠 답변할 수 있게 구성합니다.",
     ],
     limitations: [
       "50/500/1,000-user receiver matrix는 local scenario evidence이므로 production/mixed benchmark나 운영 성능 주장으로 사용하지 않습니다.",
+      "10 rooms x 50 users mixed traffic scenario도 local single app evidence이며, production multi-instance mixed benchmark나 cache-hit claim으로 사용하지 않습니다.",
       "다중 인스턴스 환경의 reconnect 후 누락 메시지 복구율은 추가 측정 예정입니다.",
     ],
     interviewQuestions: [
@@ -942,7 +950,7 @@ export const featuredPortfolioCases: PortfolioCase[] = [
     result: [
       "API Key 저장 방식, 사용량 중복 처리, quota reservation, invoice scheduler, Webhook 중복 처리, refund reversal ledger를 시나리오로 검증했습니다.",
       "Audit metadata sanitizer로 민감 metadata redaction 경계를 unit test로 검증했습니다.",
-      "혼합 사용량 부하 테스트는 반복 protocol을 문서화하고, throughput/latency/error-rate 결과는 아직 추가 측정 예정으로 분리했습니다.",
+      "혼합 사용량 부하 테스트는 2026-05-23 local full mixed repeat3에서 checks 150/150/run, HTTP failure 0/150/run을 기록했습니다.",
     ],
     evidence: evidenceSet("ai-usage-billing-gateway", [
       "API Key 저장 방식",
@@ -964,12 +972,12 @@ export const featuredPortfolioCases: PortfolioCase[] = [
       "중복 요청은 예외가 아니라 정상 입력으로 보고 request hash mismatch 같은 conflict를 별도로 다룹니다.",
       "quota_counters reservation, monthly invoice scheduler, refund reversal ledger는 통합 테스트로 시나리오 검증하되 운영 compliance claim과 분리합니다.",
       "gateway request/rate-limit, idempotency conflict, webhook conflict, ledger group counter는 low-cardinality outcome metric으로만 기록하고 운영 dashboard claim과 분리합니다.",
-      "K6_REQUIRE_OPTIONAL_PATHS=true full mixed smoke readiness guard는 모든 branch가 실행되는지 확인하는 용도이며 benchmark 수치로 쓰지 않습니다.",
-      "capture-summary.json rollup은 반복 capture의 guard 통과 여부와 branch count만 묶고 throughput/latency/error-rate aggregate는 만들지 않습니다.",
+      "K6_REQUIRE_OPTIONAL_PATHS=true full mixed repeat3는 gateway/usage/invoice/webhook branch가 모두 실행되는지 확인하고, production benchmark와 분리합니다.",
+      "capture-summary.json rollup은 반복 capture의 guard 통과 여부와 branch count를 묶고, p95/RPS는 raw summary artifact와 별도 evidence 문서에서 확인합니다.",
     ],
     limitations: [
       "invoice scheduler, quota reservation, refund reversal ledger는 시나리오 검증 상태이며 회계 compliance claim은 하지 않습니다.",
-      "k6 mixed usage benchmark는 반복 protocol까지만 문서화했고, dashboard, alerting, tracing, SLO는 공개 측정 결과가 생긴 뒤에만 측정 완료로 올립니다.",
+      "local full mixed repeat3는 운영 성능 claim이 아니며, dashboard, alerting, tracing, SLO는 공개 운영 근거가 생긴 뒤에만 측정 완료로 올립니다.",
       "quota reconciliation job, dashboard, alert rule은 운영 보강 지점으로 남겨두었습니다.",
     ],
     interviewQuestions: [
@@ -1117,10 +1125,9 @@ export const featuredPortfolioCases: PortfolioCase[] = [
         },
         {
           id: "benchmark",
-          label: "Mixed Usage Benchmark",
-          description: "혼합 사용량 부하 테스트는 추가 측정 예정입니다.",
+          label: "Local Repeat3 Evidence",
+          description: "5 VU, 30s, repeat3 branch mix를 검증합니다.",
           kind: "worker",
-          markers: ["pending"],
         },
       ],
       edges: [
@@ -1168,8 +1175,7 @@ export const featuredPortfolioCases: PortfolioCase[] = [
           id: "pending-benchmark",
           from: "usage",
           to: "benchmark",
-          label: "성능 claim 분리",
-          markers: ["pending"],
+          label: "local repeat3 측정",
         },
       ],
     },

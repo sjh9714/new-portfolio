@@ -34,7 +34,7 @@ Java/Spring 백엔드 개발자 · 신입 / 주니어
 실시간 메시징 / 조회 성능 · 개인 / BE 1
 
 - 채팅방 조회 API의 N+1 쿼리를 제거해 RPS 937에서 1,598, p95 212.85ms에서 149.22ms로 개선했습니다.
-- WebSocket receiver matrix에서는 1,000-user local repeat3 기준 expected 99,900 / unique 99,900 / missing 0 / duplicate 0을 기록했고, accepted/persisted/self-echo와 recipient delivery를 분리했습니다.
+- WebSocket receiver matrix에서는 1,000-user local repeat3 기준 expected 99,900 / unique 99,900 / missing 0 / duplicate 0을 기록했고, mixed traffic local scenario에서는 10 rooms x 50 users repeat3 receiver p95 18-20ms와 mixed HTTP failed 0/30/run을 분리했습니다.
 - STOMP 구독 인가, roomId 기반 Kafka ordering, Redis presence, reconnect sync를 다중 인스턴스 경계로 나눠 설명할 수 있게 구성했습니다.
 
 ### AI Usage Billing Gateway
@@ -43,14 +43,14 @@ Java/Spring 백엔드 개발자 · 신입 / 주니어
 
 - API Key는 원문을 1회만 반환하고 DB에는 prefix/hash를 저장하는 방식으로 구성했습니다.
 - usage idempotency, webhook duplicate/conflict, append-only ledger invariant를 시나리오로 검증했습니다.
-- quota reservation, monthly invoice scheduler, refund reversal ledger는 검증했지만, mixed usage benchmark와 운영 성능 claim은 추가 측정 예정으로 분리했습니다.
+- quota reservation, monthly invoice scheduler, refund reversal ledger를 검증하고, mixed usage는 2026-05-23 local repeat3로 측정하되 운영 성능 claim과 분리했습니다.
 
 ### BorrowMe
 
 대학생 물건 대여 / 팀 프로젝트 · 11인 팀 프로젝트
 
 - 원본 README 기록 기준 상품 목록 조회 p95는 1,010ms에서 23ms, 쿼리 수는 201회에서 3회로 개선했습니다.
-- 현재 repository에서는 2026-05-23 clean repeat3 local k6 snapshot과 상품 목록 query-count guard, follow lookup guard, ranking data path guard, Flyway baseline validation으로 회귀를 확인합니다.
+- 2026-05-23 로컬 재측정 기준으로 clean repeat3 k6 snapshot과 상품 목록 query-count guard, follow lookup guard, ranking data path guard, Flyway baseline validation을 회귀 방어 근거로 분리했습니다.
 - 팀 프로젝트 맥락에서는 예약 정합성, 조회 성능 개선, 협업 범위를 분리해 설명합니다.
 
 ## Additional Projects

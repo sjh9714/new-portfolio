@@ -196,6 +196,12 @@ export const projects: Project[] = [
         status: "verified",
       },
       {
+        label: "Mixed traffic local scenario",
+        value:
+          "10 rooms x 50 users repeat3 + mixed HTTP probes: unique 4,900/4,900, missing 0, duplicate 0, receiver p95 18-20ms, mixed HTTP failed 0/30 per run (local single app)",
+        status: "verified",
+      },
+      {
         label: "Delivery evidence validator",
         value:
           "2-user local artifact에서 manifest.json, raw JSONL, regenerated summary, byRoom coverage를 검산했고, mixedHttp 포함 artifact는 failed 0 조건으로 승격 전 확인",
@@ -238,7 +244,7 @@ export const projects: Project[] = [
     solution:
       "tenant isolation, API key prefix/hash 저장, usage idempotency, quota reservation, invoice scheduler, webhook duplicate/conflict, refund reversal ledger를 구성",
     result:
-      "API key 보안, usage idempotency, quota reservation, invoice scheduler, webhook 중복 처리, refund reversal ledger를 검증하고 성능/운영 지표는 공개 측정 전 상태로 구분했습니다.",
+      "API key 보안, usage idempotency, quota reservation, invoice scheduler, webhook 중복 처리, refund reversal ledger를 검증하고 local full mixed repeat3 측정과 운영 성능 주장을 분리했습니다.",
     primaryTechStack: [
       "Java",
       "Spring Boot",
@@ -324,8 +330,9 @@ export const projects: Project[] = [
       },
       {
         label: "혼합 사용량 부하 테스트",
-        value: "throughput/latency/error-rate 반복 benchmark 추가 측정 예정",
-        status: "pending",
+        value:
+          "2026-05-23 local full mixed repeat3: 5 VU, 30s, checks 150/150/run, HTTP failure 0/150/run, p95 18.5976-44.1454ms, invoice/webhook branch 각 6회/run",
+        status: "measured",
       },
       {
         label: "운영 성능 주장",
