@@ -500,9 +500,9 @@ export const projects: Project[] = [
     allTechStack: ["Java", "Spring Boot", "JPA", "MySQL", "OAuth", "k6"],
     evidence: [
       {
-        label: "상품 목록 p95 원본 기록(참고)",
+        label: "상품 목록 p95 원본 기록",
         value:
-          "원본 README 기록: 1,010ms -> 23ms (raw artifact 없음, 현재 재측정 아님)",
+          "참고 기록 · raw artifact 없음 · 원본 README: 1,010ms -> 23ms · 현재 재측정 claim 아님",
         status: "pending",
       },
       {

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { execFileSync } from "node:child_process";
 
 import { blogTopics } from "./blog";
 import { navigationItems, profile } from "./profile";
@@ -45,6 +46,8 @@ const sourceFilesWithPublicCopy = [
   "src/app/projects/page.tsx",
   "src/app/about/page.tsx",
   "src/app/resume/page.tsx",
+  "src/app/blog/page.tsx",
+  "src/app/blog/[slug]/page.tsx",
   "src/app/sitemap.ts",
   "src/components/architecture-diagram/index.tsx",
   "src/components/case-study-article.tsx",
@@ -53,6 +56,7 @@ const sourceFilesWithPublicCopy = [
   "src/components/evidence-matrix.tsx",
   "src/content/portfolio-cases.ts",
   "src/content/architecture-diagrams.ts",
+  "src/content/blog.ts",
   "src/content/case-studies/concert-booking.mdx",
   "src/content/case-studies/realtime-chat.mdx",
   "src/content/case-studies/ai-usage-billing-gateway.mdx",
@@ -162,6 +166,69 @@ describe("portfolio project content", () => {
     expect(homeSource).toContain('evidenceLabel: "사용량 중복 처리"');
   });
 
+  it("ships the Redis article only as a real published article", () => {
+    const blogSource = readFileSync(
+      join(process.cwd(), "src/content/blog.ts"),
+      "utf8",
+    );
+    const blogPageSource = readFileSync(
+      join(process.cwd(), "src/app/blog/page.tsx"),
+      "utf8",
+    );
+    const blogDetailSource = readFileSync(
+      join(process.cwd(), "src/app/blog/[slug]/page.tsx"),
+      "utf8",
+    );
+    const redisTopic = blogTopics.find((topic) =>
+      topic.title.startsWith("Redis를 캐시로만 쓰지 않기 위해"),
+    );
+
+    expect(redisTopic?.slug).toBe("redis-queue-lock-presence-reconciliation");
+    expect(redisTopic?.status).toBe("published");
+    if (!redisTopic || redisTopic.status !== "published") {
+      throw new Error("Redis article must be published before exposure");
+    }
+    expect(redisTopic.sections.length).toBeGreaterThanOrEqual(4);
+    expect(JSON.stringify(redisTopic)).toContain("최종 기준 데이터");
+    expect(JSON.stringify(redisTopic)).toContain("Redis distributed lock");
+    expect(JSON.stringify(redisTopic)).toContain("50/50");
+    for (const requiredConcept of [
+      "대기열",
+      "분산 락",
+      "presence",
+      "reconciliation",
+      "운영 성능 주장은 별도로 하지 않습니다",
+    ]) {
+      expect(JSON.stringify(redisTopic)).toContain(requiredConcept);
+    }
+    expect(JSON.stringify(redisTopic)).not.toContain("추가 기입 예정");
+    expect(blogSource).toContain("publishedAt");
+    expect(blogPageSource).toContain("publishedBlogTopics");
+    expect(blogPageSource).toContain("comingSoonBlogTopics");
+    expect(blogPageSource).not.toContain("작성 예정 글");
+    expect(blogDetailSource).toContain("getBlogTopicBySlug");
+    expect(blogDetailSource).not.toContain("lorem");
+    expect(blogSource).toContain('status: "published"');
+    expect(blogSource).toContain("sections:");
+  });
+
+  it("keeps raw feedback artifacts out of tracked/public files", () => {
+    const gitignoreSource = readFileSync(
+      join(process.cwd(), ".gitignore"),
+      "utf8",
+    );
+    const trackedFiles = execFileSync("git", ["ls-files"], {
+      cwd: process.cwd(),
+      encoding: "utf8",
+    });
+
+    expect(gitignoreSource).toContain("fb*.txt");
+    expect(gitignoreSource).toContain("feedback.md");
+    expect(trackedFiles).not.toMatch(/(^|\/)feedback\.md$/m);
+    expect(trackedFiles).not.toMatch(/(^|\/)fb[0-9]+\.txt$/m);
+    expect(trackedFiles).not.toMatch(/^public\/fb[0-9]+\.txt$/m);
+  });
+
   it("keeps project cards structured for a 30-second technical scan", () => {
     const projectCardSource = readFileSync(
       join(process.cwd(), "src/components/project-card.tsx"),
@@ -172,6 +239,7 @@ describe("portfolio project content", () => {
     expect(projectCardSource).toContain('LabeledText label="설계"');
     expect(projectCardSource).toContain('LabeledText label="결과"');
     expect(projectCardSource).toContain("근거");
+    expect(projectCardSource).toContain("evidence.value");
     expect(projectCardSource).toContain("대표 1순위");
     expect(projectCardSource).toContain("primaryTechStack");
     expect(projectCardSource).not.toContain("!compact");
@@ -444,7 +512,7 @@ describe("portfolio project content", () => {
     expect(borrowMe?.evidence).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          label: "상품 목록 p95 원본 기록(참고)",
+          label: "상품 목록 p95 원본 기록",
           status: "pending",
         }),
         expect.objectContaining({
