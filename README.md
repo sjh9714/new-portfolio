@@ -4,9 +4,19 @@
 문제-설계-검증 근거로 읽히게 만든 한국 백엔드 개발자 포트폴리오입니다.
 
 - Live: [new-portfolio-smoky-one-41.vercel.app](https://new-portfolio-smoky-one-41.vercel.app)
+- Resume PDF: [resume-sung-jinhyuk-backend.pdf](public/resume-sung-jinhyuk-backend.pdf)
 - GitHub: [github.com/sjh9714](https://github.com/sjh9714)
 - Email: [jinhyuk9714@gmail.com](mailto:jinhyuk9714@gmail.com)
 - Redis 글: [Redis를 캐시로만 쓰지 않기 위해 구현한 대기열, 분산 락, Presence, 정합성 복구][redis-blog]
+
+## 30초 요약
+
+- 이 사이트가 증명하는 것:
+  Java/Spring 백엔드의 동시성, 이벤트 정합성, 실시간 메시징, 과금/정산 문제 해결입니다.
+- 가장 강한 근거:
+  동일 좌석 100 concurrent requests에서 success 1, fail 99, overselling 0을 기록했습니다.
+- 아직 주장하지 않는 것:
+  공개 운영 트래픽, production benchmark, compliance 수준의 보증은 주장하지 않습니다.
 
 ## 대표 사례
 
