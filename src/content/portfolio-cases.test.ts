@@ -239,9 +239,9 @@ describe("PDF-style portfolio cases", () => {
     ).toEqual(
       expect.arrayContaining([
         {
-          label: "상품 목록 p95 원본 기록(참고)",
+          label: "상품 목록 p95 원본 기록",
           value:
-            "원본 README 기록 기준 p95 1,010ms -> 23ms (raw artifact 없음, 현재 재측정 아님)",
+            "참고 기록 · raw artifact 없음 · 원본 README 기준 p95 1,010ms -> 23ms · 현재 재측정 claim 아님",
         },
         {
           label: "상품 목록 현재 재측정 snapshot",
@@ -320,6 +320,9 @@ describe("PDF-style portfolio cases", () => {
     expect(JSON.stringify(borrowMeCase)).toContain("현재 query-count guard");
     expect(JSON.stringify(borrowMeCase)).toContain("현재 guard");
     expect(JSON.stringify(borrowMeCase)).toContain("원본 기록");
+    expect(JSON.stringify(borrowMeCase)).toContain(
+      "참고 기록 · raw artifact 없음",
+    );
     expect(JSON.stringify(borrowMeCase)).not.toContain(
       "상품 목록 p95 응답 시간을 1,010ms에서 23ms로 개선했습니다.",
     );

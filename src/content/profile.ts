@@ -1,3 +1,5 @@
+import { publishedBlogTopics } from "./blog";
+
 export const profile = {
   initials: "SJH",
   name: "성진혁",
@@ -15,5 +17,6 @@ export const navigationItems = [
   { href: "/case-studies", label: "문제 해결 사례" },
   { href: "/projects", label: "프로젝트" },
   { href: "/resume", label: "이력서" },
+  ...(publishedBlogTopics.length > 0 ? [{ href: "/blog", label: "글" }] : []),
   { href: "/about", label: "연락처" },
 ] as const;

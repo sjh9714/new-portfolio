@@ -1210,7 +1210,7 @@ export const featuredPortfolioCases: PortfolioCase[] = [
       "동시 예약 재고 초과 방지, follow lookup SQL 1회, 인증 상품 목록 팔로우 여부 응답, ranking data path SQL 5회 이하, ranking model assembly SQL 6회 이하, exercise hashtag SQL 1회, Flyway baseline schema validation을 시나리오로 검증했습니다.",
     ],
     evidence: evidenceSet("borrow-me", [
-      "상품 목록 p95 원본 기록(참고)",
+      "상품 목록 p95 원본 기록",
       "상품 목록 현재 재측정 snapshot",
       "상품 목록 쿼리 수 원본 기록 + 현재 guard",
       "Follow lookup query-count guard",
@@ -1224,9 +1224,9 @@ export const featuredPortfolioCases: PortfolioCase[] = [
     measurement: {
       scenarios: [
         {
-          label: "상품 목록 p95 원본 기록(참고)",
+          label: "상품 목록 p95 원본 기록",
           value:
-            "원본 README 기록 기준 p95 1,010ms -> 23ms (raw artifact 없음, 현재 재측정 아님)",
+            "참고 기록 · raw artifact 없음 · 원본 README 기준 p95 1,010ms -> 23ms · 현재 재측정 claim 아님",
         },
         {
           label: "상품 목록 현재 재측정 snapshot",

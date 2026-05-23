@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { metadata as blogMetadata } from "./blog/page";
 import robots from "./robots";
 import sitemap from "./sitemap";
+import { publishedBlogTopics } from "@/content/blog";
 import { featuredPortfolioCases } from "@/content/portfolio-cases";
 
 describe("metadata routes", () => {
@@ -23,17 +24,22 @@ describe("metadata routes", () => {
         ),
       ]),
     );
-    expect(sitemap().some((entry) => entry.url.endsWith("/blog"))).toBe(false);
+    expect(sitemap().map((entry) => entry.url)).toEqual(
+      expect.arrayContaining([
+        "https://portfolio.example/blog",
+        ...publishedBlogTopics.map(
+          (topic) => `https://portfolio.example/blog/${topic.slug}`,
+        ),
+      ]),
+    );
 
     vi.unstubAllEnvs();
   });
 
-  it("keeps unpublished blog pages out of public discovery", () => {
-    expect(blogMetadata.robots).toEqual(
-      expect.objectContaining({
-        index: false,
-        follow: false,
-      }),
+  it("allows the published Redis article to be discovered", () => {
+    expect(publishedBlogTopics.map((topic) => topic.slug)).toContain(
+      "redis-queue-lock-presence-reconciliation",
     );
+    expect(blogMetadata.robots).toBeUndefined();
   });
 });

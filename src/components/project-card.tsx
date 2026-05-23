@@ -63,12 +63,17 @@ export function ProjectCard({
           {evidencePreview.map((evidence) => (
             <div
               key={`${project.slug}-${evidence.label}`}
-              className="border-border bg-background flex items-start justify-between gap-3 rounded-md border px-3 py-2"
+              className="border-border bg-background flex flex-col gap-2 rounded-md border px-3 py-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3"
             >
-              <span className="text-foreground min-w-0 text-sm leading-5 [overflow-wrap:anywhere]">
-                {evidence.label}
+              <span className="flex min-w-0 flex-1 flex-col gap-1">
+                <span className="text-foreground text-sm leading-5 [overflow-wrap:anywhere]">
+                  {evidence.label}
+                </span>
+                <span className="text-muted-foreground line-clamp-2 text-xs leading-5 [overflow-wrap:anywhere]">
+                  {evidence.value}
+                </span>
               </span>
-              <StatusBadge status={evidence.status} />
+              <StatusBadge status={evidence.status} className="shrink-0" />
             </div>
           ))}
         </div>
