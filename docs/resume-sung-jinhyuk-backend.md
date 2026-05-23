@@ -34,7 +34,7 @@ Java/Spring 백엔드 개발자 · 신입 / 주니어
 실시간 메시징 / 조회 성능 · 개인 / BE 1
 
 - 채팅방 조회 API의 N+1 쿼리를 제거해 RPS 937에서 1,598, p95 212.85ms에서 149.22ms로 개선했습니다.
-- WebSocket receiver matrix에서는 1,000-user local repeat3 기준 expected 99,900 / unique 99,900 / missing 0 / duplicate 0을 기록했고, accepted/persisted/self-echo와 recipient delivery를 분리했습니다.
+- WebSocket receiver matrix에서는 1,000-user local repeat3 기준 expected 99,900 / unique 99,900 / missing 0 / duplicate 0을 기록했고, mixed traffic local scenario에서는 10 rooms x 50 users repeat3 receiver p95 18-20ms와 mixed HTTP failed 0/30/run을 분리했습니다.
 - STOMP 구독 인가, roomId 기반 Kafka ordering, Redis presence, reconnect sync를 다중 인스턴스 경계로 나눠 설명할 수 있게 구성했습니다.
 
 ### AI Usage Billing Gateway
@@ -43,7 +43,7 @@ Java/Spring 백엔드 개발자 · 신입 / 주니어
 
 - API Key는 원문을 1회만 반환하고 DB에는 prefix/hash를 저장하는 방식으로 구성했습니다.
 - usage idempotency, webhook duplicate/conflict, append-only ledger invariant를 시나리오로 검증했습니다.
-- quota reservation, monthly invoice scheduler, refund reversal ledger는 검증했지만, mixed usage benchmark와 운영 성능 claim은 추가 측정 예정으로 분리했습니다.
+- quota reservation, monthly invoice scheduler, refund reversal ledger를 검증하고, mixed usage는 2026-05-23 local repeat3로 측정하되 운영 성능 claim과 분리했습니다.
 
 ### BorrowMe
 
