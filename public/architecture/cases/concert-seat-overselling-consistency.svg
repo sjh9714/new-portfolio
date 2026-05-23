@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="420" viewBox="0 0 900 420" role="img" aria-labelledby="title desc">
+  <title id="title">동일 좌석 오버셀링 방지 문제 구간</title>
+  <desc id="desc">Queue token, reservation transaction, Outbox, Kafka, DLT, PostgreSQL reconciliation flow for same-seat contention.</desc>
+  <rect width="900" height="420" fill="#ffffff"/>
+  <style>.box{fill:#f8fafc;stroke:#0f172a;stroke-width:1.5;rx:8}.tx{fill:#eff6ff;stroke:#1d4ed8;stroke-width:2;rx:8}.source{fill:#ecfdf5;stroke:#047857;stroke-width:2;rx:8}.fail{fill:#fff7ed;stroke:#c2410c;stroke-width:1.7;rx:8}.text{font:600 15px Arial,sans-serif;fill:#0f172a}.small{font:400 12px Arial,sans-serif;fill:#475569}.line{stroke:#334155;stroke-width:1.7;fill:none;marker-end:url(#arrow)}.dash{stroke:#c2410c;stroke-dasharray:6 5}</style>
+  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="#334155"/></marker></defs>
+  <text x="40" y="42" class="text">동일 좌석 예매 경합: 문제 구간 아키텍처</text>
+  <rect x="42" y="112" width="124" height="76" class="box"/><text x="64" y="146" class="text">Client</text><text x="64" y="170" class="small">동일 좌석 요청</text>
+  <rect x="206" y="112" width="136" height="76" class="box"/><text x="226" y="146" class="text">Queue Token</text><text x="226" y="170" class="small">우회 제한</text>
+  <rect x="382" y="86" width="176" height="128" class="tx"/><text x="406" y="124" class="text">Reservation Tx</text><text x="406" y="150" class="small">Idempotency-Key</text><text x="406" y="172" class="small">Seat lock</text><text x="406" y="194" class="small">Reservation + Outbox</text>
+  <rect x="608" y="112" width="118" height="76" class="box"/><text x="630" y="146" class="text">Kafka</text><text x="630" y="170" class="small">비동기 발행</text>
+  <rect x="766" y="112" width="94" height="76" class="fail"/><text x="786" y="146" class="text">DLT</text><text x="786" y="170" class="small">격리</text>
+  <rect x="382" y="270" width="176" height="82" class="source"/><text x="406" y="306" class="text">PostgreSQL</text><text x="406" y="330" class="small">좌석/예약 최종 기준 데이터</text>
+  <rect x="608" y="270" width="170" height="82" class="fail"/><text x="630" y="306" class="text">Redis Reconcile</text><text x="630" y="330" class="small">보조 상태 복구</text>
+  <path d="M166 150H206" class="line"/><path d="M342 150H382" class="line"/><path d="M558 150H608" class="line"/><path d="M726 150H766" class="line"/><path d="M470 214V270" class="line"/><path d="M608 312H558" class="line"/><path d="M670 270C650 230 624 200 608 178" class="line dash"/>
+</svg>

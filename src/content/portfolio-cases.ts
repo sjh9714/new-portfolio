@@ -22,6 +22,14 @@ export type PortfolioArchitectureSummary = {
   designReason?: string;
 };
 
+export type PortfolioProblemArchitecture = {
+  imageSrc: string;
+  alt: string;
+  caption: string;
+  sourceFile: string;
+  readingGuide: string[];
+};
+
 export type PortfolioStateTransition = {
   from: string;
   to: string;
@@ -125,6 +133,7 @@ export type PortfolioCase = {
   domain: string;
   resumeLine: string;
   architectureSummary: PortfolioArchitectureSummary;
+  problemArchitecture: PortfolioProblemArchitecture;
   problem: string[];
   solution: string[];
   result: string[];
@@ -181,6 +190,19 @@ export const featuredPortfolioCases: PortfolioCase[] = [
         "Consumer 실패 시 DLT로 격리하고, Redis stock 불일치는 Reconciliation Job으로 복구합니다.",
       designReason:
         "Redis는 빠른 경합 제어와 대기열에는 적합하지만 최종 기준 데이터로 두면 복구 기준이 흐려지므로 PostgreSQL을 최종 기준 데이터로 유지했습니다.",
+    },
+    problemArchitecture: {
+      imageSrc: "/architecture/cases/concert-seat-overselling-consistency.svg",
+      alt: "동일 좌석 예매 경합에서 Queue token, Reservation transaction, Outbox, Kafka, DLT, PostgreSQL 복구 기준을 연결한 문제 구간 아키텍처",
+      caption:
+        "동일 좌석 요청을 트랜잭션 경계와 비동기 발행 경계로 나누고 PostgreSQL을 좌석/예약의 최종 기준 데이터로 둔 구조입니다.",
+      sourceFile:
+        "public/architecture/cases/concert-seat-overselling-consistency.svg",
+      readingGuide: [
+        "왼쪽의 Client/Queue token은 대기열 우회 요청을 제한하는 진입 경계입니다.",
+        "가운데 Reservation transaction에서 Idempotency-Key, Seat lock, Reservation insert, Outbox insert가 같은 commit 경계에 묶입니다.",
+        "오른쪽의 Kafka/Consumer/DLT와 하단 Reconciliation은 발행 실패와 Redis 보조 상태 불일치를 PostgreSQL 기준으로 복구하는 경로입니다.",
+      ],
     },
     problem: [
       "동일 좌석에 여러 사용자가 동시에 접근하면 읽기-수정-쓰기 사이 race condition으로 오버셀링이 발생할 수 있었습니다.",
@@ -469,6 +491,18 @@ export const featuredPortfolioCases: PortfolioCase[] = [
       designReason:
         "DB commit과 Kafka publish를 하나의 원자적 작업으로 보장할 수 없기 때문에 이벤트 발행 의도를 DB에 먼저 남겼습니다.",
     },
+    problemArchitecture: {
+      imageSrc: "/architecture/cases/concert-outbox-dlt-recovery.svg",
+      alt: "DB commit 이후 Kafka 발행 실패를 Outbox relay, DLT, DEAD, manual replay로 분리한 복구 아키텍처",
+      caption:
+        "도메인 DB commit과 Kafka publish 사이의 원자성 한계를 Outbox 상태와 DLT/manual replay 경로로 분리한 구조입니다.",
+      sourceFile: "public/architecture/cases/concert-outbox-dlt-recovery.svg",
+      readingGuide: [
+        "왼쪽 transaction은 도메인 변경과 Outbox insert가 함께 commit되는 구간입니다.",
+        "Outbox relay와 Kafka 사이가 비동기 발행 경계이며 실패 시 RETRYING/DEAD 상태로 추적합니다.",
+        "Consumer 실패는 DLT로 격리하고 manual replay 이후에도 consumer idempotency와 도메인 DB 기준으로 중복을 흡수합니다.",
+      ],
+    },
     problem: [
       "DB commit 이후 Kafka publish가 실패하면 예약 상태와 consumer 처리 상태가 어긋날 수 있었습니다.",
       "consumer 실패를 단순 재시도로만 처리하면 중복 처리와 무한 재시도 위험이 있었습니다.",
@@ -734,6 +768,18 @@ export const featuredPortfolioCases: PortfolioCase[] = [
       designReason:
         "대표 문제는 실시간 전송이 아니라 채팅방 조회 API의 N+1이므로 전체 채팅 구조보다 조회 경로 Before/After를 중심으로 표현했습니다.",
     },
+    problemArchitecture: {
+      imageSrc: "/architecture/cases/chat-room-n-plus-one-rps.svg",
+      alt: "채팅방 조회 API의 2N+1 쿼리 경로를 1회 조회 경로로 줄인 Before/After 아키텍처",
+      caption:
+        "실시간 delivery claim과 분리해 측정된 채팅방 조회 API의 N+1 제거 구간만 Before/After로 보여주는 구조입니다.",
+      sourceFile: "public/architecture/cases/chat-room-n-plus-one-rps.svg",
+      readingGuide: [
+        "왼쪽 Before는 채팅방 수에 따라 room, last message, read state 조회가 반복되는 경로입니다.",
+        "오른쪽 After는 Chat Room API가 필요한 목록 데이터를 1회 조회/projection으로 모으는 경로입니다.",
+        "WebSocket delivery, reconnect sync, production/mixed benchmark는 별도 측정 항목으로 분리해 표시합니다.",
+      ],
+    },
     problem: [
       "채팅방 목록 조회에서 방 수에 비례해 쿼리가 늘어나 API 응답 시간이 악화될 수 있었습니다.",
       "실시간 채팅 프로젝트라도 사용자는 먼저 방 목록 조회와 재접속 동기화 API에서 지연을 경험합니다.",
@@ -936,6 +982,19 @@ export const featuredPortfolioCases: PortfolioCase[] = [
       failureRecoveryPath: "webhook duplicate/conflict 처리와 audit log",
       designReason:
         "과금 시스템은 중복 요청과 webhook 재전송이 정상 입력이므로 중복을 예외가 아니라 설계 대상으로 처리했습니다.",
+    },
+    problemArchitecture: {
+      imageSrc: "/architecture/cases/billing-idempotency-webhook-ledger.svg",
+      alt: "멀티테넌트 과금에서 API key hash 인증, usage idempotency, invoice, webhook duplicate/conflict, append-only ledger를 연결한 아키텍처",
+      caption:
+        "tenant 경계 안에서 usage 중복 처리와 webhook 재전송을 설계 대상으로 보고 append-only ledger와 audit log로 이어지는 구조입니다.",
+      sourceFile:
+        "public/architecture/cases/billing-idempotency-webhook-ledger.svg",
+      readingGuide: [
+        "왼쪽 API Key 인증은 raw key를 저장하지 않고 prefix/hash로 tenant 경계를 확인합니다.",
+        "Usage event와 quota reservation은 중복 요청을 idempotency key와 request hash 기준으로 처리하는 구간입니다.",
+        "Invoice/webhook 이후 append-only ledger와 audit log가 정산 판단과 감사 근거를 남기는 최종 기준 데이터 역할을 합니다.",
+      ],
     },
     problem: [
       "API Key 원문 저장은 유출 시 tenant 보안 사고로 이어질 수 있었습니다.",
@@ -1192,6 +1251,19 @@ export const featuredPortfolioCases: PortfolioCase[] = [
       transactionBoundary: "읽기 전용 조회 경로",
       designReason:
         "상품 목록 조회의 병목은 전체 시스템 구조가 아니라 데이터 접근 경로였으므로 Before/After 조회 아키텍처로 표현했습니다.",
+    },
+    problemArchitecture: {
+      imageSrc: "/architecture/cases/borrowme-product-list-n-plus-one.svg",
+      alt: "BorrowMe 상품 목록 API의 201회 조회 원본 기록과 현재 3회 query-count guard를 분리한 Before/After 아키텍처",
+      caption:
+        "원본 README 성능 기록과 현재 repository query-count guard를 분리해 상품 목록 조회 병목 개선 구간을 보여주는 구조입니다.",
+      sourceFile:
+        "public/architecture/cases/borrowme-product-list-n-plus-one.svg",
+      readingGuide: [
+        "왼쪽 Before는 상품 목록에서 이미지, 예약, 팔로우 관련 조회가 반복되는 병목 구간입니다.",
+        "오른쪽 After는 상품 목록 데이터를 batch/join/projection으로 모으고 query-count guard로 회귀를 막는 경로입니다.",
+        "예약 정합성 검증은 조회 최적화와 별도 흐름이지만 같은 MySQL 기준 데이터 위에서 확인합니다.",
+      ],
     },
     problem: [
       "상품 목록 조회에서 연관 데이터 접근이 반복되며 p95 응답 시간이 1초 수준까지 늘어났습니다.",

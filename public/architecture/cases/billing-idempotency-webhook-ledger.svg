@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="420" viewBox="0 0 900 420" role="img" aria-labelledby="title desc">
+  <title id="title">Billing idempotency webhook ledger architecture</title>
+  <desc id="desc">Tenant billing flow with API key hash, usage idempotency, invoice, webhook duplicate conflict, append-only ledger, audit log.</desc>
+  <rect width="900" height="420" fill="#ffffff"/>
+  <style>.box{fill:#f8fafc;stroke:#0f172a;stroke-width:1.5;rx:8}.tx{fill:#eff6ff;stroke:#1d4ed8;stroke-width:2;rx:8}.source{fill:#ecfdf5;stroke:#047857;stroke-width:2;rx:8}.fail{fill:#fff7ed;stroke:#c2410c;stroke-width:1.7;rx:8}.text{font:600 15px Arial,sans-serif;fill:#0f172a}.small{font:400 12px Arial,sans-serif;fill:#475569}.line{stroke:#334155;stroke-width:1.7;fill:none;marker-end:url(#arrow)}</style>
+  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="#334155"/></marker></defs>
+  <text x="40" y="42" class="text">과금 idempotency / webhook / ledger: 문제 구간 아키텍처</text>
+  <rect x="42" y="128" width="118" height="76" class="box"/><text x="64" y="162" class="text">Tenant</text><text x="64" y="186" class="small">usage 요청</text>
+  <rect x="198" y="128" width="130" height="76" class="tx"/><text x="220" y="162" class="text">API Key</text><text x="220" y="186" class="small">prefix/hash</text>
+  <rect x="366" y="128" width="142" height="76" class="tx"/><text x="388" y="162" class="text">Usage Event</text><text x="388" y="186" class="small">idempotency</text>
+  <rect x="546" y="128" width="118" height="76" class="box"/><text x="568" y="162" class="text">Invoice</text><text x="568" y="186" class="small">scheduler</text>
+  <rect x="704" y="84" width="138" height="76" class="fail"/><text x="726" y="118" class="text">Webhook</text><text x="726" y="142" class="small">duplicate/conflict</text>
+  <rect x="704" y="236" width="138" height="76" class="source"/><text x="726" y="270" class="text">Ledger</text><text x="726" y="294" class="small">append-only</text>
+  <rect x="366" y="266" width="142" height="76" class="source"/><text x="388" y="300" class="text">Audit Log</text><text x="388" y="324" class="small">metadata redaction</text>
+  <path d="M160 166H198" class="line"/><path d="M328 166H366" class="line"/><path d="M508 166H546" class="line"/><path d="M664 153L704 130" class="line"/><path d="M773 160V236" class="line"/><path d="M704 274H508" class="line"/>
+</svg>

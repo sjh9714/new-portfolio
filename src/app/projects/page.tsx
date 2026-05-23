@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+/* eslint-disable @next/next/no-img-element -- Project architecture thumbnails are static SVG documentation assets. */
 import Link from "next/link";
 
 import { PortfolioCaseCard } from "@/components/portfolio-case-card";
@@ -13,6 +14,7 @@ import {
   additionalProjects,
   archiveProjects,
   getProjectBySlug,
+  projectOverallArchitectures,
 } from "@/content/projects";
 
 const supportingAdditionalProjects = getSupportingProjects(additionalProjects);
@@ -83,11 +85,29 @@ export default function ProjectsPage() {
               return null;
             }
 
+            const architecture = projectOverallArchitectures.find(
+              (item) => item.projectSlug === summary.projectSlug,
+            );
+
             return (
               <article
                 key={summary.projectSlug}
-                className="border-border grid gap-3 border-b py-4 last:border-b-0 lg:grid-cols-[1fr_2fr_auto] lg:items-center"
+                className="border-border grid gap-3 border-b py-4 last:border-b-0 lg:grid-cols-[240px_1fr_2fr_auto] lg:items-center"
               >
+                {architecture ? (
+                  <Link
+                    href={`/case-studies/${summary.caseSlug}`}
+                    className="border-border bg-background block overflow-hidden rounded-md border p-2 sm:overflow-x-auto lg:overflow-hidden"
+                    aria-label={`${project.title} 전체 아키텍처 대표 사례 보기`}
+                  >
+                    <img
+                      src={architecture.imageSrc}
+                      alt={architecture.alt}
+                      className="w-full min-w-0 rounded-sm sm:min-w-[260px] lg:min-w-0"
+                      loading="lazy"
+                    />
+                  </Link>
+                ) : null}
                 <div className="flex flex-col gap-1">
                   <h3 className="text-foreground font-semibold">
                     {project.title}
@@ -95,6 +115,11 @@ export default function ProjectsPage() {
                   <p className="text-muted-foreground text-sm">
                     {portfolioCase.domain}
                   </p>
+                  {architecture ? (
+                    <p className="text-muted-foreground text-xs leading-5">
+                      {architecture.caption}
+                    </p>
+                  ) : null}
                 </div>
                 <p className="text-foreground text-sm leading-6 [overflow-wrap:anywhere]">
                   {summary.flow}

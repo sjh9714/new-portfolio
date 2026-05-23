@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="420" viewBox="0 0 900 420" role="img" aria-labelledby="title desc">
+  <title id="title">BorrowMe product list N+1 problem architecture</title>
+  <desc id="desc">Before and after architecture for BorrowMe product list N+1 query reduction and current query-count guard.</desc>
+  <rect width="900" height="420" fill="#ffffff"/>
+  <style>.box{fill:#f8fafc;stroke:#0f172a;stroke-width:1.5;rx:8}.bad{fill:#fff7ed;stroke:#c2410c;stroke-width:1.8;rx:8}.good{fill:#ecfdf5;stroke:#047857;stroke-width:1.8;rx:8}.note{fill:#fffbeb;stroke:#b45309;stroke-width:1.6;rx:8}.text{font:600 15px Arial,sans-serif;fill:#0f172a}.small{font:400 12px Arial,sans-serif;fill:#475569}.line{stroke:#334155;stroke-width:1.7;fill:none;marker-end:url(#arrow)}</style>
+  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="#334155"/></marker></defs>
+  <text x="40" y="42" class="text">BorrowMe 상품 목록 N+1: 문제 구간 아키텍처</text>
+  <rect x="48" y="118" width="128" height="76" class="box"/><text x="70" y="152" class="text">Client</text><text x="70" y="176" class="small">상품 목록</text>
+  <rect x="218" y="118" width="142" height="76" class="box"/><text x="240" y="152" class="text">Product API</text><text x="240" y="176" class="small">첫 화면 조회</text>
+  <rect x="420" y="78" width="170" height="104" class="bad"/><text x="442" y="114" class="text">Before</text><text x="442" y="138" class="small">원본 기록 201 queries</text><text x="442" y="160" class="small">p95 1,010ms 기록</text>
+  <rect x="420" y="230" width="170" height="104" class="good"/><text x="442" y="266" class="text">After</text><text x="442" y="290" class="small">현재 guard 3 queries 이하</text><text x="442" y="312" class="small">local snapshot 별도 표기</text>
+  <rect x="650" y="118" width="150" height="86" class="good"/><text x="672" y="150" class="text">MySQL</text><text x="672" y="174" class="small">Product / Image</text><text x="672" y="194" class="small">Reservation</text>
+  <rect x="650" y="250" width="190" height="76" class="note"/><text x="672" y="284" class="text">Claim boundary</text><text x="672" y="308" class="small">원본 README와 현재 검증 분리</text>
+  <path d="M176 156H218" class="line"/><path d="M360 142L420 128" class="line"/><path d="M360 170L420 278" class="line"/><path d="M590 282C626 250 640 194 650 166" class="line"/><path d="M590 282H650" class="line"/>
+</svg>
