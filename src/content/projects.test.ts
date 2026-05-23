@@ -228,7 +228,7 @@ describe("portfolio project content", () => {
       expect.arrayContaining([
         "동일 좌석 경합",
         "혼합 부하 테스트",
-        "D/E/F 반복 시나리오 검증",
+        "결제/만료 race·중복 요청·대기열 abuse 검증",
         "Prometheus actuator metric contract",
         "Local monitoring evidence harness",
         "채팅방 조회 API RPS",
@@ -237,11 +237,14 @@ describe("portfolio project content", () => {
         "Receiver matrix by-room guard",
         "Mixed HTTP probe artifact 분리 검산",
         "Delivery evidence validator",
-        "메시지 전달 지연 시간",
+        "Room-global ordering 로컬 진단",
+        "Mixed traffic p95 latency",
+        "Production delivery benchmark",
         "Append-only Ledger 불변성",
         "Full mixed smoke readiness guard",
         "Full mixed capture rollup guard",
         "Low-cardinality outcome counters",
+        "Audit metadata sanitizer",
         "운영 성능 주장",
         "SAGA 보상 흐름",
         "RabbitMQ 이벤트 흐름",
@@ -249,6 +252,7 @@ describe("portfolio project content", () => {
         "Follow lookup query-count guard",
         "Ranking HTTP model assembly guard",
         "Exercise hashtag query-count guard",
+        "상품 목록 현재 재측정 snapshot",
         "Flyway baseline validation",
       ]),
     );
@@ -344,19 +348,28 @@ describe("portfolio project content", () => {
     );
     const borrowMe = projects.find((project) => project.slug === "borrow-me");
 
+    expect(billing?.primaryTechStack).not.toContain("Kafka");
+    expect(billing?.allTechStack).not.toContain("Kafka");
+    expect(billing?.primaryTechStack).toContain("Spring Security");
+
     expect(realtime?.evidence).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           label: "메시지 전달 지연 시간 로컬 스냅샷",
           status: "verified",
-          value: expect.stringContaining("500-user repeat3 p95 37-47ms"),
+          value: expect.stringContaining("1,000-user repeat3 p95 45-50ms"),
         }),
         expect.objectContaining({
           label: "WebSocket 전달 완전성 로컬 스냅샷",
           status: "verified",
           value: expect.stringContaining(
-            "500-user repeat3 each run expected 49,900 / unique 49,900",
+            "1,000-user repeat3 expected 99,900 / unique 99,900",
           ),
+        }),
+        expect.objectContaining({
+          label: "Room-global ordering 로컬 진단",
+          status: "verified",
+          value: expect.stringContaining("out-of-order 0"),
         }),
         expect.objectContaining({
           label: "Receiver matrix by-room guard",
@@ -374,14 +387,14 @@ describe("portfolio project content", () => {
           value: expect.stringContaining("manifest.json"),
         }),
         expect.objectContaining({
-          label: "메시지 전달 지연 시간",
+          label: "Mixed traffic p95 latency",
           status: "pending",
-          value: expect.stringContaining("1,000 session"),
+          value: expect.stringContaining("production/mixed"),
         }),
         expect.objectContaining({
-          label: "WebSocket 전달 완전성",
+          label: "Production delivery benchmark",
           status: "pending",
-          value: expect.stringContaining("1,000 session"),
+          value: expect.stringContaining("장시간 soak"),
         }),
       ]),
     );
@@ -404,6 +417,11 @@ describe("portfolio project content", () => {
           value: expect.stringContaining("gateway request/rate-limit"),
         }),
         expect.objectContaining({
+          label: "Audit metadata sanitizer",
+          status: "verified",
+          value: expect.stringContaining("[REDACTED]"),
+        }),
+        expect.objectContaining({
           label: "혼합 사용량 부하 테스트",
           status: "pending",
           value: expect.stringContaining("추가 측정 예정"),
@@ -422,8 +440,13 @@ describe("portfolio project content", () => {
     expect(borrowMe?.evidence).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          label: "상품 목록 p95 원본 기록",
+          label: "상품 목록 p95 원본 기록(참고)",
           status: "pending",
+        }),
+        expect.objectContaining({
+          label: "상품 목록 현재 재측정 snapshot",
+          status: "measured",
+          value: expect.stringContaining("p95 358.1088ms"),
         }),
         expect.objectContaining({
           label: "상품 목록 쿼리 수 원본 기록 + 현재 guard",

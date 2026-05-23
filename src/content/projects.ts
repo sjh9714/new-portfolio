@@ -81,9 +81,9 @@ export const projects: Project[] = [
         status: "verified",
       },
       {
-        label: "D/E/F 반복 시나리오 검증",
+        label: "결제/만료 race·중복 요청·대기열 abuse 검증",
         value:
-          "세 전략 x 3회 local repeat: D 216/216, E 234/234, F 144/144 checks passed",
+          "D/E/F local repeat: 결제/만료 race, idempotency replay/conflict, 대기열 token abuse checks passed",
         status: "verified",
       },
       {
@@ -168,13 +168,19 @@ export const projects: Project[] = [
       {
         label: "메시지 전달 지연 시간 로컬 스냅샷",
         value:
-          "50-user repeat3 p95 23-38ms + 500-user repeat3 p95 37-47ms, p99 46-233ms (local receiver matrix, 운영 성능 claim 아님)",
+          "50-user repeat3 p95 23-38ms, 500-user repeat3 p95 37-47ms, 1,000-user repeat3 p95 45-50ms (local receiver matrix, 운영 성능 claim 아님)",
         status: "verified",
       },
       {
         label: "WebSocket 전달 완전성 로컬 스냅샷",
         value:
-          "50-user repeat3 each run expected 4,900 / unique 4,900, 500-user repeat3 each run expected 49,900 / unique 49,900, missing 0 / duplicate 0 / completeness 100% (운영 성능 claim 아님)",
+          "50-user repeat3 expected 4,900 / unique 4,900, 500-user repeat3 expected 49,900 / unique 49,900, 1,000-user repeat3 expected 99,900 / unique 99,900, missing 0 / duplicate 0 / completeness 100% (운영 성능 claim 아님)",
+        status: "verified",
+      },
+      {
+        label: "Room-global ordering 로컬 진단",
+        value:
+          "1,000-user repeat3 persisted message id 기준 room-global out-of-order 0",
         status: "verified",
       },
       {
@@ -196,13 +202,14 @@ export const projects: Project[] = [
         status: "verified",
       },
       {
-        label: "메시지 전달 지연 시간",
-        value: "1,000 session p50/p95/p99 benchmark 추가 측정 예정",
+        label: "Mixed traffic p95 latency",
+        value: "production/mixed 1,000-session benchmark 추가 측정 예정",
         status: "pending",
       },
       {
-        label: "WebSocket 전달 완전성",
-        value: "1,000 session delivery completeness benchmark 추가 측정 예정",
+        label: "Production delivery benchmark",
+        value:
+          "장시간 soak와 mixed traffic 환경의 delivery benchmark 추가 측정 예정",
         status: "pending",
       },
     ],
@@ -213,7 +220,7 @@ export const projects: Project[] = [
       "reconnect sync API가 누락 메시지를 어떻게 판별하나요?",
     ],
     limitations: [
-      "50-user repeat3와 500-user repeat3 local receiver matrix는 시나리오 검증으로만 제시하고, 1,000 session benchmark와 운영 성능 claim은 별도 측정 항목으로 남겨둡니다.",
+      "50/500/1,000-user local receiver matrix는 시나리오 검증으로만 제시하고, production/mixed benchmark와 운영 성능 claim은 별도 측정 항목으로 남겨둡니다.",
       "Kafka consumer failure 이후 DLT replay 성공률은 별도 장애 시나리오로 수치화할 수 있습니다.",
     ],
   },
@@ -232,15 +239,22 @@ export const projects: Project[] = [
       "tenant isolation, API key prefix/hash 저장, usage idempotency, quota reservation, invoice scheduler, webhook duplicate/conflict, refund reversal ledger를 구성",
     result:
       "API key 보안, usage idempotency, quota reservation, invoice scheduler, webhook 중복 처리, refund reversal ledger를 검증하고 성능/운영 지표는 공개 측정 전 상태로 구분했습니다.",
-    primaryTechStack: ["Java", "Spring Boot", "PostgreSQL", "Kafka", "Redis"],
+    primaryTechStack: [
+      "Java",
+      "Spring Boot",
+      "PostgreSQL",
+      "Redis",
+      "Spring Security",
+    ],
     allTechStack: [
       "Java",
       "Spring Boot",
       "PostgreSQL",
-      "Kafka",
       "Redis",
+      "Spring Security",
       "JWT",
       "API Key",
+      "Micrometer",
       "Testcontainers",
       "k6",
     ],
@@ -300,6 +314,12 @@ export const projects: Project[] = [
         label: "Low-cardinality outcome counters",
         value:
           "gateway request/rate-limit, idempotency conflict, webhook conflict, ledger group counter 등록과 호출 경로 unit test",
+        status: "verified",
+      },
+      {
+        label: "Audit metadata sanitizer",
+        value:
+          "apiKey/authorization/token/secret/password/signature/cookie 계열 nested metadata [REDACTED] 처리 unit test",
         status: "verified",
       },
       {
@@ -473,10 +493,16 @@ export const projects: Project[] = [
     allTechStack: ["Java", "Spring Boot", "JPA", "MySQL", "OAuth", "k6"],
     evidence: [
       {
-        label: "상품 목록 p95 원본 기록",
+        label: "상품 목록 p95 원본 기록(참고)",
         value:
           "원본 README 기록: 1,010ms -> 23ms (raw artifact 없음, 현재 재측정 아님)",
         status: "pending",
+      },
+      {
+        label: "상품 목록 현재 재측정 snapshot",
+        value:
+          "2026-05-23 clean repeat3 local k6: p95 358.1088ms, HTTP failure rate 0, checks 10,683/10,683 (운영 성능 claim 아님)",
+        status: "measured",
       },
       {
         label: "상품 목록 쿼리 수 원본 기록 + 현재 guard",

@@ -342,15 +342,16 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         label: "Reconnect Sync API",
         description: "마지막 수신 위치 이후 message를 다시 조회합니다.",
         kind: "service",
-        evidenceLabel: "WebSocket 전달 완전성",
-        status: "pending",
+        evidenceLabel: "WebSocket 전달 완전성 로컬 스냅샷",
+        status: "verified",
       },
       {
         id: "latency-benchmark",
-        label: "Latency Benchmark",
-        description: "send-to-receive p50/p95/p99를 별도 측정합니다.",
+        label: "Mixed Traffic Benchmark",
+        description:
+          "production/mixed traffic p95는 별도 측정 대상으로 둡니다.",
         kind: "external",
-        evidenceLabel: "메시지 전달 지연 시간",
+        evidenceLabel: "Mixed traffic p95 latency",
         status: "pending",
       },
     ],
@@ -404,7 +405,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         to: "client",
         label: "구독자 전달",
         kind: "sync",
-        evidenceLabel: "WebSocket 전달 완전성",
+        evidenceLabel: "WebSocket 전달 완전성 로컬 스냅샷",
       },
       {
         id: "reconnect",
@@ -412,7 +413,7 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         to: "sync-api",
         label: "마지막 수신 cursor",
         kind: "retry",
-        evidenceLabel: "WebSocket 전달 완전성",
+        evidenceLabel: "WebSocket 전달 완전성 로컬 스냅샷",
       },
       {
         id: "sync-read",
@@ -425,9 +426,9 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
         id: "latency-sample",
         from: "client",
         to: "latency-benchmark",
-        label: "send-to-receive 샘플링",
+        label: "mixed traffic 샘플링",
         kind: "sync",
-        evidenceLabel: "메시지 전달 지연 시간",
+        evidenceLabel: "Mixed traffic p95 latency",
       },
     ],
     boundaries: [
@@ -465,8 +466,8 @@ export const architectureDiagrams: Record<string, ArchitectureDiagramSpec> = {
       {
         label: "추가 검증 예정",
         description:
-          "실제 메시지 지연과 전달 완전성은 별도 benchmark에서 공개 수치로 채워야 합니다.",
-        evidenceLabel: "메시지 전달 지연 시간",
+          "production/mixed benchmark는 별도 공개 수치로 채워야 합니다.",
+        evidenceLabel: "Mixed traffic p95 latency",
       },
     ],
   },
