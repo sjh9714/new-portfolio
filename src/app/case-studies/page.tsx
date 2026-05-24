@@ -18,12 +18,8 @@ export default function CaseStudiesPage() {
         description="4개 대표 백엔드 레포에서 뽑은 문제 해결 경험입니다. 같은 프로젝트에서 나온 사례라도 문제 구간과 면접 질문이 다르면 별도 deep dive로 분리했습니다."
       />
       <div className="grid gap-4 md:grid-cols-2">
-        {featuredProjectGroups.map((group, index) => (
-          <PortfolioProjectGroupCard
-            key={group.projectSlug}
-            group={group}
-            priority={index === 0}
-          />
+        {featuredProjectGroups.map((group) => (
+          <PortfolioProjectGroupCard key={group.projectSlug} group={group} />
         ))}
       </div>
     </div>

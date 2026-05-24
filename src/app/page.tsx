@@ -242,11 +242,10 @@ export default function Home() {
             }
           />
           <div className="grid gap-4 md:grid-cols-2">
-            {featuredProjectGroups.map((group, index) => (
+            {featuredProjectGroups.map((group) => (
               <PortfolioProjectGroupCard
                 key={group.projectSlug}
                 group={group}
-                priority={index === 0}
               />
             ))}
           </div>

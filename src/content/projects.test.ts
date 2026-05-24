@@ -164,6 +164,7 @@ describe("portfolio project content", () => {
     expect(homeSource).toContain('title="대표 프로젝트 4개"');
     expect(homeSource).toContain("featuredProjectGroups");
     expect(homeSource).not.toContain("{featuredPortfolioCases.map(");
+    expect(homeSource).not.toContain("priority={index === 0}");
     expect(homeSource).toContain('evidenceLabel: "동일 좌석 경합"');
     expect(homeSource).toContain('evidenceLabel: "채팅방 조회 API RPS"');
     expect(homeSource).toContain('evidenceLabel: "사용량 중복 처리"');

@@ -8,17 +8,11 @@ import type { FeaturedProjectGroup } from "@/content/portfolio-cases";
 
 export function PortfolioProjectGroupCard({
   group,
-  priority = false,
 }: {
   group: FeaturedProjectGroup;
-  priority?: boolean;
 }) {
   return (
-    <article
-      className={`border-border bg-card flex h-full flex-col gap-5 border p-5 ${
-        priority ? "md:col-span-2" : ""
-      }`}
-    >
+    <article className="border-border bg-card flex h-full flex-col gap-5 border p-5">
       <div className="flex flex-col gap-3">
         <div className="flex flex-wrap gap-2">
           <Badge variant="outline" className="rounded-md">

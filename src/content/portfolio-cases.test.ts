@@ -409,9 +409,11 @@ describe("PDF-style portfolio cases", () => {
     expect(homeSource).toContain('title="대표 프로젝트 4개"');
     expect(homeSource).toContain("featuredProjectGroups");
     expect(homeSource).not.toContain("{featuredPortfolioCases.map(");
+    expect(homeSource).not.toContain("priority={index === 0}");
     expect(caseIndexSource).toContain('title="대표 프로젝트 4개"');
     expect(caseIndexSource).toContain("featuredProjectGroups");
     expect(caseIndexSource).not.toContain("{featuredPortfolioCases.map(");
+    expect(caseIndexSource).not.toContain("priority={index === 0}");
     expect(caseIndexSource).toContain(
       "4개 대표 백엔드 레포에서 뽑은 문제 해결 경험입니다. 같은 프로젝트에서 나온 사례라도 문제 구간과 면접 질문이 다르면 별도 deep dive로 분리했습니다.",
     );
@@ -438,6 +440,8 @@ describe("PDF-style portfolio cases", () => {
 
     expect(groupCardSource).toContain("문제 해결 Deep Dive");
     expect(groupCardSource).toContain("group.primaryEvidence");
+    expect(groupCardSource).not.toContain("priority");
+    expect(groupCardSource).not.toContain("md:col-span-2");
     expect(portfolioCaseSource).toContain("Deep Dive");
     expect(portfolioCaseSource).toContain("featuredProjectGroups");
     expect(portfolioCaseSource).toContain("좌석 오버셀링 0건 검증");
