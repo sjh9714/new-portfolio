@@ -2,13 +2,16 @@ import type { Metadata } from "next";
 /* eslint-disable @next/next/no-img-element -- Project architecture thumbnails are static SVG documentation assets. */
 import Link from "next/link";
 
-import { PortfolioCaseCard } from "@/components/portfolio-case-card";
 import { ProjectRow } from "@/components/project-card";
 import { SectionHeader } from "@/components/section-header";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   featuredPortfolioCases,
+  getFeaturedPortfolioProjectGroups,
   getSupportingProjects,
   projectArchitectureSummaries,
+  type PortfolioCase,
 } from "@/content/portfolio-cases";
 import {
   additionalProjects,
@@ -30,6 +33,15 @@ const visibleProjectArchitectureSummaries = projectArchitectureSummaries.filter(
       summary.projectSlug as (typeof visibleArchitectureSummaryProjectSlugs)[number],
     ),
 );
+const featuredPortfolioProjectGroups = getFeaturedPortfolioProjectGroups();
+const projectCaseLinkLabels: Record<string, string> = {
+  "concert-seat-overselling-consistency": "좌석 오버셀링 0건 검증",
+  "concert-outbox-dlt-recovery": "Outbox/DLT 이벤트 복구",
+};
+
+function getProjectCaseLinkLabel(portfolioCase: PortfolioCase) {
+  return projectCaseLinkLabels[portfolioCase.slug] ?? portfolioCase.title;
+}
 
 export const metadata: Metadata = {
   title: "프로젝트",
@@ -46,26 +58,73 @@ export default function ProjectsPage() {
       />
       <section className="flex flex-col gap-5">
         <SectionHeader
-          title="문제 해결 포트폴리오"
-          description="이력서 한 줄을 구조도와 검증 결과로 확장한 5개 대표 사례입니다."
+          title="대표 프로젝트 4개에서 확장한 문제 해결 사례 5개"
+          description="프로젝트 단위로 먼저 보고, 각 레포에서 확장한 문제 해결 deep dive로 바로 이동할 수 있게 묶었습니다."
         />
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {featuredPortfolioCases.map((portfolioCase, index) => {
-            const project = getProjectBySlug(portfolioCase.projectSlug);
+        <div className="grid gap-4 md:grid-cols-2">
+          {featuredPortfolioProjectGroups.map(({ project, cases }) => (
+            <article
+              key={project.slug}
+              className="border-border bg-card flex h-full flex-col gap-5 border p-5"
+            >
+              <div className="flex flex-col gap-2">
+                <div className="flex flex-wrap gap-2">
+                  <Badge variant="outline" className="rounded-md">
+                    대표 프로젝트
+                  </Badge>
+                  {cases.length > 1 ? (
+                    <Badge variant="outline" className="rounded-md">
+                      Deep Dive {cases.length}개
+                    </Badge>
+                  ) : null}
+                </div>
+                <h2 className="text-foreground text-xl font-semibold">
+                  {project.title}
+                </h2>
+                <p className="text-muted-foreground text-sm leading-6">
+                  {project.subtitle}
+                </p>
+              </div>
 
-            if (!project) {
-              return null;
-            }
+              <div className="flex flex-col gap-2">
+                <p className="text-primary text-xs font-semibold tracking-[0.16em] uppercase">
+                  연결된 문제 해결 사례
+                </p>
+                <ul className="flex flex-col gap-2">
+                  {cases.map((portfolioCase) => (
+                    <li key={portfolioCase.slug}>
+                      <Link
+                        href={`/case-studies/${portfolioCase.slug}`}
+                        className="text-foreground hover:text-primary inline-flex text-sm leading-6 font-semibold underline-offset-4 hover:underline"
+                      >
+                        {getProjectCaseLinkLabel(portfolioCase)}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
 
-            return (
-              <PortfolioCaseCard
-                key={portfolioCase.slug}
-                portfolioCase={portfolioCase}
-                project={project}
-                rank={index + 1}
-              />
-            );
-          })}
+              <p className="text-muted-foreground text-sm leading-6">
+                {project.result}
+              </p>
+
+              <div className="flex flex-wrap gap-2">
+                {project.primaryTechStack.map((tech) => (
+                  <Badge key={tech} variant="outline" className="rounded-md">
+                    {tech}
+                  </Badge>
+                ))}
+              </div>
+
+              <div className="mt-auto">
+                <Button asChild variant="outline" size="sm">
+                  <a href={project.repoUrl} target="_blank" rel="noreferrer">
+                    GitHub
+                  </a>
+                </Button>
+              </div>
+            </article>
+          ))}
         </div>
       </section>
 

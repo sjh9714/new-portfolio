@@ -6,7 +6,10 @@ import { describe, expect, it } from "vitest";
 import {
   featuredPortfolioCases,
   featuredPortfolioProjectSlugs,
+  getFeaturedPortfolioProjectGroups,
+  getPortfolioCaseProjectBadge,
   getSupportingProjects,
+  getPortfolioCasesByProjectSlug,
   getPortfolioCaseBySlug,
   legacyCaseStudyAliases,
 } from "./portfolio-cases";
@@ -46,6 +49,36 @@ describe("PDF-style portfolio cases", () => {
       "running-app",
       "ai-interview-coach",
     ]);
+  });
+
+  it("keeps four representative projects expanded into five deep-dive cases", () => {
+    const firstConcertCase = getPortfolioCaseBySlug(
+      "concert-seat-overselling-consistency",
+    );
+    const secondConcertCase = getPortfolioCaseBySlug(
+      "concert-outbox-dlt-recovery",
+    );
+    const projectGroups = getFeaturedPortfolioProjectGroups();
+
+    expect(featuredPortfolioProjectSlugs).toHaveLength(4);
+    expect(featuredPortfolioCases).toHaveLength(5);
+    expect(getPortfolioCasesByProjectSlug("concert-booking")).toHaveLength(2);
+    expect(firstConcertCase?.title).toContain("Queue Token");
+    expect(firstConcertCase?.title).not.toContain("Outbox");
+    expect(firstConcertCase?.resumeLine).not.toContain("Outbox");
+    expect(secondConcertCase?.title).toContain("Outbox");
+    expect(secondConcertCase?.title).toContain("DLT");
+    expect(getPortfolioCaseProjectBadge(firstConcertCase!)).toBe(
+      "Concert Booking · Deep Dive 1/2",
+    );
+    expect(getPortfolioCaseProjectBadge(secondConcertCase!)).toBe(
+      "Concert Booking · Deep Dive 2/2",
+    );
+    expect(projectGroups).toHaveLength(4);
+    expect(
+      projectGroups.find((group) => group.project.slug === "concert-booking")
+        ?.cases,
+    ).toEqual([firstConcertCase, secondConcertCase]);
   });
 
   it("structures every case as problem, solution, result, and evidence", () => {
@@ -354,10 +387,43 @@ describe("PDF-style portfolio cases", () => {
     expect(homeSource).toContain(
       "이 포트폴리오는 이력서에 한 줄로 압축한 문제 해결 경험을 구조도, 문제 원인, 해결 과정, 검증 결과로 확장한 문서입니다.",
     );
-    expect(homeSource).toContain("이력서 한 줄을 확장한 문제 해결 포트폴리오");
+    expect(homeSource).toContain(
+      "대표 프로젝트 4개에서 확장한 문제 해결 사례 5개",
+    );
     expect(homeSource).toContain("featuredPortfolioCases");
     expect(caseIndexSource).toContain("featuredPortfolioCases");
+    expect(caseIndexSource).toContain(
+      "4개 대표 백엔드 레포에서 뽑은 5개 문제 해결 사례입니다. 같은 프로젝트에서 나온 사례라도 문제 구간이 다르면 별도 deep dive로 분리했습니다.",
+    );
     expect(sitemapSource).toContain("featuredPortfolioCases");
+  });
+
+  it("shows deep-dive badges and grouped project/resume views for duplicate project cases", () => {
+    const cardSource = readFileSync(
+      join(process.cwd(), "src/components/portfolio-case-card.tsx"),
+      "utf8",
+    );
+    const portfolioCaseSource = readFileSync(
+      join(process.cwd(), "src/content/portfolio-cases.ts"),
+      "utf8",
+    );
+    const projectSource = readFileSync(
+      join(process.cwd(), "src/app/projects/page.tsx"),
+      "utf8",
+    );
+    const resumeSource = readFileSync(
+      join(process.cwd(), "src/app/resume/page.tsx"),
+      "utf8",
+    );
+
+    expect(cardSource).toContain("getPortfolioCaseProjectBadge");
+    expect(portfolioCaseSource).toContain("Deep Dive");
+    expect(projectSource).toContain("getFeaturedPortfolioProjectGroups");
+    expect(projectSource).toContain("좌석 오버셀링 0건 검증");
+    expect(projectSource).toContain("Outbox/DLT 이벤트 복구");
+    expect(resumeSource).toContain("getFeaturedPortfolioProjectGroups");
+    expect(resumeSource).toContain("<ul");
+    expect(resumeSource).toContain("resumeLine");
   });
 
   it("uses duplicate-safe supporting project lists on public project summaries", () => {

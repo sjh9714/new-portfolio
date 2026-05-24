@@ -233,8 +233,8 @@ export default function Home() {
       <div className="mx-auto flex max-w-7xl flex-col gap-16 px-5 py-12 md:px-8 md:py-16">
         <section className="flex flex-col gap-6">
           <SectionHeader
-            title="이력서 한 줄을 확장한 문제 해결 포트폴리오"
-            description="프로젝트명이 아니라 문제, 해결, 결과, 도메인이 보이는 이력서 문장을 기준으로 5개 대표 사례를 먼저 읽히도록 구성했습니다."
+            title="대표 프로젝트 4개에서 확장한 문제 해결 사례 5개"
+            description="4개 대표 백엔드 레포에서 뽑은 5개 문제 해결 deep dive를 문제 구간별로 분리해 먼저 읽히도록 구성했습니다."
             action={
               <Button asChild variant="ghost">
                 <Link href="/case-studies">전체 사례 보기</Link>

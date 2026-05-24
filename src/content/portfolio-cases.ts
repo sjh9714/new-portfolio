@@ -176,11 +176,11 @@ export const featuredPortfolioCases: PortfolioCase[] = [
   {
     slug: "concert-seat-overselling-consistency",
     title:
-      "동일 좌석 100개 동시 예매 요청에서 좌석 락·Idempotency·Outbox로 오버셀링 0건 검증",
+      "동일 좌석 100개 동시 예매 요청에서 Queue Token·좌석 락·Idempotency로 오버셀링 0건 검증",
     projectSlug: "concert-booking",
     domain: "콘서트 예매 / 예약 정합성",
     resumeLine:
-      "동일 좌석 100개 동시 예매 요청에서 좌석 락·Idempotency-Key·Outbox로 success 1, fail 99, overselling 0을 검증했습니다.",
+      "동일 좌석 100개 동시 예매 요청에서 Queue Token, 좌석 락, Idempotency-Key로 success 1, fail 99, overselling 0을 검증했습니다.",
     architectureSummary: {
       sourceOfTruth: "PostgreSQL Reservation / Seat 상태",
       transactionBoundary:
@@ -1500,6 +1500,36 @@ export const featuredPortfolioProjectSlugs = Array.from(
     featuredPortfolioCases.map((portfolioCase) => portfolioCase.projectSlug),
   ),
 );
+
+export function getPortfolioCasesByProjectSlug(projectSlug: string) {
+  return featuredPortfolioCases.filter(
+    (portfolioCase) => portfolioCase.projectSlug === projectSlug,
+  );
+}
+
+export function getPortfolioCaseProjectBadge(portfolioCase: PortfolioCase) {
+  const project = requireProject(portfolioCase.projectSlug);
+  const projectCases = getPortfolioCasesByProjectSlug(
+    portfolioCase.projectSlug,
+  );
+
+  if (projectCases.length <= 1) {
+    return project.title;
+  }
+
+  const deepDiveIndex = projectCases.findIndex(
+    (item) => item.slug === portfolioCase.slug,
+  );
+
+  return `${project.title} · Deep Dive ${deepDiveIndex + 1}/${projectCases.length}`;
+}
+
+export function getFeaturedPortfolioProjectGroups() {
+  return featuredPortfolioProjectSlugs.map((projectSlug) => ({
+    project: requireProject(projectSlug),
+    cases: getPortfolioCasesByProjectSlug(projectSlug),
+  }));
+}
 
 export function isFeaturedPortfolioProject(projectSlug: string) {
   return featuredPortfolioProjectSlugs.includes(projectSlug);

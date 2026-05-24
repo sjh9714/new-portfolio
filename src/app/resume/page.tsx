@@ -8,10 +8,10 @@ import { SectionHeader } from "@/components/section-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  featuredPortfolioCases,
+  getFeaturedPortfolioProjectGroups,
   getSupportingProjects,
 } from "@/content/portfolio-cases";
-import { additionalProjects, getProjectBySlug } from "@/content/projects";
+import { additionalProjects } from "@/content/projects";
 import { profile } from "@/content/profile";
 
 export const metadata: Metadata = {
@@ -40,6 +40,7 @@ const coreSkillGroups = [
 
 const resumePdfFileName = "resume-sung-jinhyuk-backend.pdf";
 const supportingAdditionalProjects = getSupportingProjects(additionalProjects);
+const featuredPortfolioProjectGroups = getFeaturedPortfolioProjectGroups();
 
 export default function ResumePage() {
   const resumeExists = existsSync(
@@ -114,42 +115,38 @@ export default function ResumePage() {
           description="이력서의 한 줄이 포트폴리오 상세 문서로 이어지도록 구성했습니다."
         />
         <div className="border-border border-y">
-          {featuredPortfolioCases.map((portfolioCase) => {
-            const project = getProjectBySlug(portfolioCase.projectSlug);
-
-            if (!project) {
-              return null;
-            }
-
-            return (
-              <article
-                key={portfolioCase.slug}
-                className="border-border grid gap-4 border-b py-5 last:border-b-0 lg:grid-cols-[1fr_2.4fr_1fr] lg:items-start"
-              >
-                <div>
-                  <h3 className="text-foreground font-semibold">
-                    {project.title}
-                  </h3>
-                  <p className="text-muted-foreground text-sm">
-                    {portfolioCase.domain}
-                  </p>
-                  <p className="text-muted-foreground mt-2 text-xs">
-                    {project.team ?? project.role}
-                  </p>
-                </div>
-                <p className="text-foreground text-sm leading-7 [overflow-wrap:anywhere]">
-                  {portfolioCase.resumeLine}
+          {featuredPortfolioProjectGroups.map(({ project, cases }) => (
+            <article
+              key={project.slug}
+              className="border-border grid gap-4 border-b py-5 last:border-b-0 lg:grid-cols-[1fr_2.4fr_1fr] lg:items-start"
+            >
+              <div>
+                <h3 className="text-foreground font-semibold">
+                  {project.title}
+                </h3>
+                <p className="text-muted-foreground text-sm">
+                  {cases
+                    .map((portfolioCase) => portfolioCase.domain)
+                    .join(" / ")}
                 </p>
-                <div className="flex flex-wrap gap-2">
-                  {project.primaryTechStack.map((tech) => (
-                    <Badge key={tech} variant="outline" className="rounded-md">
-                      {tech}
-                    </Badge>
-                  ))}
-                </div>
-              </article>
-            );
-          })}
+                <p className="text-muted-foreground mt-2 text-xs">
+                  {project.team ?? project.role}
+                </p>
+              </div>
+              <ul className="text-foreground flex list-disc flex-col gap-2 pl-5 text-sm leading-7 [overflow-wrap:anywhere]">
+                {cases.map((portfolioCase) => (
+                  <li key={portfolioCase.slug}>{portfolioCase.resumeLine}</li>
+                ))}
+              </ul>
+              <div className="flex flex-wrap gap-2">
+                {project.primaryTechStack.map((tech) => (
+                  <Badge key={tech} variant="outline" className="rounded-md">
+                    {tech}
+                  </Badge>
+                ))}
+              </div>
+            </article>
+          ))}
         </div>
       </section>
 

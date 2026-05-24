@@ -495,7 +495,7 @@ export const projects: Project[] = [
     role: "11인 팀 프로젝트",
     team: "11인 팀 프로젝트",
     repoUrl: "https://github.com/sjh9714/borrow_me",
-    category: "additional",
+    category: "featured",
     domain: "Rental / Team Project",
     problem:
       "팀 기반 대여 서비스에서 예약 정합성, 상품 목록 조회 성능, 협업 흐름을 함께 다뤄야 함",

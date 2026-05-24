@@ -82,10 +82,12 @@ const legacyPublicStrings = [
 
 describe("portfolio project content", () => {
   it("keeps only project records with active top-level project weight as featured", () => {
+    expect(featuredProjects).toHaveLength(4);
     expect(featuredProjects.map((project) => project.slug)).toEqual([
       "concert-booking",
       "realtime-chat",
       "ai-usage-billing-gateway",
+      "borrow-me",
     ]);
   });
 
@@ -93,7 +95,6 @@ describe("portfolio project content", () => {
     expect(additionalProjects.map((project) => project.slug)).toEqual([
       "msa-shop",
       "timedeal-service",
-      "borrow-me",
       "running-app",
       "ai-interview-coach",
     ]);
@@ -160,7 +161,9 @@ describe("portfolio project content", () => {
     expect(homeSource).toContain(
       "이 포트폴리오는 이력서에 한 줄로 압축한 문제 해결 경험을 구조도, 문제 원인, 해결 과정, 검증 결과로 확장한 문서입니다.",
     );
-    expect(homeSource).toContain("이력서 한 줄을 확장한 문제 해결 포트폴리오");
+    expect(homeSource).toContain(
+      "대표 프로젝트 4개에서 확장한 문제 해결 사례 5개",
+    );
     expect(homeSource).toContain("featuredPortfolioCases");
     expect(homeSource).toContain('evidenceLabel: "동일 좌석 경합"');
     expect(homeSource).toContain('evidenceLabel: "채팅방 조회 API RPS"');

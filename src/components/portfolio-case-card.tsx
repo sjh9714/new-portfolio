@@ -4,7 +4,10 @@ import Link from "next/link";
 import { StatusBadge } from "@/components/status-badge";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import type { PortfolioCase } from "@/content/portfolio-cases";
+import {
+  getPortfolioCaseProjectBadge,
+  type PortfolioCase,
+} from "@/content/portfolio-cases";
 import type { Project } from "@/content/projects";
 
 export function PortfolioCaseCard({
@@ -31,7 +34,7 @@ export function PortfolioCaseCard({
             </Badge>
           ) : null}
           <Badge variant="outline" className="rounded-md">
-            {project.title}
+            {getPortfolioCaseProjectBadge(portfolioCase)}
           </Badge>
         </div>
         <div className="flex flex-col gap-2">
