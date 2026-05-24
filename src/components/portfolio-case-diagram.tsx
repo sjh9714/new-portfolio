@@ -37,11 +37,6 @@ export function PortfolioCaseDiagram({
   portfolioCase: PortfolioCase;
 }) {
   const diagram = portfolioCase.diagram;
-  const flowRows = diagram.edges.map((edge) => ({
-    edge,
-    from: diagram.nodes.find((node) => node.id === edge.from),
-    to: diagram.nodes.find((node) => node.id === edge.to),
-  }));
 
   return (
     <section className="border-border bg-card flex flex-col gap-5 rounded-md border p-4 md:p-5">
@@ -94,13 +89,30 @@ export function PortfolioCaseDiagram({
       </div>
 
       <ArchitectureSummary summary={portfolioCase.architectureSummary} />
+    </section>
+  );
+}
 
-      <section className="border-border bg-background flex flex-col gap-3 rounded-md border p-4">
-        <h3 className="text-muted-foreground text-sm font-semibold tracking-[0.16em] uppercase">
+export function PortfolioCaseDiagramDetails({
+  portfolioCase,
+}: {
+  portfolioCase: PortfolioCase;
+}) {
+  const diagram = portfolioCase.diagram;
+  const flowRows = diagram.edges.map((edge) => ({
+    edge,
+    from: diagram.nodes.find((node) => node.id === edge.from),
+    to: diagram.nodes.find((node) => node.id === edge.to),
+  }));
+
+  return (
+    <>
+      <details className="border-border bg-background rounded-md border p-4">
+        <summary className="text-foreground cursor-pointer text-sm font-semibold">
           흐름 세부
-        </h3>
+        </summary>
 
-        <div className="border-border rounded-md border">
+        <div className="border-border mt-4 rounded-md border">
           <table className="block w-full border-collapse text-left text-sm md:table">
             <thead className="bg-card text-muted-foreground sr-only md:not-sr-only md:table-header-group">
               <tr>
@@ -165,7 +177,7 @@ export function PortfolioCaseDiagram({
             </tbody>
           </table>
         </div>
-      </section>
+      </details>
 
       <details className="border-border bg-background rounded-md border p-4">
         <summary className="text-foreground cursor-pointer text-sm font-semibold">
@@ -201,7 +213,7 @@ export function PortfolioCaseDiagram({
           ))}
         </div>
       </details>
-    </section>
+    </>
   );
 }
 

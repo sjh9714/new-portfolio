@@ -1,4 +1,7 @@
-import { PortfolioCaseDiagram } from "@/components/portfolio-case-diagram";
+import {
+  PortfolioCaseDiagram,
+  PortfolioCaseDiagramDetails,
+} from "@/components/portfolio-case-diagram";
 import { StatusBadge } from "@/components/status-badge";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -54,9 +57,11 @@ export function CaseStudyArticle({
 
           <EvidenceSection portfolioCase={portfolioCase} />
 
-          <ContentSection title="상세 구현">
+          <PortfolioCaseDiagramDetails portfolioCase={portfolioCase} />
+
+          <FoldedContentSection title="상세 구현">
             <OrderedList items={portfolioCase.implementationDetails} />
-          </ContentSection>
+          </FoldedContentSection>
 
           {portfolioCase.stateTransitions?.length ? (
             <StateTransitionTable
@@ -97,7 +102,7 @@ function EvidenceSection({ portfolioCase }: { portfolioCase: PortfolioCase }) {
     portfolioCase.measurement?.executionEnvironment ?? [];
 
   return (
-    <ContentSection title="검증 근거 / 측정 정보">
+    <ContentSection title="검증 근거">
       <div className="grid gap-3">
         {portfolioCase.evidence.map((evidence) => (
           <div
@@ -118,11 +123,15 @@ function EvidenceSection({ portfolioCase }: { portfolioCase: PortfolioCase }) {
       </div>
 
       {scenarios.length ? (
-        <MeasurementList title="측정 시나리오" items={scenarios} />
+        <FoldedContentSection title="측정 시나리오" nested>
+          <MeasurementList items={scenarios} />
+        </FoldedContentSection>
       ) : null}
 
       {executionEnvironment.length ? (
-        <MeasurementList title="실행 환경" items={executionEnvironment} />
+        <FoldedContentSection title="실행 환경" nested>
+          <MeasurementList items={executionEnvironment} />
+        </FoldedContentSection>
       ) : null}
     </ContentSection>
   );
@@ -154,9 +163,9 @@ function CaseStudySidebar({
         <SidebarList items={portfolioCase.limitations} />
       </SidebarSection>
 
-      <SidebarSection title="예상 면접 질문">
+      <FoldedSidebarSection title="예상 면접 질문">
         <SidebarList items={portfolioCase.interviewQuestions} />
-      </SidebarSection>
+      </FoldedSidebarSection>
 
       <Button asChild className="w-full">
         <a href={project.repoUrl} target="_blank" rel="noreferrer">
@@ -168,16 +177,13 @@ function CaseStudySidebar({
 }
 
 function MeasurementList({
-  title,
   items,
 }: {
-  title: string;
   items: { label: string; value: string }[];
 }) {
   return (
-    <div className="border-border bg-card mt-4 rounded-md border p-4">
-      <h3 className="text-foreground font-semibold">{title}</h3>
-      <dl className="mt-3 grid gap-3">
+    <div className="border-border bg-card rounded-md border p-4">
+      <dl className="grid gap-3">
         {items.map((item) => (
           <div key={item.label} className="grid gap-1 sm:grid-cols-[160px_1fr]">
             <dt className="text-primary text-sm font-semibold">{item.label}</dt>
@@ -197,7 +203,7 @@ function StateTransitionTable({
   transitions: NonNullable<PortfolioCase["stateTransitions"]>;
 }) {
   return (
-    <ContentSection title="Outbox 상태 전이">
+    <FoldedContentSection title="Outbox 상태 전이">
       <div className="border-border overflow-hidden rounded-md border">
         <table className="w-full border-collapse text-left text-sm">
           <thead className="bg-card text-muted-foreground">
@@ -233,7 +239,7 @@ function StateTransitionTable({
           </tbody>
         </table>
       </div>
-    </ContentSection>
+    </FoldedContentSection>
   );
 }
 
@@ -254,6 +260,31 @@ function ContentSection({
   );
 }
 
+function FoldedContentSection({
+  title,
+  children,
+  nested = false,
+}: {
+  title: string;
+  children: React.ReactNode;
+  nested?: boolean;
+}) {
+  return (
+    <details
+      className={
+        nested
+          ? "border-border bg-card mt-4 rounded-md border p-4"
+          : "border-border bg-card rounded-md border p-5"
+      }
+    >
+      <summary className="text-foreground cursor-pointer font-semibold">
+        {title}
+      </summary>
+      <div className="mt-4">{children}</div>
+    </details>
+  );
+}
+
 function SidebarSection({
   title,
   children,
@@ -266,6 +297,23 @@ function SidebarSection({
       <h2 className="text-primary text-sm font-semibold">{title}</h2>
       {children}
     </section>
+  );
+}
+
+function FoldedSidebarSection({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <details className="flex flex-col gap-3">
+      <summary className="text-primary cursor-pointer text-sm font-semibold">
+        {title}
+      </summary>
+      <div className="mt-3">{children}</div>
+    </details>
   );
 }
 

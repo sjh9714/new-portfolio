@@ -216,6 +216,20 @@ describe("PDF-style portfolio cases", () => {
     expect(outboxCase?.measurement?.executionEnvironment).toBeUndefined();
   });
 
+  it("keeps the BorrowMe resume line compact while preserving detailed guards in the case body", () => {
+    const borrowMeCase = getPortfolioCaseBySlug(
+      "borrowme-product-list-n-plus-one",
+    );
+
+    expect(borrowMeCase?.resumeLine).toBe(
+      "BorrowMe 상품 목록 조회 N+1 개선 원본 기록과 현재 clean repeat3 snapshot을 분리하고, query-count guard와 예약 정합성 테스트로 회귀를 검증했습니다.",
+    );
+    expect(borrowMeCase?.resumeLine).not.toContain("Flyway baseline");
+    expect(borrowMeCase?.result.join(" ")).toContain(
+      "Flyway baseline schema validation",
+    );
+  });
+
   it("keeps measured scenario labels explicit without adding execution environment guesses", () => {
     expect(
       getPortfolioCaseBySlug("concert-seat-overselling-consistency")
@@ -368,7 +382,8 @@ describe("PDF-style portfolio cases", () => {
     );
 
     expect(borrowMeCase?.title).toContain("원본 기록");
-    expect(borrowMeCase?.resumeLine).toContain("원본 README 기록");
+    expect(borrowMeCase?.resumeLine).toContain("원본 기록");
+    expect(borrowMeCase?.resumeLine).toContain("현재 clean repeat3 snapshot");
     expect(JSON.stringify(borrowMeCase)).toContain("현재 query-count guard");
     expect(JSON.stringify(borrowMeCase)).toContain("현재 guard");
     expect(JSON.stringify(borrowMeCase)).toContain("원본 기록");
@@ -410,6 +425,13 @@ describe("PDF-style portfolio cases", () => {
     expect(homeSource).toContain("featuredProjectGroups");
     expect(homeSource).not.toContain("{featuredPortfolioCases.map(");
     expect(homeSource).not.toContain("priority={index === 0}");
+    expect(homeSource).toContain("validationMethodText");
+    expect(homeSource).toContain("검증 기준 보기");
+    expect(homeSource).toContain("publishedBlogTopics");
+    expect(homeSource).toContain("redis-queue-lock-presence-reconciliation");
+    expect(homeSource).not.toContain("FocusCard");
+    expect(homeSource).not.toContain("proofItems");
+    expect(homeSource).not.toContain("<ProjectRow");
     expect(caseIndexSource).toContain('title="대표 프로젝트 4개"');
     expect(caseIndexSource).toContain("featuredProjectGroups");
     expect(caseIndexSource).not.toContain("{featuredPortfolioCases.map(");
@@ -440,6 +462,8 @@ describe("PDF-style portfolio cases", () => {
 
     expect(groupCardSource).toContain("문제 해결 Deep Dive");
     expect(groupCardSource).toContain("group.primaryEvidence");
+    expect(groupCardSource).toContain("group.primaryEvidence.slice(0, 2)");
+    expect(groupCardSource).toContain("line-clamp-1");
     expect(groupCardSource).toContain("caseLink.actionLabel");
     expect(groupCardSource).toContain(
       'variant={index === 0 ? "default" : "outline"}',
@@ -478,6 +502,8 @@ describe("PDF-style portfolio cases", () => {
     );
 
     expect(diagramSource).toContain("<table");
+    expect(diagramSource).toContain("<details");
+    expect(diagramSource).toContain("<summary");
     expect(diagramSource).toContain("From");
     expect(diagramSource).toContain("To");
     expect(diagramSource).toContain("설명");
@@ -661,6 +687,44 @@ describe("PDF-style portfolio cases", () => {
     expect(figureSource).toContain("min-w");
     expect(figureSource).toContain("<figcaption");
     expect(figureSource).not.toContain("next/image");
+  });
+
+  it("keeps detail pages focused before exposing deeper implementation sections", () => {
+    const articleSource = readFileSync(
+      join(process.cwd(), "src/components/case-study-article.tsx"),
+      "utf8",
+    );
+    const diagramSource = readFileSync(
+      join(process.cwd(), "src/components/portfolio-case-diagram.tsx"),
+      "utf8",
+    );
+
+    expect(articleSource.indexOf('SummaryBlock title="문제"')).toBeLessThan(
+      articleSource.indexOf("<EvidenceSection"),
+    );
+    expect(articleSource).toContain('<ContentSection title="검증 근거">');
+    expect(articleSource).toContain(
+      '<FoldedContentSection title="측정 시나리오" nested>',
+    );
+    expect(articleSource).toContain('<FoldedContentSection title="상세 구현">');
+    expect(articleSource).toContain(
+      '<FoldedSidebarSection title="예상 면접 질문">',
+    );
+    expect(articleSource).toContain(
+      '<FoldedContentSection title="Outbox 상태 전이">',
+    );
+    expect(articleSource.indexOf("<EvidenceSection")).toBeLessThan(
+      articleSource.indexOf("<PortfolioCaseDiagramDetails"),
+    );
+    expect(articleSource.indexOf('SummaryBlock title="결과"')).toBeLessThan(
+      articleSource.indexOf("<PortfolioCaseDiagramDetails"),
+    );
+    expect(diagramSource.indexOf("<ArchitectureSummary")).toBeLessThan(
+      diagramSource.indexOf("흐름 세부"),
+    );
+    expect(diagramSource).toContain("<details");
+    expect(diagramSource).toContain("흐름 세부");
+    expect(diagramSource).toContain("구성 요소 설명");
   });
 
   it("documents the portfolio overall architecture SVG in README", () => {

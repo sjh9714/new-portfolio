@@ -1,96 +1,18 @@
-import {
-  BarChart3,
-  BookOpen,
-  Boxes,
-  Database,
-  ExternalLink,
-  LockKeyhole,
-  Mail,
-  MessageSquare,
-  ShieldCheck,
-  TicketCheck,
-} from "lucide-react";
+import { BookOpen, ExternalLink, Mail } from "lucide-react";
 import Link from "next/link";
 
 import { EvidenceMatrix } from "@/components/evidence-matrix";
-import { FocusCard } from "@/components/focus-card";
 import { PortfolioProjectGroupCard } from "@/components/portfolio-project-group-card";
-import { ProjectRow } from "@/components/project-card";
 import { SectionHeader } from "@/components/section-header";
 import { StatusBadge } from "@/components/status-badge";
 import { Button } from "@/components/ui/button";
+import { publishedBlogTopics } from "@/content/blog";
 import {
   featuredProjectGroups,
   getSupportingProjects,
 } from "@/content/portfolio-cases";
 import { additionalProjects, getProjectBySlug } from "@/content/projects";
 import { profile } from "@/content/profile";
-
-const focusCards = [
-  {
-    title: "동시성·정합성",
-    icon: LockKeyhole,
-    items: [
-      "동시성 제어(락, 낙관적 락, 버전)",
-      "중복 요청 방지(Idempotency)",
-      "정합성 보장(트랜잭션 경계)",
-      "잔여/좌석/재고 일관성 유지",
-    ],
-  },
-  {
-    title: "이벤트 기반 복구",
-    icon: Boxes,
-    items: [
-      "도메인 이벤트 설계",
-      "Outbox 패턴과 이벤트 발행",
-      "Kafka/RabbitMQ 기반 비동기 처리",
-      "DLT 기반 장애 격리",
-    ],
-  },
-  {
-    title: "실시간 메시징",
-    icon: MessageSquare,
-    items: [
-      "WebSocket + STOMP",
-      "Presence와 reconnect sync",
-      "Redis Pub/Sub / Streams",
-      "메시지 순서와 유실 최소화",
-    ],
-  },
-  {
-    title: "과금·테넌트 보안",
-    icon: ShieldCheck,
-    items: [
-      "사용량 수집과 과금 집계",
-      "멀티테넌트 데이터 격리",
-      "API Key hash 저장",
-      "정산/환불/조정 흐름",
-    ],
-  },
-];
-
-const proofItems = [
-  {
-    title: "k6 부하 테스트",
-    description: "시나리오 기반 부하 검증, 임계점 탐색 및 회귀 방지",
-    icon: BarChart3,
-  },
-  {
-    title: "Testcontainers 통합 테스트",
-    description: "실제 의존성 환경 기반 재현 가능한 통합 테스트",
-    icon: Boxes,
-  },
-  {
-    title: "Redis/Kafka/PostgreSQL 정합성",
-    description: "트랜잭션 경계와 메시지 정합성 지표/로그 지속 검증",
-    icon: Database,
-  },
-  {
-    title: "Outbox / DLT / Idempotency",
-    description: "실패를 전제로 설계하고 복구 가능성을 확보",
-    icon: TicketCheck,
-  },
-];
 
 const snapshotItems = [
   {
@@ -123,6 +45,11 @@ const snapshotItems = [
 const portfolioPurpose =
   "이 포트폴리오는 이력서에 한 줄로 압축한 문제 해결 경험을 구조도, 문제 원인, 해결 과정, 검증 결과로 확장한 문서입니다.";
 const supportingAdditionalProjects = getSupportingProjects(additionalProjects);
+const redisArticle = publishedBlogTopics.find(
+  (topic) => topic.slug === "redis-queue-lock-presence-reconciliation",
+);
+const validationMethodText =
+  "k6 · Testcontainers · Redis/Kafka/PostgreSQL 정합성 · Outbox/DLT/Idempotency";
 
 export default function Home() {
   return (
@@ -207,25 +134,13 @@ export default function Home() {
         </div>
 
         <div className="mx-auto max-w-7xl px-5 pb-12 md:px-8 md:pb-16">
-          <div className="border-border grid border md:grid-cols-4">
-            {proofItems.map((item) => (
-              <div
-                key={item.title}
-                className="border-border flex gap-4 border-b p-5 last:border-b-0 md:border-r md:border-b-0 md:last:border-r-0"
-              >
-                <span className="border-border bg-card flex size-11 shrink-0 items-center justify-center rounded-md border">
-                  <item.icon aria-hidden="true" />
-                </span>
-                <div className="flex flex-col gap-1">
-                  <h2 className="text-foreground text-sm font-semibold [overflow-wrap:anywhere]">
-                    {item.title}
-                  </h2>
-                  <p className="text-muted-foreground text-sm leading-6">
-                    {item.description}
-                  </p>
-                </div>
-              </div>
-            ))}
+          <div className="border-border bg-card flex flex-col gap-2 border p-4 md:flex-row md:items-center md:justify-between">
+            <p className="text-primary text-xs font-semibold tracking-[0.16em] uppercase">
+              검증 방식
+            </p>
+            <p className="text-foreground text-sm leading-6 [overflow-wrap:anywhere]">
+              {validationMethodText}
+            </p>
           </div>
         </div>
       </section>
@@ -251,34 +166,70 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="border-border bg-border grid gap-px overflow-hidden border md:grid-cols-4">
-          {focusCards.map((card) => (
-            <FocusCard key={card.title} {...card} />
-          ))}
-        </section>
+        {redisArticle ? (
+          <section className="flex flex-col gap-5">
+            <SectionHeader
+              title="Redis 글"
+              description="대표 사례에서 반복되는 Redis의 역할과 최종 기준 데이터 경계를 한 글로 정리했습니다."
+              action={
+                <Button asChild variant="ghost">
+                  <Link href="/blog">글 목록 보기</Link>
+                </Button>
+              }
+            />
+            <article className="border-border bg-card flex flex-col gap-4 border p-5 md:flex-row md:items-start md:justify-between">
+              <div className="flex max-w-3xl flex-col gap-2">
+                <p className="text-primary text-xs font-semibold tracking-[0.16em] uppercase">
+                  {redisArticle.readingTime}
+                </p>
+                <h2 className="text-foreground text-xl leading-7 font-semibold [overflow-wrap:anywhere]">
+                  {redisArticle.title}
+                </h2>
+                <p className="text-muted-foreground line-clamp-2 text-sm leading-7 [overflow-wrap:anywhere]">
+                  {redisArticle.summary}
+                </p>
+              </div>
+              <Button asChild variant="outline" className="shrink-0">
+                <Link href={`/blog/${redisArticle.slug}`}>글 읽기</Link>
+              </Button>
+            </article>
+          </section>
+        ) : null}
 
         <section className="flex flex-col gap-6">
-          <SectionHeader
-            title="검증 기준"
-            description="측정한 수치, 재현 가능한 검증, 아직 채워야 하는 항목을 같은 색으로 뭉개지 않습니다."
-          />
-          <EvidenceMatrix />
+          <details className="border-border bg-card rounded-md border p-5">
+            <summary className="text-foreground cursor-pointer text-lg font-semibold">
+              검증 기준 보기
+            </summary>
+            <p className="text-muted-foreground mt-3 text-sm leading-6">
+              측정한 수치, 재현 가능한 검증, 아직 채워야 하는 항목을 같은 색으로
+              뭉개지 않습니다.
+            </p>
+            <div className="mt-5">
+              <EvidenceMatrix />
+            </div>
+          </details>
         </section>
 
         <section className="flex flex-col gap-5">
           <SectionHeader
             title="추가 프로젝트"
             description="대표 사례를 보완하는 팀 협업, 제품 구현, 캐싱, AI 서비스 경험을 짧게 정리합니다."
-            action={
-              <Button asChild variant="ghost">
-                <Link href="/projects">모든 프로젝트 보기</Link>
-              </Button>
-            }
           />
-          <div className="border-border border-y">
-            {supportingAdditionalProjects.map((project) => (
-              <ProjectRow key={project.slug} project={project} />
-            ))}
+          <div className="border-border bg-card flex flex-col gap-3 border p-5 md:flex-row md:items-center md:justify-between">
+            <div className="flex flex-wrap gap-x-3 gap-y-2">
+              {supportingAdditionalProjects.map((project) => (
+                <span
+                  key={project.slug}
+                  className="text-foreground text-sm font-semibold"
+                >
+                  {project.title}
+                </span>
+              ))}
+            </div>
+            <Button asChild variant="outline" size="sm" className="shrink-0">
+              <Link href="/projects">모든 프로젝트 보기</Link>
+            </Button>
           </div>
         </section>
       </div>

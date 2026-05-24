@@ -165,6 +165,13 @@ describe("portfolio project content", () => {
     expect(homeSource).toContain("featuredProjectGroups");
     expect(homeSource).not.toContain("{featuredPortfolioCases.map(");
     expect(homeSource).not.toContain("priority={index === 0}");
+    expect(homeSource).toContain("검증 방식");
+    expect(homeSource).toContain("검증 기준 보기");
+    expect(homeSource).toContain("publishedBlogTopics");
+    expect(homeSource).toContain("redis-queue-lock-presence-reconciliation");
+    expect(homeSource).not.toContain("FocusCard");
+    expect(homeSource).not.toContain("proofItems");
+    expect(homeSource).not.toContain("<ProjectRow");
     expect(homeSource).toContain('evidenceLabel: "동일 좌석 경합"');
     expect(homeSource).toContain('evidenceLabel: "채팅방 조회 API RPS"');
     expect(homeSource).toContain('evidenceLabel: "사용량 중복 처리"');
@@ -291,7 +298,8 @@ describe("portfolio project content", () => {
     );
 
     expect(caseStudySource).toContain("lg:sticky");
-    expect(caseStudySource).toContain("검증 근거 / 측정 정보");
+    expect(caseStudySource).toContain("검증 근거");
+    expect(caseStudySource).toContain("측정 시나리오");
     expect(caseStudySource).toContain("기술 스택");
     expect(caseStudySource).toContain("한계와 다음 검증");
     expect(caseStudySource).toContain("예상 면접 질문");

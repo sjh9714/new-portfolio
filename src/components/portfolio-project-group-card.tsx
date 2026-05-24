@@ -11,6 +11,8 @@ export function PortfolioProjectGroupCard({
 }: {
   group: FeaturedProjectGroup;
 }) {
+  const primaryEvidencePreview = group.primaryEvidence.slice(0, 2);
+
   return (
     <article className="border-border bg-card flex h-full flex-col gap-5 border p-5">
       <div className="flex flex-col gap-3">
@@ -54,7 +56,7 @@ export function PortfolioProjectGroupCard({
                 </h4>
               </div>
               <p className="text-muted-foreground text-sm leading-6 [overflow-wrap:anywhere]">
-                {caseLink.summary}
+                <span className="line-clamp-1">{caseLink.summary}</span>
               </p>
             </div>
           ))}
@@ -66,7 +68,7 @@ export function PortfolioProjectGroupCard({
           대표 근거
         </p>
         <div className="grid gap-2">
-          {group.primaryEvidence.map((evidence) => (
+          {primaryEvidencePreview.map((evidence) => (
             <div
               key={`${group.projectSlug}-${evidence.label}`}
               className="border-border bg-background flex flex-col gap-2 rounded-md border px-3 py-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3"

@@ -1245,7 +1245,7 @@ export const featuredPortfolioCases: PortfolioCase[] = [
     projectSlug: "borrow-me",
     domain: "대여 서비스 / 조회 성능",
     resumeLine:
-      "BorrowMe 상품 목록 조회는 원본 README 기록 기준 p95 1,010ms→23ms, 쿼리 201회→3회 개선 사례이며, 현재 repo에서는 상품/follow/exercise query-count guard, 인증 상품 목록 follow-aware guard, ranking data path guard, 예약 정합성 테스트, Flyway baseline validation으로 회귀를 확인합니다.",
+      "BorrowMe 상품 목록 조회 N+1 개선 원본 기록과 현재 clean repeat3 snapshot을 분리하고, query-count guard와 예약 정합성 테스트로 회귀를 검증했습니다.",
     architectureSummary: {
       sourceOfTruth: "Product / Image / Reservation DB",
       transactionBoundary: "읽기 전용 조회 경로",
