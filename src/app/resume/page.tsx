@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import {
   getFeaturedPortfolioProjectGroups,
   getSupportingProjects,
+  type PortfolioCase,
 } from "@/content/portfolio-cases";
 import { additionalProjects } from "@/content/projects";
 import { profile } from "@/content/profile";
@@ -125,9 +126,7 @@ export default function ResumePage() {
                   {project.title}
                 </h3>
                 <p className="text-muted-foreground text-sm">
-                  {cases
-                    .map((portfolioCase) => portfolioCase.domain)
-                    .join(" / ")}
+                  {formatPortfolioCaseDomains(cases)}
                 </p>
                 <p className="text-muted-foreground mt-2 text-xs">
                   {project.team ?? project.role}
@@ -186,4 +185,26 @@ export default function ResumePage() {
       </section>
     </div>
   );
+}
+
+function formatPortfolioCaseDomains(cases: PortfolioCase[]) {
+  if (cases.length <= 1) {
+    return cases[0]?.domain ?? "";
+  }
+
+  const domainParts = cases.map((portfolioCase) =>
+    portfolioCase.domain.split(" / "),
+  );
+  const sharedDomain = domainParts[0]?.[0];
+
+  if (
+    sharedDomain &&
+    domainParts.every((parts) => parts[0] === sharedDomain && parts.length > 1)
+  ) {
+    return `${sharedDomain} / ${domainParts
+      .map((parts) => parts.slice(1).join(" / "))
+      .join(" · ")}`;
+  }
+
+  return cases.map((portfolioCase) => portfolioCase.domain).join(" / ");
 }

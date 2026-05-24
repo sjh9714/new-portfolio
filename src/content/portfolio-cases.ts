@@ -138,6 +138,11 @@ export type PortfolioCase = {
   solution: string[];
   result: string[];
   evidence: ProjectEvidence[];
+  primaryEvidenceLabels?: string[];
+  referenceEvidenceLabels?: string[];
+  referenceEvidenceTitle?: string;
+  additionalEvidenceLabels?: string[];
+  additionalEvidenceTitle?: string;
   measurement?: PortfolioCaseMeasurement;
   implementationDetails: string[];
   stateTransitions?: PortfolioStateTransition[];
@@ -809,6 +814,23 @@ export const featuredPortfolioCases: PortfolioCase[] = [
       "Mixed traffic p95 latency",
       "Production delivery benchmark",
     ]),
+    primaryEvidenceLabels: [
+      "채팅방 조회 API RPS",
+      "p95 응답 시간",
+      "N+1 쿼리 제거",
+    ],
+    additionalEvidenceTitle: "추가 WebSocket delivery 검증 보기",
+    additionalEvidenceLabels: [
+      "메시지 전달 지연 시간 로컬 스냅샷",
+      "WebSocket 전달 완전성 로컬 스냅샷",
+      "Room-global ordering 로컬 진단",
+      "Receiver matrix by-room guard",
+      "Mixed HTTP probe artifact 분리 검산",
+      "Mixed traffic local scenario",
+      "Delivery evidence validator",
+      "Mixed traffic p95 latency",
+      "Production delivery benchmark",
+    ],
     measurement: {
       scenarios: [
         {
@@ -1026,6 +1048,24 @@ export const featuredPortfolioCases: PortfolioCase[] = [
       "혼합 사용량 부하 테스트",
       "운영 성능 주장",
     ]),
+    primaryEvidenceLabels: [
+      "API Key 저장 방식",
+      "사용량 중복 처리",
+      "Webhook 중복 처리",
+      "Refund reversal ledger",
+      "혼합 사용량 부하 테스트",
+    ],
+    additionalEvidenceTitle: "추가 검증 보기",
+    additionalEvidenceLabels: [
+      "Append-only Ledger 불변성",
+      "Quota reservation",
+      "Monthly invoice scheduler",
+      "Full mixed smoke readiness guard",
+      "Full mixed capture rollup guard",
+      "Low-cardinality outcome counters",
+      "Audit metadata sanitizer",
+      "운영 성능 주장",
+    ],
     implementationDetails: [
       "tenant isolation은 organization 단위 경계와 API Key 인증 흐름으로 설명합니다.",
       "중복 요청은 예외가 아니라 정상 입력으로 보고 request hash mismatch 같은 conflict를 별도로 다룹니다.",
@@ -1293,11 +1333,27 @@ export const featuredPortfolioCases: PortfolioCase[] = [
       "예약 정합성",
       "Flyway baseline validation",
     ]),
+    primaryEvidenceLabels: [
+      "상품 목록 현재 재측정 snapshot",
+      "상품 목록 쿼리 수 원본 기록 + 현재 guard",
+      "예약 정합성",
+    ],
+    referenceEvidenceTitle: "참고 기록",
+    referenceEvidenceLabels: ["상품 목록 p95 원본 기록"],
+    additionalEvidenceTitle: "추가 guard 보기",
+    additionalEvidenceLabels: [
+      "Follow lookup query-count guard",
+      "Authenticated product-list follow-aware guard",
+      "Ranking data path query-count guard",
+      "Ranking HTTP model assembly guard",
+      "Exercise hashtag query-count guard",
+      "Flyway baseline validation",
+    ],
     measurement: {
       scenarios: [
         {
           label: "상품 목록 p95 원본 기록",
-          value: "참고 기록 · raw artifact 없음 · 현재 재측정 claim 아님",
+          value: "참고 기록 · raw artifact 없음 · 현재 측정 완료 claim 아님",
         },
         {
           label: "상품 목록 현재 재측정 snapshot",

@@ -236,8 +236,8 @@ describe("portfolio project content", () => {
     expect(gitignoreSource).toContain("fb*.txt");
     expect(gitignoreSource).toContain("feedback.md");
     expect(trackedFiles).not.toMatch(/(^|\/)feedback\.md$/m);
-    expect(trackedFiles).not.toMatch(/(^|\/)fb[0-9]+\.txt$/m);
-    expect(trackedFiles).not.toMatch(/^public\/fb[0-9]+\.txt$/m);
+    expect(trackedFiles).not.toMatch(/(^|\/)fb[^/]*\.txt$/m);
+    expect(trackedFiles).not.toMatch(/^public\/fb[^/]*\.txt$/m);
   });
 
   it("keeps project cards structured for a 30-second technical scan", () => {
@@ -561,6 +561,7 @@ describe("portfolio project content", () => {
         expect.objectContaining({
           label: "상품 목록 p95 원본 기록",
           status: "pending",
+          value: "참고 기록 · raw artifact 없음 · 현재 측정 완료 claim 아님",
         }),
         expect.objectContaining({
           label: "상품 목록 현재 재측정 snapshot",
@@ -609,7 +610,7 @@ describe("portfolio project content", () => {
     ).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          value: expect.stringContaining("현재 재측정 claim 아님"),
+          value: expect.stringContaining("현재 측정 완료 claim 아님"),
         }),
       ]),
     );

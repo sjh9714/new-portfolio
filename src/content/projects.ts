@@ -508,7 +508,7 @@ export const projects: Project[] = [
     evidence: [
       {
         label: "상품 목록 p95 원본 기록",
-        value: "참고 기록 · raw artifact 없음 · 현재 재측정 claim 아님",
+        value: "참고 기록 · raw artifact 없음 · 현재 측정 완료 claim 아님",
         status: "pending",
       },
       {

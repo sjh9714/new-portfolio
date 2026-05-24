@@ -6,7 +6,7 @@ import { StatusBadge } from "@/components/status-badge";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { PortfolioCase } from "@/content/portfolio-cases";
-import type { Project } from "@/content/projects";
+import type { Project, ProjectEvidence } from "@/content/projects";
 
 export function CaseStudyArticle({
   portfolioCase,
@@ -100,27 +100,47 @@ function EvidenceSection({ portfolioCase }: { portfolioCase: PortfolioCase }) {
   const scenarios = portfolioCase.measurement?.scenarios ?? [];
   const executionEnvironment =
     portfolioCase.measurement?.executionEnvironment ?? [];
+  const primaryEvidence = portfolioCase.primaryEvidenceLabels
+    ? selectEvidenceByLabels(portfolioCase, portfolioCase.primaryEvidenceLabels)
+    : portfolioCase.evidence;
+  const referenceEvidence = selectEvidenceByLabels(
+    portfolioCase,
+    portfolioCase.referenceEvidenceLabels ?? [],
+  );
+  const additionalEvidence = selectEvidenceByLabels(
+    portfolioCase,
+    portfolioCase.additionalEvidenceLabels ?? [],
+  );
 
   return (
     <ContentSection title="검증 근거">
       <div className="grid gap-3">
-        {portfolioCase.evidence.map((evidence) => (
-          <div
-            key={evidence.label}
-            className="border-border bg-card rounded-md border p-4"
-          >
-            <div className="flex items-start justify-between gap-3">
-              <h3 className="text-foreground font-semibold [overflow-wrap:anywhere]">
-                {evidence.label}
-              </h3>
-              <StatusBadge status={evidence.status} />
-            </div>
-            <p className="text-muted-foreground mt-2 text-sm leading-6 [overflow-wrap:anywhere]">
-              {evidence.value}
-            </p>
-          </div>
-        ))}
+        {primaryEvidence.map((evidence) => renderEvidenceCard(evidence))}
       </div>
+
+      {referenceEvidence.length ? (
+        <FoldedContentSection
+          title={portfolioCase.referenceEvidenceTitle ?? "참고 기록"}
+          nested
+        >
+          <div className="grid gap-3">
+            {referenceEvidence.map((evidence) =>
+              renderEvidenceCard(evidence, { badgeLabel: "참고 기록" }),
+            )}
+          </div>
+        </FoldedContentSection>
+      ) : null}
+
+      {additionalEvidence.length ? (
+        <FoldedContentSection
+          title={portfolioCase.additionalEvidenceTitle ?? "추가 검증 보기"}
+          nested
+        >
+          <div className="grid gap-3">
+            {additionalEvidence.map((evidence) => renderEvidenceCard(evidence))}
+          </div>
+        </FoldedContentSection>
+      ) : null}
 
       {scenarios.length ? (
         <FoldedContentSection title="측정 시나리오" nested>
@@ -134,6 +154,53 @@ function EvidenceSection({ portfolioCase }: { portfolioCase: PortfolioCase }) {
         </FoldedContentSection>
       ) : null}
     </ContentSection>
+  );
+}
+
+function selectEvidenceByLabels(
+  portfolioCase: PortfolioCase,
+  labels: string[],
+) {
+  return labels.map((label) => {
+    const evidence = portfolioCase.evidence.find(
+      (item) => item.label === label,
+    );
+
+    if (!evidence) {
+      throw new Error(
+        `Missing evidence "${label}" on portfolio case "${portfolioCase.slug}"`,
+      );
+    }
+
+    return evidence;
+  });
+}
+
+function renderEvidenceCard(
+  evidence: ProjectEvidence,
+  options?: { badgeLabel?: string },
+) {
+  return (
+    <div
+      key={evidence.label}
+      className="border-border bg-card rounded-md border p-4"
+    >
+      <div className="flex items-start justify-between gap-3">
+        <h3 className="text-foreground font-semibold [overflow-wrap:anywhere]">
+          {evidence.label}
+        </h3>
+        {options?.badgeLabel ? (
+          <Badge variant="outline" className="shrink-0 rounded-md">
+            {options.badgeLabel}
+          </Badge>
+        ) : (
+          <StatusBadge status={evidence.status} />
+        )}
+      </div>
+      <p className="text-muted-foreground mt-2 text-sm leading-6 [overflow-wrap:anywhere]">
+        {evidence.value}
+      </p>
+    </div>
   );
 }
 

@@ -134,6 +134,89 @@ describe("PDF-style portfolio cases", () => {
     }
   });
 
+  it("keeps noisy evidence folded behind case-specific evidence groups", () => {
+    const realtime = getPortfolioCaseBySlug("chat-room-n-plus-one-rps");
+    const billing = getPortfolioCaseBySlug(
+      "billing-idempotency-webhook-ledger",
+    );
+    const borrowMe = getPortfolioCaseBySlug("borrowme-product-list-n-plus-one");
+
+    expect(realtime?.primaryEvidenceLabels).toEqual([
+      "채팅방 조회 API RPS",
+      "p95 응답 시간",
+      "N+1 쿼리 제거",
+    ]);
+    expect(realtime?.additionalEvidenceTitle).toBe(
+      "추가 WebSocket delivery 검증 보기",
+    );
+    expect(realtime?.additionalEvidenceLabels).toEqual([
+      "메시지 전달 지연 시간 로컬 스냅샷",
+      "WebSocket 전달 완전성 로컬 스냅샷",
+      "Room-global ordering 로컬 진단",
+      "Receiver matrix by-room guard",
+      "Mixed HTTP probe artifact 분리 검산",
+      "Mixed traffic local scenario",
+      "Delivery evidence validator",
+      "Mixed traffic p95 latency",
+      "Production delivery benchmark",
+    ]);
+
+    expect(billing?.primaryEvidenceLabels).toEqual([
+      "API Key 저장 방식",
+      "사용량 중복 처리",
+      "Webhook 중복 처리",
+      "Refund reversal ledger",
+      "혼합 사용량 부하 테스트",
+    ]);
+    expect(billing?.additionalEvidenceTitle).toBe("추가 검증 보기");
+    expect(billing?.additionalEvidenceLabels).toEqual([
+      "Append-only Ledger 불변성",
+      "Quota reservation",
+      "Monthly invoice scheduler",
+      "Full mixed smoke readiness guard",
+      "Full mixed capture rollup guard",
+      "Low-cardinality outcome counters",
+      "Audit metadata sanitizer",
+      "운영 성능 주장",
+    ]);
+
+    expect(borrowMe?.primaryEvidenceLabels).toEqual([
+      "상품 목록 현재 재측정 snapshot",
+      "상품 목록 쿼리 수 원본 기록 + 현재 guard",
+      "예약 정합성",
+    ]);
+    expect(borrowMe?.referenceEvidenceTitle).toBe("참고 기록");
+    expect(borrowMe?.referenceEvidenceLabels).toEqual([
+      "상품 목록 p95 원본 기록",
+    ]);
+    expect(borrowMe?.additionalEvidenceTitle).toBe("추가 guard 보기");
+    expect(borrowMe?.additionalEvidenceLabels).toEqual([
+      "Follow lookup query-count guard",
+      "Authenticated product-list follow-aware guard",
+      "Ranking data path query-count guard",
+      "Ranking HTTP model assembly guard",
+      "Exercise hashtag query-count guard",
+      "Flyway baseline validation",
+    ]);
+  });
+
+  it("renders primary evidence, reference records, and folded evidence separately", () => {
+    const caseStudySource = readFileSync(
+      join(process.cwd(), "src/components/case-study-article.tsx"),
+      "utf8",
+    );
+
+    expect(caseStudySource).toContain("primaryEvidenceLabels");
+    expect(caseStudySource).toContain("referenceEvidenceLabels");
+    expect(caseStudySource).toContain("additionalEvidenceLabels");
+    expect(caseStudySource).toContain("referenceEvidenceTitle");
+    expect(caseStudySource).toContain("additionalEvidenceTitle");
+    expect(caseStudySource).toContain("참고 기록");
+    expect(caseStudySource).toContain("renderEvidenceCard");
+    expect(caseStudySource).toContain("badgeLabel");
+    expect(caseStudySource).toContain("FoldedContentSection");
+  });
+
   it("does not render placeholder measurement environment rows", () => {
     for (const portfolioCase of featuredPortfolioCases) {
       expect("measurementEnvironment" in portfolioCase).toBe(false);
@@ -307,7 +390,7 @@ describe("PDF-style portfolio cases", () => {
       expect.arrayContaining([
         {
           label: "상품 목록 p95 원본 기록",
-          value: "참고 기록 · raw artifact 없음 · 현재 재측정 claim 아님",
+          value: "참고 기록 · raw artifact 없음 · 현재 측정 완료 claim 아님",
         },
         {
           label: "상품 목록 현재 재측정 snapshot",
@@ -481,6 +564,9 @@ describe("PDF-style portfolio cases", () => {
     expect(projectSource).toContain("caseLinks.map");
     expect(projectSource).toContain("caseLink.label");
     expect(resumeSource).toContain("getFeaturedPortfolioProjectGroups");
+    expect(resumeSource).toContain("formatPortfolioCaseDomains");
+    expect(resumeSource).toContain("sharedDomain");
+    expect(resumeSource).toContain('join(" · ")');
     expect(resumeSource).toContain("<ul");
     expect(resumeSource).toContain("resumeLine");
   });
