@@ -440,6 +440,10 @@ describe("PDF-style portfolio cases", () => {
 
     expect(groupCardSource).toContain("문제 해결 Deep Dive");
     expect(groupCardSource).toContain("group.primaryEvidence");
+    expect(groupCardSource).toContain("caseLink.actionLabel");
+    expect(groupCardSource).toContain(
+      'variant={index === 0 ? "default" : "outline"}',
+    );
     expect(groupCardSource).not.toContain("priority");
     expect(groupCardSource).not.toContain("md:col-span-2");
     expect(portfolioCaseSource).toContain("Deep Dive");

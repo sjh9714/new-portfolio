@@ -56,12 +56,6 @@ export function PortfolioProjectGroupCard({
               <p className="text-muted-foreground text-sm leading-6 [overflow-wrap:anywhere]">
                 {caseLink.summary}
               </p>
-              <Button asChild variant="ghost" size="sm" className="self-start">
-                <Link href={`/case-studies/${caseLink.caseSlug}`}>
-                  <FileText data-icon="inline-start" aria-hidden="true" />
-                  {caseLink.actionLabel}
-                </Link>
-              </Button>
             </div>
           ))}
         </div>
@@ -99,12 +93,27 @@ export function PortfolioProjectGroupCard({
             </Badge>
           ))}
         </div>
-        <Button asChild variant="outline" className="self-start">
-          <a href={group.repoUrl} target="_blank" rel="noreferrer">
-            <ExternalLink data-icon="inline-start" aria-hidden="true" />
-            GitHub
-          </a>
-        </Button>
+        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+          {group.caseLinks.map((caseLink, index) => (
+            <Button
+              key={caseLink.caseSlug}
+              asChild
+              variant={index === 0 ? "default" : "outline"}
+              size="sm"
+            >
+              <Link href={`/case-studies/${caseLink.caseSlug}`}>
+                <FileText data-icon="inline-start" aria-hidden="true" />
+                {caseLink.actionLabel}
+              </Link>
+            </Button>
+          ))}
+          <Button asChild variant="outline" size="sm">
+            <a href={group.repoUrl} target="_blank" rel="noreferrer">
+              <ExternalLink data-icon="inline-start" aria-hidden="true" />
+              GitHub
+            </a>
+          </Button>
+        </div>
       </div>
     </article>
   );
