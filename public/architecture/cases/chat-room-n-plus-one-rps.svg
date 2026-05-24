@@ -1,15 +1,126 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="900" height="420" viewBox="0 0 900 420" role="img" aria-labelledby="title desc">
-  <title id="title">Chat room N+1 query problem architecture</title>
-  <desc id="desc">Before and after architecture for chat room list API N+1 query removal.</desc>
-  <rect width="900" height="420" fill="#ffffff"/>
-  <style>.box{fill:#f8fafc;stroke:#0f172a;stroke-width:1.5;rx:8}.bad{fill:#fff7ed;stroke:#c2410c;stroke-width:1.8;rx:8}.good{fill:#ecfdf5;stroke:#047857;stroke-width:1.8;rx:8}.pending{fill:#f8fafc;stroke:#64748b;stroke-dasharray:6 5;rx:8}.text{font:600 15px Arial,sans-serif;fill:#0f172a}.small{font:400 12px Arial,sans-serif;fill:#475569}.line{stroke:#334155;stroke-width:1.7;fill:none;marker-end:url(#arrow)}</style>
-  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="#334155"/></marker></defs>
-  <text x="40" y="42" class="text">채팅방 조회 API N+1: 문제 구간 아키텍처</text>
-  <rect x="50" y="110" width="130" height="80" class="box"/><text x="72" y="144" class="text">Client</text><text x="72" y="168" class="small">방 목록 조회</text>
-  <rect x="230" y="110" width="150" height="80" class="box"/><text x="252" y="144" class="text">Chat Room API</text><text x="252" y="168" class="small">목록 응답</text>
-  <rect x="440" y="72" width="170" height="106" class="bad"/><text x="462" y="108" class="text">Before</text><text x="462" y="132" class="small">2N+1 queries</text><text x="462" y="154" class="small">RPS 937 / p95 212.85ms</text>
-  <rect x="440" y="230" width="170" height="106" class="good"/><text x="462" y="266" class="text">After</text><text x="462" y="290" class="small">1 query</text><text x="462" y="312" class="small">RPS 1,598 / p95 149.22ms</text>
-  <rect x="682" y="110" width="150" height="80" class="good"/><text x="704" y="144" class="text">Message DB</text><text x="704" y="168" class="small">Room/Participant</text>
-  <rect x="682" y="246" width="150" height="80" class="pending"/><text x="704" y="280" class="text">Delivery</text><text x="704" y="304" class="small">production/mixed 예정</text>
-  <path d="M180 150H230" class="line"/><path d="M380 136L440 124" class="line"/><path d="M380 168L440 276" class="line"/><path d="M610 282C652 250 666 194 682 164" class="line"/><path d="M610 282H682" class="line"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="560" viewBox="0 0 1040 560" role="img" aria-labelledby="chat-room-n-plus-one-rps-title chat-room-n-plus-one-rps-desc">
+  <!-- Generated from src/architecture/specs/chat-room-n-plus-one-rps.ts. Do not edit this SVG directly. -->
+  <title id="chat-room-n-plus-one-rps-title">채팅방 조회 API N+1: 문제 구간 아키텍처</title>
+  <desc id="chat-room-n-plus-one-rps-desc">Before and after architecture for chat room list API N+1 query removal.</desc>
+  <rect width="1040" height="560" fill="#ffffff"/>
+  <defs>
+    <marker id="arrow-sync" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#334155"/></marker>
+    <marker id="arrow-async" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#f97316"/></marker>
+    <marker id="arrow-failure" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#dc2626"/></marker>
+    <marker id="arrow-replay" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#7c3aed"/></marker>
+  </defs>
+  <g id="background">
+    <text x="40" y="42" text-anchor="start" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#0f172a">채팅방 조회 API N+1: 문제 구간 아키텍처</text>
+  </g>
+  <g id="containers">
+    <g id="container-request">
+      <rect x="40" y="120" width="380" height="260" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.2" stroke-dasharray="4 4"/>
+      <text x="54" y="144" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#64748b">Read path</text>
+    </g>
+    <g id="container-compare">
+      <rect x="440" y="80" width="260" height="420" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.2" stroke-dasharray="4 4"/>
+      <text x="454" y="104" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#64748b">Before / After</text>
+    </g>
+    <g id="container-data">
+      <rect x="740" y="120" width="260" height="360" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.2" stroke-dasharray="4 4"/>
+      <text x="754" y="144" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#64748b">Data boundary</text>
+    </g>
+  </g>
+  <g id="edges">
+    <path id="edge-client-to-api" d="M 200 260 H 240" fill="none" stroke="#334155" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-sync)"/>
+    <path id="edge-api-to-before" d="M 400 260 H 430 V 180 H 460" fill="none" stroke="#dc2626" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6 5" marker-end="url(#arrow-failure)"/>
+    <path id="edge-api-to-after" d="M 400 260 H 430 V 400 H 460" fill="none" stroke="#334155" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-sync)"/>
+    <path id="edge-before-to-db" d="M 680 180 H 720 V 270 H 760" fill="none" stroke="#dc2626" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6 5" marker-end="url(#arrow-failure)"/>
+    <path id="edge-after-to-db" d="M 680 400 H 720 V 270 H 760" fill="none" stroke="#334155" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-sync)"/>
+    <path id="edge-after-to-delivery" d="M 680 400 H 720 V 420 H 760" fill="none" stroke="#f97316" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-async)"/>
+  </g>
+  <g id="edge-labels">
+    <g id="edge-label-client-to-api">
+      <rect x="179" y="179" width="82" height="22" rx="11" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+      <text x="220" y="194" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#475569">조회 요청</text>
+    </g>
+    <g id="edge-label-api-to-before">
+      <rect x="379" y="79" width="102" height="22" rx="11" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+      <text x="430" y="94" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#475569">기존 반복 조회</text>
+    </g>
+    <g id="edge-label-api-to-after">
+      <rect x="374" y="489" width="112" height="22" rx="11" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+      <text x="430" y="504" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#475569">조회 경로 재구성</text>
+    </g>
+    <g id="edge-label-before-to-db">
+      <rect x="679" y="79" width="82" height="22" rx="11" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+      <text x="720" y="94" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#475569">2N+1</text>
+    </g>
+    <g id="edge-label-after-to-db">
+      <rect x="654" y="489" width="92" height="22" rx="11" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+      <text x="700" y="504" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#475569">1 query</text>
+    </g>
+    <g id="edge-label-after-to-delivery">
+      <rect x="769" y="489" width="102" height="22" rx="11" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+      <text x="820" y="504" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#475569">전달 지표 분리</text>
+    </g>
+  </g>
+  <g id="nodes">
+    <g id="node-client">
+      <rect x="60" y="220" width="140" height="80" rx="8" fill="#f8fafc" stroke="#0f172a" stroke-width="1.5"/>
+      <text x="130" y="251" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#0f172a">Client</text>
+      <text x="130" y="275" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#475569">
+        <tspan x="130" dy="0">방 목록 조회</tspan>
+      </text>
+    </g>
+    <g id="node-api">
+      <rect x="240" y="220" width="160" height="80" rx="8" fill="#f8fafc" stroke="#0f172a" stroke-width="1.5"/>
+      <text x="320" y="251" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#0f172a">Chat Room API</text>
+      <text x="320" y="275" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#475569">
+        <tspan x="320" dy="0">목록 응답</tspan>
+      </text>
+    </g>
+    <g id="node-before">
+      <rect x="460" y="120" width="220" height="120" rx="8" fill="#fff7ed" stroke="#c2410c" stroke-width="1.7"/>
+      <text x="570" y="151" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#0f172a">Before</text>
+      <text x="570" y="175" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#475569">
+        <tspan x="570" dy="0">2N+1 queries</tspan>
+        <tspan x="570" dy="18">RPS 937</tspan>
+        <tspan x="570" dy="18">p95 212.85ms</tspan>
+      </text>
+    </g>
+    <g id="node-after">
+      <rect x="460" y="340" width="220" height="120" rx="8" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+      <text x="570" y="371" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#0f172a">After</text>
+      <text x="570" y="395" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#475569">
+        <tspan x="570" dy="0">1 query</tspan>
+        <tspan x="570" dy="18">RPS 1,598</tspan>
+        <tspan x="570" dy="18">p95 149.22ms</tspan>
+      </text>
+    </g>
+    <g id="node-messageDb">
+      <rect x="760" y="220" width="180" height="100" rx="8" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+      <text x="850" y="251" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#0f172a">Message DB</text>
+      <text x="850" y="275" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#475569">
+        <tspan x="850" dy="0">Room</tspan>
+        <tspan x="850" dy="18">Participant</tspan>
+      </text>
+    </g>
+    <g id="node-delivery">
+      <rect x="760" y="380" width="180" height="80" rx="8" fill="#fffbeb" stroke="#b45309" stroke-width="1.6"/>
+      <text x="850" y="411" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#0f172a">Delivery</text>
+      <text x="850" y="435" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#475569">
+        <tspan x="850" dy="0">production/mixed 예정</tspan>
+      </text>
+    </g>
+  </g>
+  <g id="legend">
+    <g transform="translate(40 512)">
+      <line x1="0" y1="10" x2="24" y2="10" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow-sync)"/>
+      <text x="34" y="14" font-family="Arial, sans-serif" font-size="12" fill="#475569">동기 호출</text>
+    </g>
+    <g transform="translate(138 512)">
+      <line x1="0" y1="10" x2="24" y2="10" stroke="#dc2626" stroke-width="1.8" stroke-dasharray="6 5" marker-end="url(#arrow-failure)"/>
+      <text x="34" y="14" font-family="Arial, sans-serif" font-size="12" fill="#475569">실패/복구 경로</text>
+    </g>
+    <g transform="translate(272 512)">
+      <line x1="0" y1="10" x2="24" y2="10" stroke="#f97316" stroke-width="1.8" marker-end="url(#arrow-async)"/>
+      <text x="34" y="14" font-family="Arial, sans-serif" font-size="12" fill="#475569">비동기 경계</text>
+    </g>
+  </g>
 </svg>

@@ -1,16 +1,191 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="900" height="420" viewBox="0 0 900 420" role="img" aria-labelledby="title desc">
-  <title id="title">Billing idempotency webhook ledger architecture</title>
-  <desc id="desc">Tenant billing flow with API key hash, usage idempotency, invoice, webhook duplicate conflict, append-only ledger, audit log.</desc>
-  <rect width="900" height="420" fill="#ffffff"/>
-  <style>.box{fill:#f8fafc;stroke:#0f172a;stroke-width:1.5;rx:8}.tx{fill:#eff6ff;stroke:#1d4ed8;stroke-width:2;rx:8}.source{fill:#ecfdf5;stroke:#047857;stroke-width:2;rx:8}.fail{fill:#fff7ed;stroke:#c2410c;stroke-width:1.7;rx:8}.text{font:600 15px Arial,sans-serif;fill:#0f172a}.small{font:400 12px Arial,sans-serif;fill:#475569}.line{stroke:#334155;stroke-width:1.7;fill:none;marker-end:url(#arrow)}</style>
-  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="#334155"/></marker></defs>
-  <text x="40" y="42" class="text">과금 idempotency / webhook / ledger: 문제 구간 아키텍처</text>
-  <rect x="42" y="128" width="118" height="76" class="box"/><text x="64" y="162" class="text">Tenant</text><text x="64" y="186" class="small">usage 요청</text>
-  <rect x="198" y="128" width="130" height="76" class="tx"/><text x="220" y="162" class="text">API Key</text><text x="220" y="186" class="small">prefix/hash</text>
-  <rect x="366" y="128" width="142" height="76" class="tx"/><text x="388" y="162" class="text">Usage Event</text><text x="388" y="186" class="small">idempotency</text>
-  <rect x="546" y="128" width="118" height="76" class="box"/><text x="568" y="162" class="text">Invoice</text><text x="568" y="186" class="small">scheduler</text>
-  <rect x="704" y="84" width="138" height="76" class="fail"/><text x="726" y="118" class="text">Webhook</text><text x="726" y="142" class="small">duplicate/conflict</text>
-  <rect x="704" y="236" width="138" height="76" class="source"/><text x="726" y="270" class="text">Ledger</text><text x="726" y="294" class="small">append-only</text>
-  <rect x="366" y="266" width="142" height="76" class="source"/><text x="388" y="300" class="text">Audit Log</text><text x="388" y="324" class="small">metadata redaction</text>
-  <path d="M160 166H198" class="line"/><path d="M328 166H366" class="line"/><path d="M508 166H546" class="line"/><path d="M664 153L704 130" class="line"/><path d="M773 160V236" class="line"/><path d="M704 274H508" class="line"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="620" viewBox="0 0 1100 620" role="img" aria-labelledby="billing-idempotency-webhook-ledger-title billing-idempotency-webhook-ledger-desc">
+  <!-- Generated from src/architecture/specs/billing-idempotency-webhook-ledger.ts. Do not edit this SVG directly. -->
+  <title id="billing-idempotency-webhook-ledger-title">과금 idempotency / webhook / ledger: 문제 구간 아키텍처</title>
+  <desc id="billing-idempotency-webhook-ledger-desc">Tenant billing flow with API key hash, usage idempotency, invoice, webhook duplicate conflict, append-only ledger, audit log.</desc>
+  <rect width="1100" height="620" fill="#ffffff"/>
+  <defs>
+    <marker id="arrow-sync" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#334155"/></marker>
+    <marker id="arrow-async" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#f97316"/></marker>
+    <marker id="arrow-failure" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#dc2626"/></marker>
+    <marker id="arrow-replay" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#7c3aed"/></marker>
+  </defs>
+  <g id="background">
+    <text x="40" y="42" text-anchor="start" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#0f172a">과금 idempotency / webhook / ledger: 문제 구간 아키텍처</text>
+  </g>
+  <g id="containers">
+    <g id="container-usage">
+      <rect x="30" y="120" width="1040" height="230" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.2" stroke-dasharray="4 4"/>
+      <text x="44" y="144" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#64748b">Gateway / Usage flow</text>
+    </g>
+    <g id="container-billing">
+      <rect x="30" y="390" width="1040" height="160" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.2" stroke-dasharray="4 4"/>
+      <text x="44" y="414" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#64748b">Billing / Audit flow</text>
+    </g>
+  </g>
+  <g id="edges">
+    <path id="edge-tenant-to-api-key" d="M 180 260 H 220" fill="none" stroke="#334155" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-sync)"/>
+    <path id="edge-api-key-to-gateway" d="M 380 260 H 420" fill="none" stroke="#334155" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-sync)"/>
+    <path id="edge-gateway-to-usage-event" d="M 580 260 H 620" fill="none" stroke="#334155" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-sync)"/>
+    <path id="edge-gateway-to-redis" d="M 500 220 V 200" fill="none" stroke="#334155" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-sync)"/>
+    <path id="edge-usage-event-to-invoice" d="M 700 220 V 200" fill="none" stroke="#f97316" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-async)"/>
+    <path id="edge-invoice-to-postgres" d="M 780 160 H 800 H 940 V 220" fill="none" stroke="#334155" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-sync)"/>
+    <path id="edge-usage-to-postgres" d="M 780 260 H 800 V 270 H 840" fill="none" stroke="#334155" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-sync)"/>
+    <path id="edge-provider-to-webhook" d="M 200 460 H 240" fill="none" stroke="#f97316" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-async)"/>
+    <path id="edge-webhook-to-ledger" d="M 400 460 H 460" fill="none" stroke="#dc2626" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6 5" marker-end="url(#arrow-failure)"/>
+    <path id="edge-ledger-to-sanitizer" d="M 620 460 H 660" fill="none" stroke="#334155" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-sync)"/>
+    <path id="edge-sanitizer-to-audit" d="M 820 460 H 860" fill="none" stroke="#334155" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-sync)"/>
+    <path id="edge-audit-to-postgres" d="M 940 420 V 320" fill="none" stroke="#334155" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-sync)"/>
+  </g>
+  <g id="edge-labels">
+    <g id="edge-label-tenant-to-api-key">
+      <rect x="144" y="179" width="112" height="22" rx="11" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+      <text x="200" y="194" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#475569">X-API-Key</text>
+    </g>
+    <g id="edge-label-api-key-to-gateway">
+      <rect x="354" y="319" width="92" height="22" rx="11" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+      <text x="400" y="334" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#475569">hash 검증</text>
+    </g>
+    <g id="edge-label-gateway-to-usage-event">
+      <rect x="559" y="319" width="82" height="22" rx="11" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+      <text x="600" y="334" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#475569">사용량 기록</text>
+    </g>
+    <g id="edge-label-gateway-to-redis">
+      <rect x="459" y="79" width="122" height="22" rx="11" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+      <text x="520" y="94" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#475569">rate limit</text>
+    </g>
+    <g id="edge-label-usage-event-to-invoice">
+      <rect x="639" y="79" width="122" height="22" rx="11" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+      <text x="700" y="94" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#475569">invoice 집계</text>
+    </g>
+    <g id="edge-label-invoice-to-postgres">
+      <rect x="799" y="169" width="102" height="22" rx="11" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+      <text x="850" y="184" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#475569">정산 기준 저장</text>
+    </g>
+    <g id="edge-label-usage-to-postgres">
+      <rect x="754" y="339" width="112" height="22" rx="11" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+      <text x="810" y="354" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#475569">최종 기준 데이터</text>
+    </g>
+    <g id="edge-label-provider-to-webhook">
+      <rect x="149" y="379" width="142" height="22" rx="11" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+      <text x="220" y="394" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#475569">signature 검증</text>
+    </g>
+    <g id="edge-label-webhook-to-ledger">
+      <rect x="389" y="379" width="82" height="22" rx="11" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+      <text x="430" y="394" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#475569">중복 처리</text>
+    </g>
+    <g id="edge-label-ledger-to-sanitizer">
+      <rect x="589" y="379" width="102" height="22" rx="11" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+      <text x="640" y="394" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#475569">감사 메타데이터</text>
+    </g>
+    <g id="edge-label-sanitizer-to-audit">
+      <rect x="784" y="379" width="112" height="22" rx="11" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+      <text x="840" y="394" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#475569">redaction</text>
+    </g>
+    <g id="edge-label-audit-to-postgres">
+      <rect x="869" y="369" width="142" height="22" rx="11" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+      <text x="940" y="384" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#475569">append audit</text>
+    </g>
+  </g>
+  <g id="nodes">
+    <g id="node-tenant">
+      <rect x="40" y="220" width="140" height="80" rx="8" fill="#f8fafc" stroke="#0f172a" stroke-width="1.5"/>
+      <text x="110" y="251" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#0f172a">Tenant</text>
+      <text x="110" y="275" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#475569">
+        <tspan x="110" dy="0">usage 요청</tspan>
+      </text>
+    </g>
+    <g id="node-apiKey">
+      <rect x="220" y="220" width="160" height="80" rx="8" fill="#eff6ff" stroke="#1d4ed8" stroke-width="2"/>
+      <text x="300" y="251" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#0f172a">API Key</text>
+      <text x="300" y="275" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#475569">
+        <tspan x="300" dy="0">prefix/hash</tspan>
+        <tspan x="300" dy="18">원문 미저장</tspan>
+      </text>
+    </g>
+    <g id="node-usageGateway">
+      <rect x="420" y="220" width="160" height="80" rx="8" fill="#f8fafc" stroke="#0f172a" stroke-width="1.5"/>
+      <text x="500" y="251" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#0f172a">Usage Gateway</text>
+      <text x="500" y="275" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#475569">
+        <tspan x="500" dy="0">retry idempotency</tspan>
+      </text>
+    </g>
+    <g id="node-redis">
+      <rect x="420" y="120" width="160" height="80" rx="8" fill="#f8fafc" stroke="#64748b" stroke-width="1.5"/>
+      <text x="500" y="151" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#0f172a">Redis</text>
+      <text x="500" y="175" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#475569">
+        <tspan x="500" dy="0">rate limit</tspan>
+      </text>
+    </g>
+    <g id="node-invoice">
+      <rect x="620" y="120" width="160" height="80" rx="8" fill="#f8fafc" stroke="#0f172a" stroke-width="1.5"/>
+      <text x="700" y="151" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#0f172a">Invoice</text>
+      <text x="700" y="175" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#475569">
+        <tspan x="700" dy="0">tenant 집계</tspan>
+      </text>
+    </g>
+    <g id="node-usageEvent">
+      <rect x="620" y="220" width="160" height="80" rx="8" fill="#eff6ff" stroke="#1d4ed8" stroke-width="2"/>
+      <text x="700" y="251" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#0f172a">Usage Event</text>
+      <text x="700" y="275" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#475569">
+        <tspan x="700" dy="0">idempotency</tspan>
+      </text>
+    </g>
+    <g id="node-postgres">
+      <rect x="840" y="220" width="200" height="100" rx="8" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+      <text x="940" y="251" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#0f172a">PostgreSQL</text>
+      <text x="940" y="275" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#475569">
+        <tspan x="940" dy="0">Usage / Invoice</tspan>
+        <tspan x="940" dy="18">Ledger / Audit</tspan>
+      </text>
+    </g>
+    <g id="node-provider">
+      <rect x="40" y="420" width="160" height="80" rx="8" fill="#f8fafc" stroke="#0f172a" stroke-width="1.5"/>
+      <text x="120" y="451" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#0f172a">Payment Mock</text>
+      <text x="120" y="475" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#475569">
+        <tspan x="120" dy="0">webhook delivery</tspan>
+      </text>
+    </g>
+    <g id="node-webhook">
+      <rect x="240" y="420" width="160" height="80" rx="8" fill="#fff7ed" stroke="#c2410c" stroke-width="1.7"/>
+      <text x="320" y="451" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#0f172a">Webhook</text>
+      <text x="320" y="475" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#475569">
+        <tspan x="320" dy="0">duplicate/conflict</tspan>
+      </text>
+    </g>
+    <g id="node-ledger">
+      <rect x="460" y="420" width="160" height="80" rx="8" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+      <text x="540" y="451" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#0f172a">Ledger Entry</text>
+      <text x="540" y="475" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#475569">
+        <tspan x="540" dy="0">append-only</tspan>
+      </text>
+    </g>
+    <g id="node-sanitizer">
+      <rect x="660" y="420" width="160" height="80" rx="8" fill="#f8fafc" stroke="#0f172a" stroke-width="1.5"/>
+      <text x="740" y="451" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#0f172a">Audit Sanitizer</text>
+      <text x="740" y="475" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#475569">
+        <tspan x="740" dy="0">metadata redaction</tspan>
+      </text>
+    </g>
+    <g id="node-audit">
+      <rect x="860" y="420" width="160" height="80" rx="8" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+      <text x="940" y="451" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#0f172a">Audit Log</text>
+      <text x="940" y="475" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="#475569">
+        <tspan x="940" dy="0">민감값 제거</tspan>
+      </text>
+    </g>
+  </g>
+  <g id="legend">
+    <g transform="translate(40 572)">
+      <line x1="0" y1="10" x2="24" y2="10" stroke="#334155" stroke-width="1.8" marker-end="url(#arrow-sync)"/>
+      <text x="34" y="14" font-family="Arial, sans-serif" font-size="12" fill="#475569">동기 호출</text>
+    </g>
+    <g transform="translate(138 572)">
+      <line x1="0" y1="10" x2="24" y2="10" stroke="#f97316" stroke-width="1.8" marker-end="url(#arrow-async)"/>
+      <text x="34" y="14" font-family="Arial, sans-serif" font-size="12" fill="#475569">비동기 경계</text>
+    </g>
+    <g transform="translate(248 572)">
+      <line x1="0" y1="10" x2="24" y2="10" stroke="#dc2626" stroke-width="1.8" stroke-dasharray="6 5" marker-end="url(#arrow-failure)"/>
+      <text x="34" y="14" font-family="Arial, sans-serif" font-size="12" fill="#475569">실패/복구 경로</text>
+    </g>
+  </g>
 </svg>

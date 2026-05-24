@@ -9,13 +9,15 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "generate:architecture": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/architecture/generate.ts",
+    "check:architecture": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/architecture/generate.ts --check",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
     "typecheck": "tsc --noEmit --incremental false",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
-    "ci": "npm run format:check && npm run typecheck && npm test && npm run lint && npm run build"
+    "ci": "npm run check:architecture && npm run format:check && npm run typecheck && npm test && npm run lint && npm run build"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",

@@ -60,6 +60,19 @@ SVG 구조도는 `public/architecture/overall`과 `public/architecture/cases`에
 문제-설계-검증 근거를 읽는 순서를 보조합니다. PNG/JPG/WebP 스크린샷이나 근거 없는 운영
 claim은 추가하지 않습니다.
 
+문제 구간 구조도는 raw SVG를 직접 수정하지 않고
+`src/architecture/specs/*.ts`의 nodes/edges 데이터에서 생성합니다.
+
+```bash
+npm run generate:architecture
+npm run check:architecture
+```
+
+전체 아키텍처 SVG(`public/architecture/overall/*.svg`)는 프로젝트 전체 맥락을 보여주는
+수동 문서 자산으로 유지하고, 문제 구간 SVG(`public/architecture/cases/*.svg`)는
+generator output으로 관리합니다. 작성 규칙은
+[`docs/ARCHITECTURE_SVG_RULES.md`](docs/ARCHITECTURE_SVG_RULES.md)에 정리했습니다.
+
 이 다이어그램은 구현된 핵심 흐름과 검증 대상 경계를 설명하기 위한 단순화된 구조도이며,
 운영 배포 토폴로지나 production SLO를 주장하지 않습니다.
 
