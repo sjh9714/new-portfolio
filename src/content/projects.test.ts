@@ -598,7 +598,7 @@ describe("portfolio project content", () => {
     ).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          value: expect.stringContaining("원본 README 기록"),
+          value: expect.stringContaining("현재 재측정 claim 아님"),
         }),
       ]),
     );

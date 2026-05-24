@@ -241,13 +241,12 @@ describe("PDF-style portfolio cases", () => {
       expect.arrayContaining([
         {
           label: "상품 목록 p95 원본 기록",
-          value:
-            "참고 기록 · raw artifact 없음 · 원본 README 기준 p95 1,010ms -> 23ms · 현재 재측정 claim 아님",
+          value: "참고 기록 · raw artifact 없음 · 현재 재측정 claim 아님",
         },
         {
           label: "상품 목록 현재 재측정 snapshot",
           value:
-            "2026-05-23 clean repeat3 local k6: p95 358.1088ms, HTTP failure rate 0, checks 10,683/10,683",
+            "p95 358.1088ms · HTTP failure 0 · checks 10,683/10,683 (local)",
         },
         {
           label: "상품 목록 쿼리 수 원본 기록 + 현재 guard",
