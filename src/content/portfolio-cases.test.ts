@@ -404,7 +404,7 @@ describe("PDF-style portfolio cases", () => {
     });
   });
 
-  it("groups homepage and case index cards by project while sitemap keeps five case routes", () => {
+  it("uses home for four project summaries and case index for five deep-dive choices", () => {
     const homeSource = readFileSync(
       join(process.cwd(), "src/app/page.tsx"),
       "utf8",
@@ -432,12 +432,15 @@ describe("PDF-style portfolio cases", () => {
     expect(homeSource).not.toContain("FocusCard");
     expect(homeSource).not.toContain("proofItems");
     expect(homeSource).not.toContain("<ProjectRow");
-    expect(caseIndexSource).toContain('title="대표 프로젝트 4개"');
-    expect(caseIndexSource).toContain("featuredProjectGroups");
-    expect(caseIndexSource).not.toContain("{featuredPortfolioCases.map(");
+    expect(caseIndexSource).toContain('title="문제 해결 Deep Dive 5개"');
+    expect(caseIndexSource).toContain("featuredPortfolioCases.map");
+    expect(caseIndexSource).not.toContain("PortfolioProjectGroupCard");
+    expect(caseIndexSource).not.toContain("featuredProjectGroups");
     expect(caseIndexSource).not.toContain("priority={index === 0}");
+    expect(caseIndexSource).toContain("portfolioCase.evidence.find");
+    expect(caseIndexSource).toContain('status === "measured"');
     expect(caseIndexSource).toContain(
-      "4개 대표 백엔드 레포에서 뽑은 문제 해결 경험입니다. 같은 프로젝트에서 나온 사례라도 문제 구간과 면접 질문이 다르면 별도 deep dive로 분리했습니다.",
+      "5개 문제 해결 deep dive를 고르는 목록입니다.",
     );
     expect(sitemapSource).toContain("featuredPortfolioCases");
   });
@@ -460,14 +463,14 @@ describe("PDF-style portfolio cases", () => {
       "utf8",
     );
 
-    expect(groupCardSource).toContain("문제 해결 Deep Dive");
+    expect(groupCardSource).toContain("Deep Dive");
     expect(groupCardSource).toContain("group.primaryEvidence");
-    expect(groupCardSource).toContain("group.primaryEvidence.slice(0, 2)");
-    expect(groupCardSource).toContain("line-clamp-1");
+    expect(groupCardSource).toContain("getHomeEvidencePreview");
+    expect(groupCardSource).toContain("group.primaryEvidence.slice(0, 1)");
+    expect(groupCardSource).toContain('"상품 목록 현재 재측정 snapshot"');
+    expect(groupCardSource).not.toContain("group.description");
+    expect(groupCardSource).not.toContain("caseLink.summary");
     expect(groupCardSource).toContain("caseLink.actionLabel");
-    expect(groupCardSource).toContain(
-      'variant={index === 0 ? "default" : "outline"}',
-    );
     expect(groupCardSource).not.toContain("priority");
     expect(groupCardSource).not.toContain("md:col-span-2");
     expect(portfolioCaseSource).toContain("Deep Dive");

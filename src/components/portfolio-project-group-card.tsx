@@ -11,10 +11,10 @@ export function PortfolioProjectGroupCard({
 }: {
   group: FeaturedProjectGroup;
 }) {
-  const primaryEvidencePreview = group.primaryEvidence.slice(0, 2);
+  const primaryEvidencePreview = getHomeEvidencePreview(group);
 
   return (
-    <article className="border-border bg-card flex h-full flex-col gap-5 border p-5">
+    <article className="border-border bg-card flex h-full flex-col gap-4 border p-5">
       <div className="flex flex-col gap-3">
         <div className="flex flex-wrap gap-2">
           <Badge variant="outline" className="rounded-md">
@@ -31,39 +31,10 @@ export function PortfolioProjectGroupCard({
             {group.title}
           </h3>
           <p className="text-primary text-sm font-semibold">{group.subtitle}</p>
-          <p className="text-muted-foreground text-sm leading-6">
-            {group.description}
-          </p>
         </div>
       </div>
 
       <div className="flex flex-col gap-3">
-        <p className="text-muted-foreground text-xs font-semibold tracking-[0.16em] uppercase">
-          문제 해결 Deep Dive
-        </p>
-        <div className="grid gap-3">
-          {group.caseLinks.map((caseLink, index) => (
-            <div
-              key={caseLink.caseSlug}
-              className="border-border bg-background flex flex-col gap-3 rounded-md border p-4"
-            >
-              <div className="flex flex-wrap items-center gap-2">
-                <Badge variant="outline" className="rounded-md">
-                  Deep Dive {index + 1}/{group.caseLinks.length}
-                </Badge>
-                <h4 className="text-foreground text-sm font-semibold [overflow-wrap:anywhere]">
-                  {caseLink.label}
-                </h4>
-              </div>
-              <p className="text-muted-foreground text-sm leading-6 [overflow-wrap:anywhere]">
-                <span className="line-clamp-1">{caseLink.summary}</span>
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-2">
         <p className="text-muted-foreground text-xs font-semibold tracking-[0.16em] uppercase">
           대표 근거
         </p>
@@ -95,14 +66,12 @@ export function PortfolioProjectGroupCard({
             </Badge>
           ))}
         </div>
+        <p className="text-muted-foreground text-xs font-semibold tracking-[0.16em] uppercase">
+          Deep Dive
+        </p>
         <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-          {group.caseLinks.map((caseLink, index) => (
-            <Button
-              key={caseLink.caseSlug}
-              asChild
-              variant={index === 0 ? "default" : "outline"}
-              size="sm"
-            >
+          {group.caseLinks.map((caseLink) => (
+            <Button key={caseLink.caseSlug} asChild variant="outline" size="sm">
               <Link href={`/case-studies/${caseLink.caseSlug}`}>
                 <FileText data-icon="inline-start" aria-hidden="true" />
                 {caseLink.actionLabel}
@@ -119,4 +88,18 @@ export function PortfolioProjectGroupCard({
       </div>
     </article>
   );
+}
+
+function getHomeEvidencePreview(group: FeaturedProjectGroup) {
+  if (group.projectSlug === "borrow-me") {
+    const currentSnapshot = group.primaryEvidence.find(
+      (evidence) => evidence.label === "상품 목록 현재 재측정 snapshot",
+    );
+
+    return currentSnapshot
+      ? [currentSnapshot]
+      : group.primaryEvidence.slice(0, 1);
+  }
+
+  return group.primaryEvidence.slice(0, 1);
 }

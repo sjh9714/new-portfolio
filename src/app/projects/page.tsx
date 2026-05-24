@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 /* eslint-disable @next/next/no-img-element -- Project architecture thumbnails are static SVG documentation assets. */
 import Link from "next/link";
 
-import { ProjectRow } from "@/components/project-card";
 import { SectionHeader } from "@/components/section-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -186,7 +185,7 @@ export default function ProjectsPage() {
 
       <ProjectRowSection
         title="추가 프로젝트"
-        description="대표 사례를 보완하는 팀 협업, 제품 구현, 캐싱, AI 서비스 경험입니다."
+        description="대표 사례를 보완하는 팀 협업, 제품 구현, 캐싱, AI 서비스 경험을 compact하게 정리합니다."
         projects={supportingAdditionalProjects}
       />
 
@@ -212,14 +211,43 @@ function ProjectRowSection({
     <section className="flex flex-col gap-4">
       <SectionHeader title={title} description={description} />
       <div className="border-border border-y">
-        <div className="text-muted-foreground hidden grid-cols-[1.1fr_2fr_1.2fr_auto] gap-4 border-b py-3 text-xs font-semibold tracking-[0.16em] uppercase lg:grid">
+        <div className="text-muted-foreground hidden grid-cols-[1.1fr_1.1fr_1.2fr_auto] gap-4 border-b py-3 text-xs font-semibold tracking-[0.16em] uppercase lg:grid">
           <span>프로젝트</span>
-          <span>핵심 결과</span>
+          <span>도메인</span>
           <span>기술</span>
           <span>링크</span>
         </div>
         {projects.map((project) => (
-          <ProjectRow key={project.slug} project={project} />
+          <article
+            key={project.slug}
+            id={project.slug}
+            className="border-border grid gap-4 border-b py-5 last:border-b-0 lg:grid-cols-[1.1fr_1.1fr_1.2fr_auto] lg:items-center"
+          >
+            <div>
+              <h3 className="text-foreground font-semibold">{project.title}</h3>
+              <p className="text-muted-foreground text-sm leading-6">
+                {project.subtitle}
+              </p>
+            </div>
+            <p className="text-muted-foreground text-sm">{project.domain}</p>
+            <div className="flex flex-wrap gap-2">
+              {project.primaryTechStack.slice(0, 5).map((tech) => (
+                <Badge key={tech} variant="outline" className="rounded-md">
+                  {tech}
+                </Badge>
+              ))}
+            </div>
+            <Button asChild variant="ghost" size="sm">
+              <a
+                href={project.repoUrl}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={`${project.title} GitHub`}
+              >
+                GitHub
+              </a>
+            </Button>
+          </article>
         ))}
       </div>
     </section>
