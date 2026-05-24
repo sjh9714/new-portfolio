@@ -277,7 +277,7 @@ export const billingIdempotencyWebhookLedgerSpec = {
       toPort: "bottom",
       label: "append audit",
       kind: "sync",
-      labelPosition: { x: 940, y: 380 },
+      labelPosition: { x: 990, y: 370 },
     },
   ],
 } satisfies DiagramSpec;

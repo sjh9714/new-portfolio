@@ -108,12 +108,12 @@ export const borrowmeProductListNPlusOneSpec = {
       fromPort: "right",
       toPort: "left",
       via: [
-        { x: 430, y: 260 },
-        { x: 430, y: 180 },
+        { x: 440, y: 260 },
+        { x: 440, y: 180 },
       ],
       label: "반복 조회",
       kind: "failure",
-      labelPosition: { x: 430, y: 90 },
+      labelPosition: { x: 470, y: 260 },
     },
     {
       id: "api-to-after",
@@ -122,8 +122,8 @@ export const borrowmeProductListNPlusOneSpec = {
       fromPort: "right",
       toPort: "left",
       via: [
-        { x: 430, y: 260 },
-        { x: 430, y: 400 },
+        { x: 440, y: 260 },
+        { x: 440, y: 400 },
       ],
       label: "조회 경로 재구성",
       kind: "sync",

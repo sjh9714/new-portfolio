@@ -82,8 +82,8 @@
       <text x="840" y="394" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#475569">redaction</text>
     </g>
     <g id="edge-label-audit-to-postgres">
-      <rect x="869" y="369" width="142" height="22" rx="11" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
-      <text x="940" y="384" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#475569">append audit</text>
+      <rect x="919" y="359" width="142" height="22" rx="11" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+      <text x="990" y="374" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#475569">append audit</text>
     </g>
   </g>
   <g id="nodes">

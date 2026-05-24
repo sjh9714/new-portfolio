@@ -28,8 +28,8 @@
   </g>
   <g id="edges">
     <path id="edge-client-to-api" d="M 200 260 H 240" fill="none" stroke="#334155" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-sync)"/>
-    <path id="edge-api-to-before" d="M 400 260 H 430 V 180 H 460" fill="none" stroke="#dc2626" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6 5" marker-end="url(#arrow-failure)"/>
-    <path id="edge-api-to-after" d="M 400 260 H 430 V 400 H 460" fill="none" stroke="#334155" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-sync)"/>
+    <path id="edge-api-to-before" d="M 400 260 H 440 V 180 H 460" fill="none" stroke="#dc2626" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6 5" marker-end="url(#arrow-failure)"/>
+    <path id="edge-api-to-after" d="M 400 260 H 440 V 400 H 460" fill="none" stroke="#334155" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-sync)"/>
     <path id="edge-before-to-db" d="M 680 180 H 720 V 270 H 760" fill="none" stroke="#dc2626" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6 5" marker-end="url(#arrow-failure)"/>
     <path id="edge-after-to-db" d="M 680 400 H 720 V 270 H 760" fill="none" stroke="#334155" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-sync)"/>
     <path id="edge-after-to-delivery" d="M 680 400 H 720 V 420 H 760" fill="none" stroke="#f97316" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-async)"/>
@@ -40,8 +40,8 @@
       <text x="220" y="194" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#475569">조회 요청</text>
     </g>
     <g id="edge-label-api-to-before">
-      <rect x="379" y="79" width="102" height="22" rx="11" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
-      <text x="430" y="94" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#475569">기존 반복 조회</text>
+      <rect x="419" y="249" width="102" height="22" rx="11" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+      <text x="470" y="264" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#475569">기존 반복 조회</text>
     </g>
     <g id="edge-label-api-to-after">
       <rect x="374" y="489" width="112" height="22" rx="11" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
