@@ -1257,11 +1257,12 @@ export const featuredPortfolioCases: PortfolioCase[] = [
   },
   {
     slug: "borrowme-product-list-n-plus-one",
-    title: "상품 목록 조회 N+1 개선 원본 기록을 현재 query-count guard로 검증",
+    title:
+      "상품 목록 조회 N+1 개선 기록과 현재 query-count guard를 분리해 검증",
     projectSlug: "borrow-me",
     domain: "대여 서비스 / 조회 성능",
     resumeLine:
-      "BorrowMe 상품 목록 조회 N+1 개선 원본 기록과 현재 clean repeat3 snapshot을 분리하고, query-count guard와 예약 정합성 테스트로 회귀를 검증했습니다.",
+      "BorrowMe 상품 목록 조회 N+1 개선 기록과 현재 clean repeat3 snapshot을 분리하고, query-count guard와 예약 정합성 테스트로 회귀를 검증했습니다.",
     architectureSummary: {
       sourceOfTruth: "Product / Image / Reservation DB",
       transactionBoundary: "읽기 전용 조회 경로",
@@ -1295,7 +1296,7 @@ export const featuredPortfolioCases: PortfolioCase[] = [
       "원본 README 기록 기준 상품 목록 p95 응답 시간은 1,010ms에서 23ms로 개선됐습니다.",
       "2026-05-23 clean repeat3 local k6 snapshot에서는 p95 358.1088ms, HTTP failure rate 0을 기록했습니다.",
       "원본 README 기록과 현재 query-count guard 기준 쿼리 수는 201회에서 3회로 정리됩니다.",
-      "동시 예약 재고 초과 방지, follow lookup SQL 1회, 인증 상품 목록 팔로우 여부 응답, ranking data path SQL 5회 이하, ranking model assembly SQL 6회 이하, exercise hashtag SQL 1회, Flyway baseline schema validation을 시나리오로 검증했습니다.",
+      "현재 repo에서는 query-count guard와 예약 정합성 테스트로 조회 경로와 재고 정합성 회귀를 검증했습니다.",
     ],
     evidence: evidenceSet("borrow-me", [
       "상품 목록 p95 원본 기록",
@@ -1320,7 +1321,7 @@ export const featuredPortfolioCases: PortfolioCase[] = [
       scenarios: [
         {
           label: "상품 목록 p95 원본 기록",
-          value: "참고 기록 · raw artifact 없음 · 현재 측정 완료 claim 아님",
+          value: "raw artifact 없음 · 현재 측정 완료 claim 아님",
         },
         {
           label: "상품 목록 현재 재측정 snapshot",

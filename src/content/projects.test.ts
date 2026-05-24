@@ -237,6 +237,9 @@ describe("portfolio project content", () => {
     expect(gitignoreSource).toContain("feedback.md");
     expect(trackedFiles).not.toMatch(/(^|\/)feedback\.md$/m);
     expect(trackedFiles).not.toMatch(/(^|\/)fb[^/]*\.txt$/m);
+    expect(trackedFiles).not.toMatch(/^feedback\.md$/m);
+    expect(trackedFiles).not.toMatch(/^fb[^/]*\.txt$/m);
+    expect(trackedFiles).not.toMatch(/^public\/feedback\.md$/m);
     expect(trackedFiles).not.toMatch(/^public\/fb[^/]*\.txt$/m);
   });
 
@@ -562,7 +565,7 @@ describe("portfolio project content", () => {
         expect.objectContaining({
           label: "상품 목록 p95 원본 기록",
           status: "pending",
-          value: "참고 기록 · raw artifact 없음 · 현재 측정 완료 claim 아님",
+          value: "raw artifact 없음 · 현재 측정 완료 claim 아님",
         }),
         expect.objectContaining({
           label: "상품 목록 현재 재측정 snapshot",

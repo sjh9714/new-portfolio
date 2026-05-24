@@ -281,16 +281,16 @@ describe("PDF-style portfolio cases", () => {
     expect(outboxCase?.measurement?.executionEnvironment).toBeUndefined();
   });
 
-  it("keeps the BorrowMe resume line compact while preserving detailed guards in the case body", () => {
+  it("keeps the BorrowMe resume line compact without expanding guard details in results", () => {
     const borrowMeCase = getPortfolioCaseBySlug(
       "borrowme-product-list-n-plus-one",
     );
 
     expect(borrowMeCase?.resumeLine).toBe(
-      "BorrowMe 상품 목록 조회 N+1 개선 원본 기록과 현재 clean repeat3 snapshot을 분리하고, query-count guard와 예약 정합성 테스트로 회귀를 검증했습니다.",
+      "BorrowMe 상품 목록 조회 N+1 개선 기록과 현재 clean repeat3 snapshot을 분리하고, query-count guard와 예약 정합성 테스트로 회귀를 검증했습니다.",
     );
     expect(borrowMeCase?.resumeLine).not.toContain("Flyway baseline");
-    expect(borrowMeCase?.result.join(" ")).toContain(
+    expect(borrowMeCase?.result.join(" ")).not.toContain(
       "Flyway baseline schema validation",
     );
   });
@@ -372,7 +372,7 @@ describe("PDF-style portfolio cases", () => {
       expect.arrayContaining([
         {
           label: "상품 목록 p95 원본 기록",
-          value: "참고 기록 · raw artifact 없음 · 현재 측정 완료 claim 아님",
+          value: "raw artifact 없음 · 현재 측정 완료 claim 아님",
         },
         {
           label: "상품 목록 현재 재측정 snapshot",
@@ -445,17 +445,31 @@ describe("PDF-style portfolio cases", () => {
     const borrowMeCase = getPortfolioCaseBySlug(
       "borrowme-product-list-n-plus-one",
     );
+    const borrowMePayload = JSON.stringify(borrowMeCase);
+    const borrowMeResult = JSON.stringify(borrowMeCase?.result ?? []);
 
-    expect(borrowMeCase?.title).toContain("원본 기록");
-    expect(borrowMeCase?.resumeLine).toContain("원본 기록");
-    expect(borrowMeCase?.resumeLine).toContain("현재 clean repeat3 snapshot");
-    expect(JSON.stringify(borrowMeCase)).toContain("현재 query-count guard");
-    expect(JSON.stringify(borrowMeCase)).toContain("현재 guard");
-    expect(JSON.stringify(borrowMeCase)).toContain("원본 기록");
-    expect(JSON.stringify(borrowMeCase)).toContain(
-      "참고 기록 · raw artifact 없음",
+    expect(borrowMeCase?.title).toContain(
+      "개선 기록과 현재 query-count guard를 분리",
     );
-    expect(JSON.stringify(borrowMeCase)).not.toContain(
+    expect(borrowMeCase?.title).not.toContain(
+      "원본 기록을 현재 query-count guard로 검증",
+    );
+    expect(borrowMeCase?.resumeLine).toContain("개선 기록");
+    expect(borrowMeCase?.resumeLine).toContain("현재 clean repeat3 snapshot");
+    expect(borrowMePayload).toContain("현재 query-count guard");
+    expect(borrowMePayload).toContain("현재 guard");
+    expect(borrowMePayload).toContain("원본 기록");
+    expect(borrowMePayload).toContain(
+      "raw artifact 없음 · 현재 측정 완료 claim 아님",
+    );
+    expect(borrowMePayload).not.toContain("참고 기록 · raw artifact 없음");
+    expect(borrowMePayload).not.toContain("참고 기록 · 참고 기록");
+    expect(borrowMeResult).not.toContain("follow lookup");
+    expect(borrowMeResult).not.toContain("ranking data path");
+    expect(borrowMeResult).not.toContain("ranking model assembly");
+    expect(borrowMeResult).not.toContain("exercise hashtag");
+    expect(borrowMeResult).not.toContain("Flyway baseline schema validation");
+    expect(borrowMePayload).not.toContain(
       "상품 목록 p95 응답 시간을 1,010ms에서 23ms로 개선했습니다.",
     );
   });
