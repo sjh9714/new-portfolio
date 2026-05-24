@@ -115,6 +115,7 @@ describe("PDF-style portfolio cases", () => {
         portfolioCase.architectureSummary.sourceOfTruth ??
           portfolioCase.architectureSummary.designReason,
       ).toBeTruthy();
+      expect(portfolioCase.problemArchitecture.caption.trim()).toBeTruthy();
       expect(portfolioCase.limitations.length).toBeGreaterThan(0);
       expect(portfolioCase.interviewQuestions.length).toBeGreaterThan(0);
     }
@@ -580,15 +581,18 @@ describe("PDF-style portfolio cases", () => {
     }
   });
 
-  it("keeps portfolio case architecture focused on SVG, reading guide, and summary", () => {
+  it("keeps portfolio case architecture focused on SVG, caption, and optional key decisions", () => {
     const diagramSource = readFileSync(
       join(process.cwd(), "src/components/portfolio-case-diagram.tsx"),
       "utf8",
     );
 
     expect(diagramSource).toContain("ArchitectureFigure");
-    expect(diagramSource).toContain("그림 읽는 법");
-    expect(diagramSource).toContain("아키텍처 판단 요약");
+    expect(diagramSource).toContain("핵심 설계 판단");
+    expect(diagramSource).toContain("keyArchitectureDecisions");
+    expect(diagramSource).not.toContain("그림 읽는 법");
+    expect(diagramSource).not.toContain("범례");
+    expect(diagramSource).not.toContain("아키텍처 판단 요약");
     expect(diagramSource).not.toContain("<table");
     expect(diagramSource).not.toContain("<details");
     expect(diagramSource).not.toContain("<summary");
@@ -674,10 +678,6 @@ describe("PDF-style portfolio cases", () => {
       );
       expect(portfolioCase.problemArchitecture?.alt.trim()).toBeTruthy();
       expect(portfolioCase.problemArchitecture?.caption.trim()).toBeTruthy();
-      expect(
-        portfolioCase.problemArchitecture?.readingGuide.length,
-      ).toBeGreaterThan(0);
-
       const publicPath = portfolioCase.problemArchitecture?.imageSrc.replace(
         /^\//,
         "",
@@ -742,7 +742,7 @@ describe("PDF-style portfolio cases", () => {
     }
   });
 
-  it("renders SVG architecture figure before the reading guide and architecture summary", () => {
+  it("renders SVG architecture figure before optional key decisions without generic guide or legend text", () => {
     const diagramSource = readFileSync(
       join(process.cwd(), "src/components/portfolio-case-diagram.tsx"),
       "utf8",
@@ -757,12 +757,13 @@ describe("PDF-style portfolio cases", () => {
 
     expect(diagramSource).toContain("문제 구간 아키텍처");
     expect(diagramSource).toContain("ArchitectureFigure");
+    expect(diagramSource).toContain("핵심 설계 판단");
     expect(diagramSource.indexOf("ArchitectureFigure")).toBeLessThan(
-      diagramSource.indexOf("그림 읽는 법"),
+      diagramSource.indexOf("핵심 설계 판단"),
     );
-    expect(diagramSource.indexOf("그림 읽는 법")).toBeLessThan(
-      diagramSource.indexOf("아키텍처 판단 요약"),
-    );
+    expect(diagramSource).not.toContain("그림 읽는 법");
+    expect(diagramSource).not.toContain("범례");
+    expect(diagramSource).not.toContain("아키텍처 판단 요약");
     expect(diagramSource).not.toContain("흐름 세부");
     expect(diagramSource).not.toContain("구성 요소 설명");
     expect(figureSource).toContain("<img");
@@ -833,20 +834,57 @@ describe("PDF-style portfolio cases", () => {
     expect(visualSource).not.toContain("getStep");
   });
 
-  it("keeps diagram legend semantic without node or flow detail sections", () => {
+  it("removes generic diagram guide and legend sections while keeping compact key decisions", () => {
     const diagramSource = readFileSync(
       join(process.cwd(), "src/components/portfolio-case-diagram.tsx"),
       "utf8",
     );
 
     expect(diagramSource).toContain("문제 구간 아키텍처");
-    expect(diagramSource).toContain("아키텍처 판단 요약");
-    expect(diagramSource).toContain('aria-label="구조도 범례"');
-    expect(diagramSource).toContain("·");
+    expect(diagramSource).toContain("핵심 설계 판단");
+    expect(diagramSource).not.toContain("그림 읽는 법");
+    expect(diagramSource).not.toContain("범례");
+    expect(diagramSource).not.toContain("아키텍처 판단 요약");
+    expect(diagramSource).not.toContain('aria-label="구조도 범례"');
     expect(diagramSource).not.toContain("<details");
     expect(diagramSource).not.toContain("<summary");
     expect(diagramSource).not.toContain("구성 요소 설명");
     expect(diagramSource).not.toContain("흐름 세부");
+  });
+
+  it("keeps key architecture decisions only on cases where they add signal", () => {
+    expect(
+      getPortfolioCaseBySlug("concert-seat-overselling-consistency")
+        ?.keyArchitectureDecisions,
+    ).toEqual([
+      "PostgreSQL을 좌석/예약의 최종 기준 데이터로 둡니다.",
+      "Queue Token은 대기열 우회 요청을 제한하고, Idempotency-Key와 Seat Lock은 Reservation Tx 안에서 처리합니다.",
+      "Redis stock은 빠른 조회/제어용이며, 불일치는 DB 기준 reconciliation 대상으로 둡니다.",
+    ]);
+    expect(
+      getPortfolioCaseBySlug("concert-outbox-dlt-recovery")
+        ?.keyArchitectureDecisions,
+    ).toEqual([
+      "도메인 변경과 Outbox Insert를 같은 DB transaction에 기록합니다.",
+      "Outbox는 exactly-once 보장이 아니라, 발행 의도를 복구 가능하게 남기는 장치입니다.",
+      "중복 소비는 consumer idempotency로 흡수하고, 자동 복구 실패는 DEAD/manual replay로 분리합니다.",
+    ]);
+    expect(
+      getPortfolioCaseBySlug("billing-idempotency-webhook-ledger")
+        ?.keyArchitectureDecisions,
+    ).toEqual([
+      "API Key raw value는 1회만 반환하고, DB에는 prefix/hash만 저장합니다.",
+      "Usage와 webhook 중복 요청은 예외가 아니라 정상 입력으로 처리합니다.",
+      "Usage Event, Invoice, Append-only Ledger, Audit Log를 과금 판단의 최종 기준 데이터로 둡니다.",
+    ]);
+    expect(
+      getPortfolioCaseBySlug("chat-room-n-plus-one-rps")
+        ?.keyArchitectureDecisions,
+    ).toBeUndefined();
+    expect(
+      getPortfolioCaseBySlug("borrowme-product-list-n-plus-one")
+        ?.keyArchitectureDecisions,
+    ).toBeUndefined();
   });
 
   it("shows compact project-level architecture summaries on projects page", () => {

@@ -133,6 +133,7 @@ export type PortfolioCase = {
   domain: string;
   resumeLine: string;
   architectureSummary: PortfolioArchitectureSummary;
+  keyArchitectureDecisions?: string[];
   problemArchitecture: PortfolioProblemArchitecture;
   problem: string[];
   solution: string[];
@@ -196,11 +197,16 @@ export const featuredPortfolioCases: PortfolioCase[] = [
       designReason:
         "Redis는 빠른 경합 제어와 대기열에는 적합하지만 최종 기준 데이터로 두면 복구 기준이 흐려지므로 PostgreSQL을 최종 기준 데이터로 유지했습니다.",
     },
+    keyArchitectureDecisions: [
+      "PostgreSQL을 좌석/예약의 최종 기준 데이터로 둡니다.",
+      "Queue Token은 대기열 우회 요청을 제한하고, Idempotency-Key와 Seat Lock은 Reservation Tx 안에서 처리합니다.",
+      "Redis stock은 빠른 조회/제어용이며, 불일치는 DB 기준 reconciliation 대상으로 둡니다.",
+    ],
     problemArchitecture: {
       imageSrc: "/architecture/cases/concert-seat-overselling-consistency.svg",
       alt: "동일 좌석 예매 경합에서 Queue token, Reservation transaction, Outbox, Kafka, DLT, PostgreSQL 복구 기준을 연결한 문제 구간 아키텍처",
       caption:
-        "동일 좌석 요청을 트랜잭션 경계와 비동기 발행 경계로 나누고 PostgreSQL을 좌석/예약의 최종 기준 데이터로 둔 구조입니다.",
+        "동일 좌석 경합에서 Queue Token, Reservation Tx, PostgreSQL 최종 기준 데이터, Redis 보조 상태를 분리한 구조입니다.",
       sourceFile:
         "public/architecture/cases/concert-seat-overselling-consistency.svg",
       readingGuide: [
@@ -496,11 +502,16 @@ export const featuredPortfolioCases: PortfolioCase[] = [
       designReason:
         "DB commit과 Kafka publish를 하나의 원자적 작업으로 보장할 수 없기 때문에 이벤트 발행 의도를 DB에 먼저 남겼습니다.",
     },
+    keyArchitectureDecisions: [
+      "도메인 변경과 Outbox Insert를 같은 DB transaction에 기록합니다.",
+      "Outbox는 exactly-once 보장이 아니라, 발행 의도를 복구 가능하게 남기는 장치입니다.",
+      "중복 소비는 consumer idempotency로 흡수하고, 자동 복구 실패는 DEAD/manual replay로 분리합니다.",
+    ],
     problemArchitecture: {
       imageSrc: "/architecture/cases/concert-outbox-dlt-recovery.svg",
       alt: "DB commit 이후 Kafka 발행 실패를 Outbox relay, DLT, DEAD, manual replay로 분리한 복구 아키텍처",
       caption:
-        "도메인 DB commit과 Kafka publish 사이의 원자성 한계를 Outbox 상태와 DLT/manual replay 경로로 분리한 구조입니다.",
+        "DB commit과 Kafka publish 사이의 실패 구간을 Outbox 상태, DLT, manual replay로 분리한 구조입니다.",
       sourceFile: "public/architecture/cases/concert-outbox-dlt-recovery.svg",
       readingGuide: [
         "왼쪽 transaction은 도메인 변경과 Outbox insert가 함께 commit되는 구간입니다.",
@@ -781,7 +792,7 @@ export const featuredPortfolioCases: PortfolioCase[] = [
       imageSrc: "/architecture/cases/chat-room-n-plus-one-rps.svg",
       alt: "채팅방 조회 API의 2N+1 쿼리 경로를 1회 조회 경로로 줄인 Before/After 아키텍처",
       caption:
-        "실시간 delivery claim과 분리해 측정된 채팅방 조회 API의 N+1 제거 구간만 Before/After로 보여주는 구조입니다.",
+        "채팅방 목록 조회에서 반복 쿼리로 증가하던 DB 접근 경로를 1회 조회/projection 경로로 줄인 Before/After 구조입니다.",
       sourceFile: "public/architecture/cases/chat-room-n-plus-one-rps.svg",
       readingGuide: [
         "왼쪽 Before는 채팅방 수에 따라 room, last message, read state 조회가 반복되는 경로입니다.",
@@ -995,11 +1006,16 @@ export const featuredPortfolioCases: PortfolioCase[] = [
       designReason:
         "과금 시스템은 중복 요청과 webhook 재전송이 정상 입력이므로 중복을 예외가 아니라 설계 대상으로 처리했습니다.",
     },
+    keyArchitectureDecisions: [
+      "API Key raw value는 1회만 반환하고, DB에는 prefix/hash만 저장합니다.",
+      "Usage와 webhook 중복 요청은 예외가 아니라 정상 입력으로 처리합니다.",
+      "Usage Event, Invoice, Append-only Ledger, Audit Log를 과금 판단의 최종 기준 데이터로 둡니다.",
+    ],
     problemArchitecture: {
       imageSrc: "/architecture/cases/billing-idempotency-webhook-ledger.svg",
       alt: "멀티테넌트 과금에서 API key hash 인증, usage idempotency, invoice, webhook duplicate/conflict, append-only ledger를 연결한 아키텍처",
       caption:
-        "tenant 경계 안에서 usage 중복 처리와 webhook 재전송을 설계 대상으로 보고 append-only ledger와 audit log로 이어지는 구조입니다.",
+        "API Key 인증, usage idempotency, webhook duplicate/conflict, append-only ledger를 tenant 경계 안에서 검증한 구조입니다.",
       sourceFile:
         "public/architecture/cases/billing-idempotency-webhook-ledger.svg",
       readingGuide: [
@@ -1273,7 +1289,7 @@ export const featuredPortfolioCases: PortfolioCase[] = [
       imageSrc: "/architecture/cases/borrowme-product-list-n-plus-one.svg",
       alt: "BorrowMe 상품 목록 API의 201회 조회 원본 기록과 현재 3회 query-count guard를 분리한 Before/After 아키텍처",
       caption:
-        "원본 README 성능 기록과 현재 repository query-count guard를 분리해 상품 목록 조회 병목 개선 구간을 보여주는 구조입니다.",
+        "상품 목록 조회의 원본 N+1 개선 기록과 현재 query-count guard를 분리해 보여주는 Before/After 구조입니다.",
       sourceFile:
         "public/architecture/cases/borrowme-product-list-n-plus-one.svg",
       readingGuide: [
