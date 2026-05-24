@@ -7,11 +7,10 @@ import { SectionHeader } from "@/components/section-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
+  featuredProjectGroups,
   featuredPortfolioCases,
-  getFeaturedPortfolioProjectGroups,
   getSupportingProjects,
   projectArchitectureSummaries,
-  type PortfolioCase,
 } from "@/content/portfolio-cases";
 import {
   additionalProjects,
@@ -33,16 +32,6 @@ const visibleProjectArchitectureSummaries = projectArchitectureSummaries.filter(
       summary.projectSlug as (typeof visibleArchitectureSummaryProjectSlugs)[number],
     ),
 );
-const featuredPortfolioProjectGroups = getFeaturedPortfolioProjectGroups();
-const projectCaseLinkLabels: Record<string, string> = {
-  "concert-seat-overselling-consistency": "좌석 오버셀링 0건 검증",
-  "concert-outbox-dlt-recovery": "Outbox/DLT 이벤트 복구",
-};
-
-function getProjectCaseLinkLabel(portfolioCase: PortfolioCase) {
-  return projectCaseLinkLabels[portfolioCase.slug] ?? portfolioCase.title;
-}
-
 export const metadata: Metadata = {
   title: "프로젝트",
   description:
@@ -58,11 +47,11 @@ export default function ProjectsPage() {
       />
       <section className="flex flex-col gap-5">
         <SectionHeader
-          title="대표 프로젝트 4개에서 확장한 문제 해결 사례 5개"
+          title="대표 프로젝트 4개"
           description="프로젝트 단위로 먼저 보고, 각 레포에서 확장한 문제 해결 deep dive로 바로 이동할 수 있게 묶었습니다."
         />
         <div className="grid gap-4 md:grid-cols-2">
-          {featuredPortfolioProjectGroups.map(({ project, cases }) => (
+          {featuredProjectGroups.map(({ project, caseLinks }) => (
             <article
               key={project.slug}
               className="border-border bg-card flex h-full flex-col gap-5 border p-5"
@@ -72,9 +61,9 @@ export default function ProjectsPage() {
                   <Badge variant="outline" className="rounded-md">
                     대표 프로젝트
                   </Badge>
-                  {cases.length > 1 ? (
+                  {caseLinks.length > 1 ? (
                     <Badge variant="outline" className="rounded-md">
-                      Deep Dive {cases.length}개
+                      Deep Dive {caseLinks.length}개
                     </Badge>
                   ) : null}
                 </div>
@@ -91,13 +80,13 @@ export default function ProjectsPage() {
                   연결된 문제 해결 사례
                 </p>
                 <ul className="flex flex-col gap-2">
-                  {cases.map((portfolioCase) => (
-                    <li key={portfolioCase.slug}>
+                  {caseLinks.map((caseLink) => (
+                    <li key={caseLink.caseSlug}>
                       <Link
-                        href={`/case-studies/${portfolioCase.slug}`}
+                        href={`/case-studies/${caseLink.caseSlug}`}
                         className="text-foreground hover:text-primary inline-flex text-sm leading-6 font-semibold underline-offset-4 hover:underline"
                       >
-                        {getProjectCaseLinkLabel(portfolioCase)}
+                        {caseLink.label}
                       </Link>
                     </li>
                   ))}

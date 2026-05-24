@@ -1465,6 +1465,27 @@ export type ProjectArchitectureSummary = {
   flow: string;
 };
 
+export type FeaturedProjectGroupCase = {
+  caseSlug: string;
+  label: string;
+  summary: string;
+  actionLabel: string;
+};
+
+export type FeaturedProjectGroup = {
+  projectSlug: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  caseSlugs: string[];
+  cases: PortfolioCase[];
+  caseLinks: FeaturedProjectGroupCase[];
+  primaryEvidence: ProjectEvidence[];
+  techStack: string[];
+  repoUrl: string;
+  project: Project;
+};
+
 export const projectArchitectureSummaries: ProjectArchitectureSummary[] = [
   {
     projectSlug: "concert-booking",
@@ -1501,6 +1522,87 @@ export const featuredPortfolioProjectSlugs = Array.from(
   ),
 );
 
+const featuredProjectGroupDefinitions = [
+  {
+    projectSlug: "concert-booking",
+    description:
+      "동일 좌석 경합과 DB commit 이후 Kafka 발행 실패를 각각 동시성 정합성, 이벤트 복구 deep dive로 분리했습니다.",
+    caseLinks: [
+      {
+        caseSlug: "concert-seat-overselling-consistency",
+        label: "좌석 오버셀링 0건 검증",
+        summary:
+          "동일 좌석 100개 동시 요청에서 success 1, fail 99, overselling 0",
+        actionLabel: "좌석 정합성 보기",
+      },
+      {
+        caseSlug: "concert-outbox-dlt-recovery",
+        label: "Outbox/DLT 이벤트 복구",
+        summary:
+          "DB commit 이후 Kafka 발행 실패를 Outbox·DLT·수동 재처리로 복구 가능한 상태로 설계",
+        actionLabel: "Outbox/DLT 보기",
+      },
+    ],
+    primaryEvidenceLabels: ["동일 좌석 경합", "Testcontainers 검증 시나리오"],
+  },
+  {
+    projectSlug: "realtime-chat",
+    description:
+      "실시간 채팅 전체 구조보다 채팅방 조회 API의 N+1 제거와 조회 성능 개선 구간을 대표 deep dive로 분리했습니다.",
+    caseLinks: [
+      {
+        caseSlug: "chat-room-n-plus-one-rps",
+        label: "채팅방 조회 API N+1 제거",
+        summary: "RPS 937→1,598, p95 212.85ms→149.22ms, query 2N+1→1",
+        actionLabel: "조회 성능 개선 보기",
+      },
+    ],
+    primaryEvidenceLabels: [
+      "채팅방 조회 API RPS",
+      "p95 응답 시간",
+      "N+1 쿼리 제거",
+    ],
+  },
+  {
+    projectSlug: "ai-usage-billing-gateway",
+    description:
+      "멀티테넌트 과금 흐름에서 API Key 저장, 사용량 중복 처리, Webhook 중복 처리를 하나의 정합성 deep dive로 묶었습니다.",
+    caseLinks: [
+      {
+        caseSlug: "billing-idempotency-webhook-ledger",
+        label: "과금 idempotency / webhook / ledger 검증",
+        summary:
+          "API Key hash 저장, usage idempotency, webhook duplicate/conflict, append-only ledger invariant 검증",
+        actionLabel: "과금 정합성 보기",
+      },
+    ],
+    primaryEvidenceLabels: [
+      "API Key 저장 방식",
+      "사용량 중복 처리",
+      "Webhook 중복 처리",
+    ],
+  },
+  {
+    projectSlug: "borrow-me",
+    description:
+      "팀 프로젝트의 상품 목록 N+1 개선 원본 기록과 현재 query-count guard, clean repeat3 snapshot을 분리해 보여줍니다.",
+    caseLinks: [
+      {
+        caseSlug: "borrowme-product-list-n-plus-one",
+        label: "상품 목록 N+1 개선과 현재 guard 분리 검증",
+        summary:
+          "원본 기록과 현재 재측정 snapshot을 섞지 않고 query-count guard로 조회 경로 회귀를 방지",
+        actionLabel: "조회 성능 개선 보기",
+      },
+    ],
+    primaryEvidenceLabels: [
+      "상품 목록 p95 원본 기록",
+      "상품 목록 현재 재측정 snapshot",
+      "상품 목록 쿼리 수 원본 기록 + 현재 guard",
+    ],
+  },
+] as const;
+
 export function getPortfolioCasesByProjectSlug(projectSlug: string) {
   return featuredPortfolioCases.filter(
     (portfolioCase) => portfolioCase.projectSlug === projectSlug,
@@ -1524,11 +1626,38 @@ export function getPortfolioCaseProjectBadge(portfolioCase: PortfolioCase) {
   return `${project.title} · Deep Dive ${deepDiveIndex + 1}/${projectCases.length}`;
 }
 
+export const featuredProjectGroups: FeaturedProjectGroup[] =
+  featuredProjectGroupDefinitions.map((group) => {
+    const project = requireProject(group.projectSlug);
+    const cases = group.caseLinks.map((caseLink) => {
+      const portfolioCase = getPortfolioCaseBySlug(caseLink.caseSlug);
+
+      if (!portfolioCase) {
+        throw new Error(`Missing portfolio case: ${caseLink.caseSlug}`);
+      }
+
+      return portfolioCase;
+    });
+
+    return {
+      projectSlug: group.projectSlug,
+      title: project.title,
+      subtitle: project.subtitle,
+      description: group.description,
+      caseSlugs: group.caseLinks.map((caseLink) => caseLink.caseSlug),
+      cases,
+      caseLinks: [...group.caseLinks],
+      primaryEvidence: group.primaryEvidenceLabels.map((label) =>
+        requireEvidence(group.projectSlug, label),
+      ),
+      techStack: project.primaryTechStack,
+      repoUrl: project.repoUrl,
+      project,
+    };
+  });
+
 export function getFeaturedPortfolioProjectGroups() {
-  return featuredPortfolioProjectSlugs.map((projectSlug) => ({
-    project: requireProject(projectSlug),
-    cases: getPortfolioCasesByProjectSlug(projectSlug),
-  }));
+  return featuredProjectGroups;
 }
 
 export function isFeaturedPortfolioProject(projectSlug: string) {

@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
 import {
+  featuredProjectGroups,
   featuredPortfolioCases,
   featuredPortfolioProjectSlugs,
   getFeaturedPortfolioProjectGroups,
@@ -75,10 +76,28 @@ describe("PDF-style portfolio cases", () => {
       "Concert Booking · Deep Dive 2/2",
     );
     expect(projectGroups).toHaveLength(4);
+    expect(featuredProjectGroups).toHaveLength(4);
     expect(
       projectGroups.find((group) => group.project.slug === "concert-booking")
         ?.cases,
     ).toEqual([firstConcertCase, secondConcertCase]);
+    expect(
+      projectGroups.find((group) => group.projectSlug === "concert-booking")
+        ?.caseSlugs,
+    ).toEqual([
+      "concert-seat-overselling-consistency",
+      "concert-outbox-dlt-recovery",
+    ]);
+    for (const group of projectGroups.filter(
+      (item) => item.projectSlug !== "concert-booking",
+    )) {
+      expect(group.caseSlugs).toHaveLength(1);
+    }
+    for (const group of projectGroups) {
+      expect(group.primaryEvidence.length).toBeGreaterThan(0);
+      expect(group.techStack).toEqual(group.project.primaryTechStack);
+      expect(group.repoUrl).toBe(group.project.repoUrl);
+    }
   });
 
   it("structures every case as problem, solution, result, and evidence", () => {
@@ -370,7 +389,7 @@ describe("PDF-style portfolio cases", () => {
     });
   });
 
-  it("points the homepage and sitemap at portfolio cases, not featured projects", () => {
+  it("groups homepage and case index cards by project while sitemap keeps five case routes", () => {
     const homeSource = readFileSync(
       join(process.cwd(), "src/app/page.tsx"),
       "utf8",
@@ -387,20 +406,21 @@ describe("PDF-style portfolio cases", () => {
     expect(homeSource).toContain(
       "이 포트폴리오는 이력서에 한 줄로 압축한 문제 해결 경험을 구조도, 문제 원인, 해결 과정, 검증 결과로 확장한 문서입니다.",
     );
-    expect(homeSource).toContain(
-      "대표 프로젝트 4개에서 확장한 문제 해결 사례 5개",
-    );
-    expect(homeSource).toContain("featuredPortfolioCases");
-    expect(caseIndexSource).toContain("featuredPortfolioCases");
+    expect(homeSource).toContain('title="대표 프로젝트 4개"');
+    expect(homeSource).toContain("featuredProjectGroups");
+    expect(homeSource).not.toContain("{featuredPortfolioCases.map(");
+    expect(caseIndexSource).toContain('title="대표 프로젝트 4개"');
+    expect(caseIndexSource).toContain("featuredProjectGroups");
+    expect(caseIndexSource).not.toContain("{featuredPortfolioCases.map(");
     expect(caseIndexSource).toContain(
-      "4개 대표 백엔드 레포에서 뽑은 5개 문제 해결 사례입니다. 같은 프로젝트에서 나온 사례라도 문제 구간이 다르면 별도 deep dive로 분리했습니다.",
+      "4개 대표 백엔드 레포에서 뽑은 문제 해결 경험입니다. 같은 프로젝트에서 나온 사례라도 문제 구간과 면접 질문이 다르면 별도 deep dive로 분리했습니다.",
     );
     expect(sitemapSource).toContain("featuredPortfolioCases");
   });
 
   it("shows deep-dive badges and grouped project/resume views for duplicate project cases", () => {
-    const cardSource = readFileSync(
-      join(process.cwd(), "src/components/portfolio-case-card.tsx"),
+    const groupCardSource = readFileSync(
+      join(process.cwd(), "src/components/portfolio-project-group-card.tsx"),
       "utf8",
     );
     const portfolioCaseSource = readFileSync(
@@ -416,11 +436,15 @@ describe("PDF-style portfolio cases", () => {
       "utf8",
     );
 
-    expect(cardSource).toContain("getPortfolioCaseProjectBadge");
+    expect(groupCardSource).toContain("문제 해결 Deep Dive");
+    expect(groupCardSource).toContain("group.primaryEvidence");
     expect(portfolioCaseSource).toContain("Deep Dive");
-    expect(projectSource).toContain("getFeaturedPortfolioProjectGroups");
-    expect(projectSource).toContain("좌석 오버셀링 0건 검증");
-    expect(projectSource).toContain("Outbox/DLT 이벤트 복구");
+    expect(portfolioCaseSource).toContain("featuredProjectGroups");
+    expect(portfolioCaseSource).toContain("좌석 오버셀링 0건 검증");
+    expect(portfolioCaseSource).toContain("Outbox/DLT 이벤트 복구");
+    expect(projectSource).toContain("featuredProjectGroups");
+    expect(projectSource).toContain("caseLinks.map");
+    expect(projectSource).toContain("caseLink.label");
     expect(resumeSource).toContain("getFeaturedPortfolioProjectGroups");
     expect(resumeSource).toContain("<ul");
     expect(resumeSource).toContain("resumeLine");

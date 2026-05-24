@@ -14,13 +14,13 @@ import Link from "next/link";
 
 import { EvidenceMatrix } from "@/components/evidence-matrix";
 import { FocusCard } from "@/components/focus-card";
-import { PortfolioCaseCard } from "@/components/portfolio-case-card";
+import { PortfolioProjectGroupCard } from "@/components/portfolio-project-group-card";
 import { ProjectRow } from "@/components/project-card";
 import { SectionHeader } from "@/components/section-header";
 import { StatusBadge } from "@/components/status-badge";
 import { Button } from "@/components/ui/button";
 import {
-  featuredPortfolioCases,
+  featuredProjectGroups,
   getSupportingProjects,
 } from "@/content/portfolio-cases";
 import { additionalProjects, getProjectBySlug } from "@/content/projects";
@@ -233,31 +233,22 @@ export default function Home() {
       <div className="mx-auto flex max-w-7xl flex-col gap-16 px-5 py-12 md:px-8 md:py-16">
         <section className="flex flex-col gap-6">
           <SectionHeader
-            title="대표 프로젝트 4개에서 확장한 문제 해결 사례 5개"
-            description="4개 대표 백엔드 레포에서 뽑은 5개 문제 해결 deep dive를 문제 구간별로 분리해 먼저 읽히도록 구성했습니다."
+            title="대표 프로젝트 4개"
+            description="이력서에 압축한 문제 해결 경험을 프로젝트 단위로 묶고, 필요한 경우 별도 deep dive로 확장했습니다. Concert Booking은 동시성 정합성과 이벤트 복구를 각각 별도 문제 구간으로 나눠 설명합니다."
             action={
               <Button asChild variant="ghost">
                 <Link href="/case-studies">전체 사례 보기</Link>
               </Button>
             }
           />
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {featuredPortfolioCases.map((portfolioCase, index) => {
-              const project = getProjectBySlug(portfolioCase.projectSlug);
-
-              if (!project) {
-                return null;
-              }
-
-              return (
-                <PortfolioCaseCard
-                  key={portfolioCase.slug}
-                  portfolioCase={portfolioCase}
-                  project={project}
-                  rank={index + 1}
-                />
-              );
-            })}
+          <div className="grid gap-4 md:grid-cols-2">
+            {featuredProjectGroups.map((group, index) => (
+              <PortfolioProjectGroupCard
+                key={group.projectSlug}
+                group={group}
+                priority={index === 0}
+              />
+            ))}
           </div>
         </section>
 
