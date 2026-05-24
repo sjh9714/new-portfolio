@@ -1,7 +1,4 @@
-import {
-  PortfolioCaseDiagram,
-  PortfolioCaseDiagramDetails,
-} from "@/components/portfolio-case-diagram";
+import { PortfolioCaseDiagram } from "@/components/portfolio-case-diagram";
 import { StatusBadge } from "@/components/status-badge";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -57,17 +54,15 @@ export function CaseStudyArticle({
 
           <EvidenceSection portfolioCase={portfolioCase} />
 
-          <PortfolioCaseDiagramDetails portfolioCase={portfolioCase} />
-
-          <FoldedContentSection title="상세 구현">
-            <OrderedList items={portfolioCase.implementationDetails} />
-          </FoldedContentSection>
+          <ImplementationPointSection portfolioCase={portfolioCase} />
 
           {portfolioCase.stateTransitions?.length ? (
             <StateTransitionTable
               transitions={portfolioCase.stateTransitions}
             />
           ) : null}
+
+          <GitHubEvidenceLink project={project} />
         </section>
 
         <CaseStudySidebar portfolioCase={portfolioCase} project={project} />
@@ -97,19 +92,12 @@ function SummaryBlock({ title, items }: { title: string; items: string[] }) {
 }
 
 function EvidenceSection({ portfolioCase }: { portfolioCase: PortfolioCase }) {
-  const scenarios = portfolioCase.measurement?.scenarios ?? [];
-  const executionEnvironment =
-    portfolioCase.measurement?.executionEnvironment ?? [];
   const primaryEvidence = portfolioCase.primaryEvidenceLabels
     ? selectEvidenceByLabels(portfolioCase, portfolioCase.primaryEvidenceLabels)
     : portfolioCase.evidence;
   const referenceEvidence = selectEvidenceByLabels(
     portfolioCase,
     portfolioCase.referenceEvidenceLabels ?? [],
-  );
-  const additionalEvidence = selectEvidenceByLabels(
-    portfolioCase,
-    portfolioCase.additionalEvidenceLabels ?? [],
   );
 
   return (
@@ -119,39 +107,14 @@ function EvidenceSection({ portfolioCase }: { portfolioCase: PortfolioCase }) {
       </div>
 
       {referenceEvidence.length ? (
-        <FoldedContentSection
-          title={portfolioCase.referenceEvidenceTitle ?? "참고 기록"}
-          nested
-        >
-          <div className="grid gap-3">
-            {referenceEvidence.map((evidence) =>
-              renderEvidenceCard(evidence, { badgeLabel: "참고 기록" }),
-            )}
-          </div>
-        </FoldedContentSection>
-      ) : null}
-
-      {additionalEvidence.length ? (
-        <FoldedContentSection
-          title={portfolioCase.additionalEvidenceTitle ?? "추가 검증 보기"}
-          nested
-        >
-          <div className="grid gap-3">
-            {additionalEvidence.map((evidence) => renderEvidenceCard(evidence))}
-          </div>
-        </FoldedContentSection>
-      ) : null}
-
-      {scenarios.length ? (
-        <FoldedContentSection title="측정 시나리오" nested>
-          <MeasurementList items={scenarios} />
-        </FoldedContentSection>
-      ) : null}
-
-      {executionEnvironment.length ? (
-        <FoldedContentSection title="실행 환경" nested>
-          <MeasurementList items={executionEnvironment} />
-        </FoldedContentSection>
+        <div className="grid gap-3">
+          {referenceEvidence.map((evidence) =>
+            renderReferenceEvidence(
+              evidence,
+              portfolioCase.referenceEvidenceTitle ?? "참고 기록",
+            ),
+          )}
+        </div>
       ) : null}
     </ContentSection>
   );
@@ -204,6 +167,43 @@ function renderEvidenceCard(
   );
 }
 
+function renderReferenceEvidence(evidence: ProjectEvidence, title: string) {
+  return renderEvidenceCard(evidence, { badgeLabel: title });
+}
+
+function ImplementationPointSection({
+  portfolioCase,
+}: {
+  portfolioCase: PortfolioCase;
+}) {
+  if (!portfolioCase.implementationDetails.length) {
+    return null;
+  }
+
+  return (
+    <ContentSection title="구현 포인트">
+      <div className="border-border bg-card rounded-md border p-5">
+        <OrderedList items={portfolioCase.implementationDetails.slice(0, 3)} />
+      </div>
+    </ContentSection>
+  );
+}
+
+function GitHubEvidenceLink({ project }: { project: Project }) {
+  return (
+    <section className="border-border bg-card flex flex-col gap-3 rounded-md border p-5">
+      <p className="text-muted-foreground text-sm leading-6">
+        세부 테스트, guard, raw artifact는 GitHub README와 docs에 정리했습니다.
+      </p>
+      <Button asChild className="w-fit">
+        <a href={project.repoUrl} target="_blank" rel="noreferrer">
+          GitHub 근거 보기
+        </a>
+      </Button>
+    </section>
+  );
+}
+
 function CaseStudySidebar({
   portfolioCase,
   project,
@@ -236,31 +236,10 @@ function CaseStudySidebar({
 
       <Button asChild className="w-full">
         <a href={project.repoUrl} target="_blank" rel="noreferrer">
-          GitHub 저장소
+          GitHub 근거 보기
         </a>
       </Button>
     </aside>
-  );
-}
-
-function MeasurementList({
-  items,
-}: {
-  items: { label: string; value: string }[];
-}) {
-  return (
-    <div className="border-border bg-card rounded-md border p-4">
-      <dl className="grid gap-3">
-        {items.map((item) => (
-          <div key={item.label} className="grid gap-1 sm:grid-cols-[160px_1fr]">
-            <dt className="text-primary text-sm font-semibold">{item.label}</dt>
-            <dd className="text-muted-foreground text-sm leading-6 [overflow-wrap:anywhere]">
-              {item.value}
-            </dd>
-          </div>
-        ))}
-      </dl>
-    </div>
   );
 }
 
@@ -270,7 +249,7 @@ function StateTransitionTable({
   transitions: NonNullable<PortfolioCase["stateTransitions"]>;
 }) {
   return (
-    <FoldedContentSection title="Outbox 상태 전이">
+    <ContentSection title="Outbox 상태 전이">
       <div className="border-border overflow-hidden rounded-md border">
         <table className="w-full border-collapse text-left text-sm">
           <thead className="bg-card text-muted-foreground">
@@ -306,7 +285,7 @@ function StateTransitionTable({
           </tbody>
         </table>
       </div>
-    </FoldedContentSection>
+    </ContentSection>
   );
 }
 
@@ -324,31 +303,6 @@ function ContentSection({
       </h2>
       {children}
     </section>
-  );
-}
-
-function FoldedContentSection({
-  title,
-  children,
-  nested = false,
-}: {
-  title: string;
-  children: React.ReactNode;
-  nested?: boolean;
-}) {
-  return (
-    <details
-      className={
-        nested
-          ? "border-border bg-card mt-4 rounded-md border p-4"
-          : "border-border bg-card rounded-md border p-5"
-      }
-    >
-      <summary className="text-foreground cursor-pointer font-semibold">
-        {title}
-      </summary>
-      <div className="mt-4">{children}</div>
-    </details>
   );
 }
 

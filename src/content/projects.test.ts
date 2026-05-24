@@ -299,11 +299,12 @@ describe("portfolio project content", () => {
 
     expect(caseStudySource).toContain("lg:sticky");
     expect(caseStudySource).toContain("검증 근거");
-    expect(caseStudySource).toContain("측정 시나리오");
+    expect(caseStudySource).not.toContain("측정 시나리오");
+    expect(caseStudySource).toContain("구현 포인트");
     expect(caseStudySource).toContain("기술 스택");
     expect(caseStudySource).toContain("한계와 다음 검증");
     expect(caseStudySource).toContain("예상 면접 질문");
-    expect(caseStudySource).toContain("GitHub 저장소");
+    expect(caseStudySource).toContain("GitHub 근거 보기");
     expect(caseStudySource).not.toContain('SidebarSection title="근거"');
     expect(caseStudySource).not.toContain('SidebarSection title="측정 환경"');
     expect(caseStudySource).not.toContain(

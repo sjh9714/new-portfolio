@@ -528,6 +528,10 @@ export const featuredPortfolioCases: PortfolioCase[] = [
       "결제/만료 race·중복 요청·대기열 abuse 검증",
       "혼합 부하 테스트",
     ]),
+    primaryEvidenceLabels: [
+      "Testcontainers 검증 시나리오",
+      "결제/만료 race·중복 요청·대기열 abuse 검증",
+    ],
     measurement: {
       scenarios: [
         {
@@ -819,18 +823,6 @@ export const featuredPortfolioCases: PortfolioCase[] = [
       "p95 응답 시간",
       "N+1 쿼리 제거",
     ],
-    additionalEvidenceTitle: "추가 WebSocket delivery 검증 보기",
-    additionalEvidenceLabels: [
-      "메시지 전달 지연 시간 로컬 스냅샷",
-      "WebSocket 전달 완전성 로컬 스냅샷",
-      "Room-global ordering 로컬 진단",
-      "Receiver matrix by-room guard",
-      "Mixed HTTP probe artifact 분리 검산",
-      "Mixed traffic local scenario",
-      "Delivery evidence validator",
-      "Mixed traffic p95 latency",
-      "Production delivery benchmark",
-    ],
     measurement: {
       scenarios: [
         {
@@ -870,10 +862,8 @@ export const featuredPortfolioCases: PortfolioCase[] = [
     },
     implementationDetails: [
       "조회 성능 사례는 WebSocket delivery 성능과 분리해 API 병목 개선으로 설명합니다.",
-      "roomId 기반 Kafka ordering, Redis presence, reconnect sync는 프로젝트 맥락으로 연결하되 local snapshot과 반복 benchmark의 경계를 분리합니다.",
-      "10 rooms x 50 users mixed traffic local scenario는 WebSocket drain 뒤 HTTP probe를 분리해 receiver denominator와 HTTP 실패율을 함께 검산합니다.",
-      "delivery evidence validator는 manifest, raw JSONL, regenerated summary, byRoom coverage를 대조해 artifact 승격 전 claim boundary를 확인합니다.",
-      "면접에서는 N+1 제거 방식과 실시간 전달 지연 측정 계획을 나눠 답변할 수 있게 구성합니다.",
+      "채팅방 목록 조회는 N+1 제거와 fetch/projection 전략을 중심으로 답변할 수 있게 정리했습니다.",
+      "WebSocket delivery와 mixed traffic 세부 artifact는 GitHub README/docs 근거로 분리했습니다.",
     ],
     limitations: [
       "50/500/1,000-user receiver matrix는 local scenario evidence이므로 production/mixed benchmark나 운영 성능 주장으로 사용하지 않습니다.",
@@ -1055,24 +1045,10 @@ export const featuredPortfolioCases: PortfolioCase[] = [
       "Refund reversal ledger",
       "혼합 사용량 부하 테스트",
     ],
-    additionalEvidenceTitle: "추가 검증 보기",
-    additionalEvidenceLabels: [
-      "Append-only Ledger 불변성",
-      "Quota reservation",
-      "Monthly invoice scheduler",
-      "Full mixed smoke readiness guard",
-      "Full mixed capture rollup guard",
-      "Low-cardinality outcome counters",
-      "Audit metadata sanitizer",
-      "운영 성능 주장",
-    ],
     implementationDetails: [
       "tenant isolation은 organization 단위 경계와 API Key 인증 흐름으로 설명합니다.",
       "중복 요청은 예외가 아니라 정상 입력으로 보고 request hash mismatch 같은 conflict를 별도로 다룹니다.",
-      "quota_counters reservation, monthly invoice scheduler, refund reversal ledger는 통합 테스트로 시나리오 검증하되 운영 compliance claim과 분리합니다.",
-      "gateway request/rate-limit, idempotency conflict, webhook conflict, ledger group counter는 low-cardinality outcome metric으로만 기록하고 운영 dashboard claim과 분리합니다.",
-      "K6_REQUIRE_OPTIONAL_PATHS=true full mixed repeat3는 gateway/usage/invoice/webhook branch가 모두 실행되는지 확인하고, production benchmark와 분리합니다.",
-      "capture-summary.json rollup은 반복 capture의 guard 통과 여부와 branch count를 묶고, p95/RPS는 raw summary artifact와 별도 evidence 문서에서 확인합니다.",
+      "quota, scheduler, audit/counter guard 세부는 GitHub README/docs 근거로 분리했습니다.",
     ],
     limitations: [
       "invoice scheduler, quota reservation, refund reversal ledger는 시나리오 검증 상태이며 회계 compliance claim은 하지 않습니다.",
@@ -1340,15 +1316,6 @@ export const featuredPortfolioCases: PortfolioCase[] = [
     ],
     referenceEvidenceTitle: "참고 기록",
     referenceEvidenceLabels: ["상품 목록 p95 원본 기록"],
-    additionalEvidenceTitle: "추가 guard 보기",
-    additionalEvidenceLabels: [
-      "Follow lookup query-count guard",
-      "Authenticated product-list follow-aware guard",
-      "Ranking data path query-count guard",
-      "Ranking HTTP model assembly guard",
-      "Exercise hashtag query-count guard",
-      "Flyway baseline validation",
-    ],
     measurement: {
       scenarios: [
         {
@@ -1398,7 +1365,7 @@ export const featuredPortfolioCases: PortfolioCase[] = [
     implementationDetails: [
       "이 사례는 백엔드 기본기인 조회 병목 발견과 N+1 제거를 대표 사례로 분리합니다.",
       "팀 프로젝트 맥락은 협업과 의사결정 설명에 쓰고, 수치는 원본 기록과 현재 query-count guard의 경계를 함께 표시합니다.",
-      "Flyway baseline validation은 현재 schema를 재현하는 baseline 검증으로만 설명하고, 과거 운영 migration history 복원 claim과 분리합니다.",
+      "follow/ranking/Flyway guard 세부는 GitHub README/docs 근거로 분리했습니다.",
     ],
     limitations: [
       "p95 1,010ms→23ms와 쿼리 201회→3회는 원본 README 기록이며, raw artifact가 없어 현재 재측정값처럼 주장하지 않습니다.",

@@ -134,7 +134,7 @@ describe("PDF-style portfolio cases", () => {
     }
   });
 
-  it("keeps noisy evidence folded behind case-specific evidence groups", () => {
+  it("keeps detail evidence focused on representative claims", () => {
     const realtime = getPortfolioCaseBySlug("chat-room-n-plus-one-rps");
     const billing = getPortfolioCaseBySlug(
       "billing-idempotency-webhook-ledger",
@@ -146,20 +146,8 @@ describe("PDF-style portfolio cases", () => {
       "p95 응답 시간",
       "N+1 쿼리 제거",
     ]);
-    expect(realtime?.additionalEvidenceTitle).toBe(
-      "추가 WebSocket delivery 검증 보기",
-    );
-    expect(realtime?.additionalEvidenceLabels).toEqual([
-      "메시지 전달 지연 시간 로컬 스냅샷",
-      "WebSocket 전달 완전성 로컬 스냅샷",
-      "Room-global ordering 로컬 진단",
-      "Receiver matrix by-room guard",
-      "Mixed HTTP probe artifact 분리 검산",
-      "Mixed traffic local scenario",
-      "Delivery evidence validator",
-      "Mixed traffic p95 latency",
-      "Production delivery benchmark",
-    ]);
+    expect(realtime?.additionalEvidenceTitle).toBeUndefined();
+    expect(realtime?.additionalEvidenceLabels).toBeUndefined();
 
     expect(billing?.primaryEvidenceLabels).toEqual([
       "API Key 저장 방식",
@@ -168,17 +156,8 @@ describe("PDF-style portfolio cases", () => {
       "Refund reversal ledger",
       "혼합 사용량 부하 테스트",
     ]);
-    expect(billing?.additionalEvidenceTitle).toBe("추가 검증 보기");
-    expect(billing?.additionalEvidenceLabels).toEqual([
-      "Append-only Ledger 불변성",
-      "Quota reservation",
-      "Monthly invoice scheduler",
-      "Full mixed smoke readiness guard",
-      "Full mixed capture rollup guard",
-      "Low-cardinality outcome counters",
-      "Audit metadata sanitizer",
-      "운영 성능 주장",
-    ]);
+    expect(billing?.additionalEvidenceTitle).toBeUndefined();
+    expect(billing?.additionalEvidenceLabels).toBeUndefined();
 
     expect(borrowMe?.primaryEvidenceLabels).toEqual([
       "상품 목록 현재 재측정 snapshot",
@@ -189,18 +168,19 @@ describe("PDF-style portfolio cases", () => {
     expect(borrowMe?.referenceEvidenceLabels).toEqual([
       "상품 목록 p95 원본 기록",
     ]);
-    expect(borrowMe?.additionalEvidenceTitle).toBe("추가 guard 보기");
-    expect(borrowMe?.additionalEvidenceLabels).toEqual([
-      "Follow lookup query-count guard",
-      "Authenticated product-list follow-aware guard",
-      "Ranking data path query-count guard",
-      "Ranking HTTP model assembly guard",
-      "Exercise hashtag query-count guard",
-      "Flyway baseline validation",
-    ]);
+    expect(borrowMe?.additionalEvidenceTitle).toBeUndefined();
+    expect(borrowMe?.additionalEvidenceLabels).toBeUndefined();
+
+    for (const portfolioCase of featuredPortfolioCases) {
+      const primaryEvidenceLabels =
+        portfolioCase.primaryEvidenceLabels ??
+        portfolioCase.evidence.map((evidence) => evidence.label);
+
+      expect(primaryEvidenceLabels.length).toBeLessThanOrEqual(5);
+    }
   });
 
-  it("renders primary evidence, reference records, and folded evidence separately", () => {
+  it("renders primary evidence and compact reference records without noisy folded evidence", () => {
     const caseStudySource = readFileSync(
       join(process.cwd(), "src/components/case-study-article.tsx"),
       "utf8",
@@ -208,13 +188,15 @@ describe("PDF-style portfolio cases", () => {
 
     expect(caseStudySource).toContain("primaryEvidenceLabels");
     expect(caseStudySource).toContain("referenceEvidenceLabels");
-    expect(caseStudySource).toContain("additionalEvidenceLabels");
     expect(caseStudySource).toContain("referenceEvidenceTitle");
-    expect(caseStudySource).toContain("additionalEvidenceTitle");
     expect(caseStudySource).toContain("참고 기록");
+    expect(caseStudySource).toContain("renderReferenceEvidence");
     expect(caseStudySource).toContain("renderEvidenceCard");
     expect(caseStudySource).toContain("badgeLabel");
-    expect(caseStudySource).toContain("FoldedContentSection");
+    expect(caseStudySource).not.toContain("additionalEvidenceLabels");
+    expect(caseStudySource).not.toContain("additionalEvidenceTitle");
+    expect(caseStudySource).not.toContain("추가 guard 보기");
+    expect(caseStudySource).not.toContain("추가 검증 보기");
   });
 
   it("does not render placeholder measurement environment rows", () => {
@@ -584,19 +566,20 @@ describe("PDF-style portfolio cases", () => {
     }
   });
 
-  it("renders portfolio case flow as a readable table instead of edge cards", () => {
+  it("keeps portfolio case architecture focused on SVG, reading guide, and summary", () => {
     const diagramSource = readFileSync(
       join(process.cwd(), "src/components/portfolio-case-diagram.tsx"),
       "utf8",
     );
 
-    expect(diagramSource).toContain("<table");
-    expect(diagramSource).toContain("<details");
-    expect(diagramSource).toContain("<summary");
-    expect(diagramSource).toContain("From");
-    expect(diagramSource).toContain("To");
-    expect(diagramSource).toContain("설명");
-    expect(diagramSource).toContain("표식");
+    expect(diagramSource).toContain("ArchitectureFigure");
+    expect(diagramSource).toContain("그림 읽는 법");
+    expect(diagramSource).toContain("아키텍처 판단 요약");
+    expect(diagramSource).not.toContain("<table");
+    expect(diagramSource).not.toContain("<details");
+    expect(diagramSource).not.toContain("<summary");
+    expect(diagramSource).not.toContain("흐름 세부");
+    expect(diagramSource).not.toContain("구성 요소 설명");
     expect(diagramSource).not.toContain("FlowMobileField");
     expect(diagramSource).not.toContain("md:hidden");
     expect(diagramSource).not.toContain("hidden overflow-x-auto");
@@ -714,7 +697,7 @@ describe("PDF-style portfolio cases", () => {
     );
   });
 
-  it("keeps TSX visual diagram data while case details render the SVG architecture first", () => {
+  it("keeps TSX visual diagram data while case details render only the SVG architecture summary", () => {
     const diagramSource = readFileSync(
       join(process.cwd(), "src/components/portfolio-case-diagram.tsx"),
       "utf8",
@@ -724,10 +707,11 @@ describe("PDF-style portfolio cases", () => {
       "utf8",
     );
 
-    expect(diagramSource).toContain("흐름 세부");
-    expect(diagramSource).toContain("<table");
     expect(diagramSource).toContain("ArchitectureFigure");
     expect(diagramSource).not.toContain("PortfolioCaseVisualDiagram");
+    expect(diagramSource).not.toContain("흐름 세부");
+    expect(diagramSource).not.toContain("구성 요소 설명");
+    expect(diagramSource).not.toContain("<table");
     expect(visualSource).toContain("한눈에 보는 아키텍처");
     expect(visualSource).toContain("<figure");
     expect(visualSource).toContain("<figcaption");
@@ -744,7 +728,7 @@ describe("PDF-style portfolio cases", () => {
     }
   });
 
-  it("renders SVG architecture figure before the reading guide and flow detail table", () => {
+  it("renders SVG architecture figure before the reading guide and architecture summary", () => {
     const diagramSource = readFileSync(
       join(process.cwd(), "src/components/portfolio-case-diagram.tsx"),
       "utf8",
@@ -765,12 +749,8 @@ describe("PDF-style portfolio cases", () => {
     expect(diagramSource.indexOf("그림 읽는 법")).toBeLessThan(
       diagramSource.indexOf("아키텍처 판단 요약"),
     );
-    expect(diagramSource.indexOf("<ArchitectureSummary")).toBeLessThan(
-      diagramSource.indexOf("흐름 세부"),
-    );
-    expect(diagramSource.indexOf("흐름 세부")).toBeLessThan(
-      diagramSource.indexOf("구성 요소 설명"),
-    );
+    expect(diagramSource).not.toContain("흐름 세부");
+    expect(diagramSource).not.toContain("구성 요소 설명");
     expect(figureSource).toContain("<img");
     expect(figureSource).toContain("overflow-x-auto");
     expect(figureSource).toContain("min-w");
@@ -792,28 +772,23 @@ describe("PDF-style portfolio cases", () => {
       articleSource.indexOf("<EvidenceSection"),
     );
     expect(articleSource).toContain('<ContentSection title="검증 근거">');
-    expect(articleSource).toContain(
-      '<FoldedContentSection title="측정 시나리오" nested>',
-    );
-    expect(articleSource).toContain('<FoldedContentSection title="상세 구현">');
+    expect(articleSource).toContain('<ContentSection title="구현 포인트">');
+    expect(articleSource).toContain("slice(0, 3)");
+    expect(articleSource).not.toContain("측정 시나리오");
+    expect(articleSource).not.toContain("상세 구현");
+    expect(articleSource).not.toContain("실행 환경");
+    expect(articleSource).not.toContain("additionalEvidence");
     expect(articleSource).toContain(
       '<FoldedSidebarSection title="예상 면접 질문">',
     );
     expect(articleSource).toContain(
-      '<FoldedContentSection title="Outbox 상태 전이">',
+      '<ContentSection title="Outbox 상태 전이">',
     );
-    expect(articleSource.indexOf("<EvidenceSection")).toBeLessThan(
-      articleSource.indexOf("<PortfolioCaseDiagramDetails"),
-    );
-    expect(articleSource.indexOf('SummaryBlock title="결과"')).toBeLessThan(
-      articleSource.indexOf("<PortfolioCaseDiagramDetails"),
-    );
-    expect(diagramSource.indexOf("<ArchitectureSummary")).toBeLessThan(
-      diagramSource.indexOf("흐름 세부"),
-    );
-    expect(diagramSource).toContain("<details");
-    expect(diagramSource).toContain("흐름 세부");
-    expect(diagramSource).toContain("구성 요소 설명");
+    expect(articleSource).not.toContain("PortfolioCaseDiagramDetails");
+    expect(articleSource).not.toContain("FoldedContentSection");
+    expect(articleSource).toContain("세부 테스트, guard, raw artifact");
+    expect(articleSource).toContain("GitHub 근거 보기");
+    expect(diagramSource).not.toContain("<details");
   });
 
   it("documents the portfolio overall architecture SVG in README", () => {
@@ -844,7 +819,7 @@ describe("PDF-style portfolio cases", () => {
     expect(visualSource).not.toContain("getStep");
   });
 
-  it("keeps diagram legend semantic and moves node cards behind details", () => {
+  it("keeps diagram legend semantic without node or flow detail sections", () => {
     const diagramSource = readFileSync(
       join(process.cwd(), "src/components/portfolio-case-diagram.tsx"),
       "utf8",
@@ -854,10 +829,10 @@ describe("PDF-style portfolio cases", () => {
     expect(diagramSource).toContain("아키텍처 판단 요약");
     expect(diagramSource).toContain('aria-label="구조도 범례"');
     expect(diagramSource).toContain("·");
-    expect(diagramSource).toContain("<details");
-    expect(diagramSource).toContain("<summary");
-    expect(diagramSource).toContain("구성 요소 설명");
-    expect(diagramSource).toContain("흐름 세부");
+    expect(diagramSource).not.toContain("<details");
+    expect(diagramSource).not.toContain("<summary");
+    expect(diagramSource).not.toContain("구성 요소 설명");
+    expect(diagramSource).not.toContain("흐름 세부");
   });
 
   it("shows compact project-level architecture summaries on projects page", () => {
