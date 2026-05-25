@@ -2,7 +2,10 @@ import { PortfolioCaseDiagram } from "@/components/portfolio-case-diagram";
 import { StatusBadge } from "@/components/status-badge";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import type { PortfolioCase } from "@/content/portfolio-cases";
+import {
+  getPortfolioCaseProjectBadge,
+  type PortfolioCase,
+} from "@/content/portfolio-cases";
 import type { Project, ProjectEvidence } from "@/content/projects";
 
 export function CaseStudyArticle({
@@ -12,34 +15,34 @@ export function CaseStudyArticle({
   portfolioCase: PortfolioCase;
   project: Project;
 }) {
+  const heroEvidence = portfolioCase.primaryEvidenceLabels
+    ? selectEvidenceByLabels(portfolioCase, portfolioCase.primaryEvidenceLabels)
+    : portfolioCase.evidence;
+  const heroStatus = heroEvidence[0]?.status;
+
   return (
     <article className="mx-auto flex max-w-7xl flex-col gap-10 px-5 py-12 md:px-8 md:py-16">
-      <header className="border-border flex flex-col gap-6 border-b pb-10">
+      <header className="border-border flex flex-col gap-5 border-b pb-8">
         <div className="flex flex-col gap-3">
           <p className="text-muted-foreground text-sm font-semibold tracking-[0.18em] uppercase">
             문제 해결 포트폴리오 / {portfolioCase.domain}
           </p>
-          <h1 className="text-foreground max-w-5xl text-4xl leading-tight font-bold tracking-tight [overflow-wrap:anywhere] md:text-6xl">
-            {portfolioCase.title}
+          <div className="flex flex-wrap items-center gap-2">
+            {heroStatus ? <StatusBadge status={heroStatus} /> : null}
+            <Badge variant="outline" className="rounded-md">
+              {getPortfolioCaseProjectBadge(portfolioCase)}
+            </Badge>
+          </div>
+          <h1 className="text-foreground max-w-4xl text-4xl leading-tight font-bold tracking-tight [text-wrap:balance] [word-break:keep-all] md:text-5xl">
+            {portfolioCase.displayTitle}
           </h1>
-          <p className="text-muted-foreground max-w-4xl text-lg leading-8">
+          <p className="text-muted-foreground max-w-3xl text-lg leading-8 [word-break:keep-all]">
             {portfolioCase.resumeLine}
           </p>
         </div>
-        <div className="grid gap-3 md:grid-cols-3">
-          <MetaItem label="프로젝트" value={project.title} />
-          <MetaItem label="참여" value={project.team ?? project.role} />
-          {project.period ? (
-            <MetaItem label="기간" value={project.period} />
-          ) : null}
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {project.primaryTechStack.map((tech) => (
-            <Badge key={tech} variant="outline" className="rounded-md">
-              {tech}
-            </Badge>
-          ))}
-        </div>
+        <HeroMetricStrip metrics={portfolioCase.heroMetrics} />
+        <MethodTagList tags={portfolioCase.methodTags} />
+        <CompactMetaRow portfolioCase={portfolioCase} project={project} />
       </header>
 
       <div className="grid gap-10 lg:grid-cols-[minmax(0,800px)_340px] lg:items-start">
@@ -71,14 +74,81 @@ export function CaseStudyArticle({
   );
 }
 
-function MetaItem({ label, value }: { label: string; value: string }) {
+function HeroMetricStrip({
+  metrics,
+}: {
+  metrics?: PortfolioCase["heroMetrics"];
+}) {
+  if (!metrics?.length) {
+    return null;
+  }
+
   return (
-    <div className="border-border bg-card rounded-md border p-4">
-      <p className="text-primary text-xs font-semibold">{label}</p>
-      <p className="text-foreground mt-2 text-sm leading-6 [overflow-wrap:anywhere]">
-        {value}
-      </p>
+    <div
+      aria-label="핵심 결과"
+      className="grid gap-2 sm:grid-cols-3 lg:max-w-3xl"
+    >
+      {metrics.map((metric) => (
+        <div
+          key={`${metric.label}-${metric.value}`}
+          className="border-border bg-card rounded-md border px-4 py-3"
+        >
+          <p className="text-primary text-xs font-semibold">{metric.label}</p>
+          <p className="text-foreground mt-1 text-sm leading-6 font-semibold [overflow-wrap:anywhere]">
+            {metric.value}
+          </p>
+        </div>
+      ))}
     </div>
+  );
+}
+
+function MethodTagList({ tags }: { tags: string[] }) {
+  if (!tags.length) {
+    return null;
+  }
+
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <span className="text-primary text-xs font-semibold">해결 키워드</span>
+      {tags.map((tag) => (
+        <Badge key={tag} variant="outline" className="rounded-md">
+          {tag}
+        </Badge>
+      ))}
+    </div>
+  );
+}
+
+function CompactMetaRow({
+  portfolioCase,
+  project,
+}: {
+  portfolioCase: PortfolioCase;
+  project: Project;
+}) {
+  const visibleTechStack = project.primaryTechStack.slice(0, 5);
+  const metaItems = [
+    ["프로젝트", project.title],
+    ["참여", project.team ?? project.role],
+    ...(project.period ? [["기간", project.period]] : []),
+    ["기술", visibleTechStack.join(" · ")],
+  ];
+
+  return (
+    <dl
+      aria-label={`${portfolioCase.displayTitle} 메타 정보`}
+      className="border-border bg-card text-muted-foreground flex flex-wrap gap-x-4 gap-y-2 rounded-md border px-4 py-3 text-sm leading-6"
+    >
+      {metaItems.map(([label, value]) => (
+        <div key={label} className="flex min-w-0 gap-1">
+          <dt className="text-primary shrink-0 font-semibold">{label}</dt>
+          <dd className="text-foreground min-w-0 [overflow-wrap:anywhere]">
+            {value}
+          </dd>
+        </div>
+      ))}
+    </dl>
   );
 }
 
@@ -213,19 +283,9 @@ function CaseStudySidebar({
 }) {
   return (
     <aside
-      aria-label={`${portfolioCase.title} 요약`}
+      aria-label={`${portfolioCase.displayTitle} 요약`}
       className="border-border bg-card flex flex-col gap-6 rounded-md border p-5 lg:sticky lg:top-6"
     >
-      <SidebarSection title="기술 스택">
-        <div className="flex flex-wrap gap-2">
-          {project.primaryTechStack.map((tech) => (
-            <Badge key={tech} variant="outline" className="rounded-md">
-              {tech}
-            </Badge>
-          ))}
-        </div>
-      </SidebarSection>
-
       <SidebarSection title="한계와 다음 검증">
         <SidebarList items={portfolioCase.limitations} />
       </SidebarSection>

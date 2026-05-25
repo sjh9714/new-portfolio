@@ -52,7 +52,7 @@ export default function CaseStudiesPage() {
                   </Badge>
                 </div>
                 <h2 className="text-foreground text-lg leading-7 font-semibold [overflow-wrap:anywhere]">
-                  {portfolioCase.title}
+                  {portfolioCase.displayTitle}
                 </h2>
               </div>
 

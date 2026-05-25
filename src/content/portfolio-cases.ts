@@ -129,9 +129,12 @@ export type PortfolioVisualDiagram =
 export type PortfolioCase = {
   slug: string;
   title: string;
+  displayTitle: string;
   projectSlug: string;
   domain: string;
   resumeLine: string;
+  heroMetrics?: MeasurementEnvironmentItem[];
+  methodTags: string[];
   architectureSummary: PortfolioArchitectureSummary;
   keyArchitectureDecisions?: string[];
   problemArchitecture: PortfolioProblemArchitecture;
@@ -183,10 +186,17 @@ export const featuredPortfolioCases: PortfolioCase[] = [
     slug: "concert-seat-overselling-consistency",
     title:
       "동일 좌석 100개 동시 예매 요청에서 Queue Token·좌석 락·Idempotency로 오버셀링 0건 검증",
+    displayTitle: "동일 좌석 오버셀링 0건 검증",
     projectSlug: "concert-booking",
     domain: "콘서트 예매 / 예약 정합성",
     resumeLine:
-      "동일 좌석 100개 동시 예매 요청에서 Queue Token, 좌석 락, Idempotency-Key로 success 1, fail 99, overselling 0을 검증했습니다.",
+      "100개 동시 예매 요청에서 Queue Token·좌석 락·Idempotency-Key로 success 1, fail 99를 확인했습니다.",
+    heroMetrics: [
+      { label: "동시 요청", value: "100" },
+      { label: "결과", value: "success 1 / fail 99" },
+      { label: "오버셀링", value: "0" },
+    ],
+    methodTags: ["Queue Token", "좌석 락", "Idempotency-Key"],
     architectureSummary: {
       sourceOfTruth: "PostgreSQL Reservation / Seat 상태",
       transactionBoundary:
@@ -252,7 +262,7 @@ export const featuredPortfolioCases: PortfolioCase[] = [
     implementationDetails: [
       "좌석 경합은 DB transaction 안의 락과 idempotency check가 같은 경계에 있도록 정리했습니다.",
       "Redis는 빠른 조회와 queue 역할을 맡지만 좌석/예약 상태의 최종 기준 데이터로 두지 않았습니다.",
-      "Outbox를 예약 흐름에 포함해 DB 변경과 이벤트 발행 의도를 같은 commit 경계에 남겼습니다.",
+      "이벤트 발행 의도는 Outbox에 남기되, 이 사례의 핵심 검증은 좌석 경합과 중복 예약 방지에 맞췄습니다.",
     ],
     limitations: [
       "운영 알림, tracing, SLO, runbook은 아직 대표 근거로 제시하지 않습니다.",
@@ -488,10 +498,12 @@ export const featuredPortfolioCases: PortfolioCase[] = [
     slug: "concert-outbox-dlt-recovery",
     title:
       "DB commit 이후 Kafka 발행 실패를 Outbox·DLT·수동 재처리로 복구 가능한 상태로 설계",
+    displayTitle: "Outbox/DLT 이벤트 복구 설계",
     projectSlug: "concert-booking",
     domain: "콘서트 예매 / 이벤트 정합성",
     resumeLine:
-      "DB commit 이후 Kafka 발행 실패를 Outbox·DLT·수동 재처리 경로로 격리해 예약/결제/만료 이벤트를 복구 가능한 상태로 설계했습니다.",
+      "DB commit 이후 Kafka 발행 실패를 Outbox·DLT·수동 재처리로 복구 가능한 상태로 설계했습니다.",
+    methodTags: ["Outbox", "DLT", "Manual Replay", "Consumer Idempotency"],
     architectureSummary: {
       sourceOfTruth: "Outbox 상태와 도메인 DB",
       transactionBoundary:
@@ -778,10 +790,17 @@ export const featuredPortfolioCases: PortfolioCase[] = [
   {
     slug: "chat-room-n-plus-one-rps",
     title: "채팅방 조회 API의 N+1 쿼리를 제거해 RPS 937→1,598 개선",
+    displayTitle: "채팅방 조회 N+1 제거",
     projectSlug: "realtime-chat",
     domain: "실시간 채팅 / 조회 성능",
     resumeLine:
-      "채팅방 조회 API의 N+1 쿼리를 제거해 RPS 937→1,598, p95 212.85ms→149.22ms, 쿼리 2N+1→1회로 개선했습니다.",
+      "채팅방 조회 API의 N+1 쿼리를 제거해 RPS 937→1,598, p95 212.85ms→149.22ms로 개선했습니다.",
+    heroMetrics: [
+      { label: "RPS", value: "937 → 1,598" },
+      { label: "p95", value: "212.85ms → 149.22ms" },
+      { label: "Query", value: "2N+1 → 1" },
+    ],
+    methodTags: ["JPQL Projection", "Query Shape", "k6"],
     architectureSummary: {
       sourceOfTruth: "Message / Room / Participant DB",
       transactionBoundary: "읽기 전용 조회 경로",
@@ -994,10 +1013,12 @@ export const featuredPortfolioCases: PortfolioCase[] = [
     slug: "billing-idempotency-webhook-ledger",
     title:
       "멀티테넌트 과금 흐름에서 API Key hash 저장·사용량 중복 처리·Webhook 중복 처리를 검증",
+    displayTitle: "과금 중복 처리와 Ledger 검증",
     projectSlug: "ai-usage-billing-gateway",
     domain: "SaaS 과금 / 멀티테넌트 보안",
     resumeLine:
       "멀티테넌트 과금 흐름에서 API Key hash 저장, 사용량 중복 처리, Webhook duplicate/conflict, append-only ledger invariant를 검증했습니다.",
+    methodTags: ["API Key Hash", "Idempotency", "Webhook", "Ledger"],
     architectureSummary: {
       sourceOfTruth: "Usage Event, Invoice, Append-only Ledger",
       transactionBoundary: "usage idempotency와 ledger insert 경계",
@@ -1275,10 +1296,17 @@ export const featuredPortfolioCases: PortfolioCase[] = [
     slug: "borrowme-product-list-n-plus-one",
     title:
       "상품 목록 조회 N+1 개선 기록과 현재 query-count guard를 분리해 검증",
+    displayTitle: "상품 목록 N+1 개선 검증",
     projectSlug: "borrow-me",
     domain: "대여 서비스 / 조회 성능",
     resumeLine:
-      "BorrowMe 상품 목록 조회 N+1 개선 기록과 현재 clean repeat3 snapshot을 분리하고, query-count guard와 예약 정합성 테스트로 회귀를 검증했습니다.",
+      "상품 목록 조회의 원본 N+1 개선 기록과 현재 clean repeat3 snapshot/query-count guard를 분리해 검증했습니다.",
+    heroMetrics: [
+      { label: "p95", value: "358.1088ms" },
+      { label: "HTTP failure", value: "0" },
+      { label: "Guard", value: "query-count" },
+    ],
+    methodTags: ["Query-count Guard", "k6", "Testcontainers"],
     architectureSummary: {
       sourceOfTruth: "Product / Image / Reservation DB",
       transactionBoundary: "읽기 전용 조회 경로",

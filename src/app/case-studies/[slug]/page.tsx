@@ -35,7 +35,7 @@ export async function generateMetadata({
   }
 
   return {
-    title: portfolioCase.title,
+    title: portfolioCase.displayTitle,
     description: portfolioCase.resumeLine,
   };
 }

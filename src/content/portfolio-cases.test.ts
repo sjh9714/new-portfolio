@@ -1,7 +1,10 @@
 import { readFileSync } from "node:fs";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
+import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
+
+import { ArchitectureFigure } from "@/components/architecture/architecture-figure";
 
 import {
   featuredProjectGroups,
@@ -105,7 +108,21 @@ describe("PDF-style portfolio cases", () => {
       expect(portfolioCase.title).not.toBe(
         getProjectBySlug(portfolioCase.projectSlug)?.title,
       );
+      expect(portfolioCase.displayTitle.trim()).toBeTruthy();
+      expect(portfolioCase.displayTitle.length).toBeLessThanOrEqual(32);
+      expect(portfolioCase.displayTitle.length).toBeLessThan(
+        portfolioCase.title.length,
+      );
+      expect(portfolioCase.displayTitle).not.toBe(
+        getProjectBySlug(portfolioCase.projectSlug)?.title,
+      );
       expect(portfolioCase.resumeLine.length).toBeGreaterThan(20);
+      expect(portfolioCase.methodTags.length).toBeGreaterThan(0);
+      expect(portfolioCase.methodTags.length).toBeLessThanOrEqual(5);
+      for (const metric of portfolioCase.heroMetrics ?? []) {
+        expect(metric.label.trim()).toBeTruthy();
+        expect(metric.value.trim()).toBeTruthy();
+      }
       expect(portfolioCase.problem.length).toBeGreaterThanOrEqual(3);
       expect(portfolioCase.solution.length).toBeGreaterThanOrEqual(3);
       expect(portfolioCase.result.length).toBeGreaterThanOrEqual(3);
@@ -288,7 +305,7 @@ describe("PDF-style portfolio cases", () => {
     );
 
     expect(borrowMeCase?.resumeLine).toBe(
-      "BorrowMe 상품 목록 조회 N+1 개선 기록과 현재 clean repeat3 snapshot을 분리하고, query-count guard와 예약 정합성 테스트로 회귀를 검증했습니다.",
+      "상품 목록 조회의 원본 N+1 개선 기록과 현재 clean repeat3 snapshot/query-count guard를 분리해 검증했습니다.",
     );
     expect(borrowMeCase?.resumeLine).not.toContain("Flyway baseline");
     expect(borrowMeCase?.result.join(" ")).not.toContain(
@@ -514,6 +531,7 @@ describe("PDF-style portfolio cases", () => {
     expect(homeSource).not.toContain("<ProjectRow");
     expect(caseIndexSource).toContain('title="문제 해결 Deep Dive 5개"');
     expect(caseIndexSource).toContain("featuredPortfolioCases.map");
+    expect(caseIndexSource).toContain("portfolioCase.displayTitle");
     expect(caseIndexSource).not.toContain("PortfolioProjectGroupCard");
     expect(caseIndexSource).not.toContain("featuredProjectGroups");
     expect(caseIndexSource).not.toContain("priority={index === 0}");
@@ -654,6 +672,66 @@ describe("PDF-style portfolio cases", () => {
 
     expect(articleSource).toContain("Outbox 상태 전이");
     expect(articleSource).toContain("stateTransitions");
+  });
+
+  it("renders case detail hero from short display titles and keeps resume lines as subtitles", () => {
+    const articleSource = readFileSync(
+      join(process.cwd(), "src/components/case-study-article.tsx"),
+      "utf8",
+    );
+    const detailPageSource = readFileSync(
+      join(process.cwd(), "src/app/case-studies/[slug]/page.tsx"),
+      "utf8",
+    );
+    const firstConcertCase = getPortfolioCaseBySlug(
+      "concert-seat-overselling-consistency",
+    );
+
+    expect(articleSource).toContain("{portfolioCase.displayTitle}");
+    expect(articleSource).toContain("{portfolioCase.resumeLine}");
+    expect(articleSource).toContain("portfolioCase.heroMetrics");
+    expect(articleSource).toContain("portfolioCase.methodTags");
+    expect(articleSource).toContain("HeroMetricStrip");
+    expect(articleSource).toContain("MethodTagList");
+    expect(articleSource).toContain("CompactMetaRow");
+    expect(articleSource).not.toContain("{portfolioCase.title}");
+    expect(detailPageSource).toContain("title: portfolioCase.displayTitle");
+    expect(detailPageSource).toContain("description: portfolioCase.resumeLine");
+
+    expect(firstConcertCase?.displayTitle).toBe("동일 좌석 오버셀링 0건 검증");
+    expect(firstConcertCase?.displayTitle).not.toContain("Queue Token");
+    expect(firstConcertCase?.displayTitle).not.toContain("Idempotency");
+    expect(firstConcertCase?.resumeLine).toContain("Queue Token");
+    expect(firstConcertCase?.resumeLine).toContain("Idempotency-Key");
+    expect(firstConcertCase?.heroMetrics).toEqual([
+      { label: "동시 요청", value: "100" },
+      { label: "결과", value: "success 1 / fail 99" },
+      { label: "오버셀링", value: "0" },
+    ]);
+  });
+
+  it("does not expose architecture source file paths in public figure markup", () => {
+    const architecture = getPortfolioCaseBySlug(
+      "concert-seat-overselling-consistency",
+    )?.problemArchitecture;
+    const figureSource = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/architecture/architecture-figure.tsx",
+      ),
+      "utf8",
+    );
+
+    if (!architecture) {
+      throw new Error("Missing Concert architecture metadata");
+    }
+
+    const markup = renderToStaticMarkup(ArchitectureFigure({ architecture }));
+
+    expect(figureSource).not.toContain("파일:");
+    expect(markup).not.toContain("파일: public/architecture");
+    expect(markup).not.toContain(architecture.sourceFile);
+    expect(markup).toContain(architecture.caption);
   });
 
   it("requires every featured portfolio case to expose a visual diagram", () => {
@@ -803,6 +881,7 @@ describe("PDF-style portfolio cases", () => {
     expect(articleSource).not.toContain("FoldedContentSection");
     expect(articleSource).toContain("세부 테스트, guard, raw artifact");
     expect(articleSource).toContain("GitHub 근거 보기");
+    expect(articleSource).not.toContain('SidebarSection title="기술 스택"');
     expect(diagramSource).not.toContain("<details");
   });
 
@@ -887,6 +966,20 @@ describe("PDF-style portfolio cases", () => {
     ).toBeUndefined();
   });
 
+  it("keeps the Concert seat case implementation point focused on seat contention", () => {
+    const concertCase = getPortfolioCaseBySlug(
+      "concert-seat-overselling-consistency",
+    );
+    const implementationDetails = concertCase?.implementationDetails ?? [];
+
+    expect(implementationDetails).toContain(
+      "이벤트 발행 의도는 Outbox에 남기되, 이 사례의 핵심 검증은 좌석 경합과 중복 예약 방지에 맞췄습니다.",
+    );
+    expect(implementationDetails).not.toContain(
+      "Outbox를 예약 흐름에 포함해 DB 변경과 이벤트 발행 의도를 같은 commit 경계에 남겼습니다.",
+    );
+  });
+
   it("shows compact project-level architecture summaries on projects page", () => {
     const projectSource = readFileSync(
       join(process.cwd(), "src/app/projects/page.tsx"),
@@ -894,6 +987,9 @@ describe("PDF-style portfolio cases", () => {
     );
 
     expect(projectSource).toContain("전체 아키텍처 요약");
+    expect(projectSource).toContain("<details");
+    expect(projectSource).toContain("<summary");
+    expect(projectSource).toContain("전체 아키텍처 요약 보기");
     for (const slug of [
       "concert-booking",
       "realtime-chat",

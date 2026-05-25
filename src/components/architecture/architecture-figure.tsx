@@ -18,9 +18,6 @@ export function ArchitectureFigure({
       </div>
       <figcaption className="text-muted-foreground text-sm leading-6 [overflow-wrap:anywhere]">
         {architecture.caption}
-        <span className="mt-1 block text-xs">
-          파일: {architecture.sourceFile}
-        </span>
       </figcaption>
     </figure>
   );

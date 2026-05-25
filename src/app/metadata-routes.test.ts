@@ -1,10 +1,14 @@
 import { describe, expect, it, vi } from "vitest";
 
 import { metadata as blogMetadata } from "./blog/page";
+import { generateMetadata as generateCaseStudyMetadata } from "./case-studies/[slug]/page";
 import robots from "./robots";
 import sitemap from "./sitemap";
 import { publishedBlogTopics } from "@/content/blog";
-import { featuredPortfolioCases } from "@/content/portfolio-cases";
+import {
+  featuredPortfolioCases,
+  getPortfolioCaseBySlug,
+} from "@/content/portfolio-cases";
 
 describe("metadata routes", () => {
   it("uses NEXT_PUBLIC_SITE_URL for robots and sitemap", () => {
@@ -41,5 +45,39 @@ describe("metadata routes", () => {
       "redis-queue-lock-presence-reconciliation",
     );
     expect(blogMetadata.robots).toBeUndefined();
+  });
+
+  it("uses short portfolio case display titles for case-study metadata", async () => {
+    const portfolioCase = getPortfolioCaseBySlug(
+      "concert-seat-overselling-consistency",
+    );
+
+    await expect(
+      generateCaseStudyMetadata({
+        params: Promise.resolve({
+          slug: "concert-seat-overselling-consistency",
+        }),
+      }),
+    ).resolves.toMatchObject({
+      title: portfolioCase?.displayTitle,
+      description: portfolioCase?.resumeLine,
+    });
+
+    await expect(
+      generateCaseStudyMetadata({
+        params: Promise.resolve({ slug: "concert-booking" }),
+      }),
+    ).resolves.toMatchObject({
+      title: portfolioCase?.displayTitle,
+      description: portfolioCase?.resumeLine,
+    });
+
+    await expect(
+      generateCaseStudyMetadata({
+        params: Promise.resolve({ slug: "unknown-case" }),
+      }),
+    ).resolves.toEqual({
+      title: "문제 해결 사례",
+    });
   });
 });

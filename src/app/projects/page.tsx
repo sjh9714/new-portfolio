@@ -116,71 +116,78 @@ export default function ProjectsPage() {
         </div>
       </section>
 
-      <section className="flex flex-col gap-4">
-        <SectionHeader
-          title="전체 아키텍처 요약"
-          description="대표 문제 해결 사례가 각 프로젝트 전체 흐름 안에서 어느 구간에 위치하는지 짧게 연결합니다."
-        />
-        <div className="border-border border-y">
-          {visibleProjectArchitectureSummaries.map((summary) => {
-            const project = getProjectBySlug(summary.projectSlug);
-            const portfolioCase = featuredPortfolioCases.find(
-              (item) => item.slug === summary.caseSlug,
-            );
+      <section>
+        <details className="border-border bg-card rounded-md border p-5">
+          <summary className="text-foreground cursor-pointer text-lg font-semibold">
+            전체 아키텍처 요약 보기
+          </summary>
+          <div className="mt-5 flex flex-col gap-4">
+            <SectionHeader
+              title="전체 아키텍처 요약"
+              description="대표 문제 해결 사례가 각 프로젝트 전체 흐름 안에서 어느 구간에 위치하는지 짧게 연결합니다."
+            />
+            <div className="border-border border-y">
+              {visibleProjectArchitectureSummaries.map((summary) => {
+                const project = getProjectBySlug(summary.projectSlug);
+                const portfolioCase = featuredPortfolioCases.find(
+                  (item) => item.slug === summary.caseSlug,
+                );
 
-            if (!project || !portfolioCase) {
-              return null;
-            }
+                if (!project || !portfolioCase) {
+                  return null;
+                }
 
-            const architecture = projectOverallArchitectures.find(
-              (item) => item.projectSlug === summary.projectSlug,
-            );
+                const architecture = projectOverallArchitectures.find(
+                  (item) => item.projectSlug === summary.projectSlug,
+                );
 
-            return (
-              <article
-                key={summary.projectSlug}
-                className="border-border grid gap-3 border-b py-4 last:border-b-0 lg:grid-cols-[240px_1fr_2fr_auto] lg:items-center"
-              >
-                {architecture ? (
-                  <Link
-                    href={`/case-studies/${summary.caseSlug}`}
-                    className="border-border bg-background block overflow-hidden rounded-md border p-2 sm:overflow-x-auto lg:overflow-hidden"
-                    aria-label={`${project.title} 전체 아키텍처 대표 사례 보기`}
+                return (
+                  <article
+                    key={summary.projectSlug}
+                    className="border-border grid gap-3 border-b py-4 last:border-b-0 lg:grid-cols-[240px_1fr_2fr_auto] lg:items-center"
                   >
-                    <img
-                      src={architecture.imageSrc}
-                      alt={architecture.alt}
-                      className="w-full min-w-0 rounded-sm sm:min-w-[260px] lg:min-w-0"
-                      loading="lazy"
-                    />
-                  </Link>
-                ) : null}
-                <div className="flex flex-col gap-1">
-                  <h3 className="text-foreground font-semibold">
-                    {project.title}
-                  </h3>
-                  <p className="text-muted-foreground text-sm">
-                    {portfolioCase.domain}
-                  </p>
-                  {architecture ? (
-                    <p className="text-muted-foreground text-xs leading-5">
-                      {architecture.caption}
+                    {architecture ? (
+                      <Link
+                        href={`/case-studies/${summary.caseSlug}`}
+                        className="border-border bg-background block overflow-hidden rounded-md border p-2 sm:overflow-x-auto lg:overflow-hidden"
+                        aria-label={`${project.title} 전체 아키텍처 대표 사례 보기`}
+                      >
+                        <img
+                          src={architecture.imageSrc}
+                          alt={architecture.alt}
+                          className="w-full min-w-0 rounded-sm sm:min-w-[260px] lg:min-w-0"
+                          loading="lazy"
+                        />
+                      </Link>
+                    ) : null}
+                    <div className="flex flex-col gap-1">
+                      <h3 className="text-foreground font-semibold">
+                        {project.title}
+                      </h3>
+                      <p className="text-muted-foreground text-sm">
+                        {portfolioCase.domain}
+                      </p>
+                      {architecture ? (
+                        <p className="text-muted-foreground text-xs leading-5">
+                          {architecture.caption}
+                        </p>
+                      ) : null}
+                    </div>
+                    <p className="text-foreground text-sm leading-6 [overflow-wrap:anywhere]">
+                      {summary.flow}
                     </p>
-                  ) : null}
-                </div>
-                <p className="text-foreground text-sm leading-6 [overflow-wrap:anywhere]">
-                  {summary.flow}
-                </p>
-                <Link
-                  href={`/case-studies/${summary.caseSlug}`}
-                  className="text-primary text-sm font-semibold hover:underline"
-                >
-                  대표 사례 보기
-                </Link>
-              </article>
-            );
-          })}
-        </div>
+                    <Link
+                      href={`/case-studies/${summary.caseSlug}`}
+                      className="text-primary text-sm font-semibold hover:underline"
+                    >
+                      대표 사례 보기
+                    </Link>
+                  </article>
+                );
+              })}
+            </div>
+          </div>
+        </details>
       </section>
 
       <ProjectRowSection

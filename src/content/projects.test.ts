@@ -235,6 +235,8 @@ describe("portfolio project content", () => {
 
     expect(gitignoreSource).toContain("fb*.txt");
     expect(gitignoreSource).toContain("feedback.md");
+    expect(gitignoreSource.match(/^fb\*\.txt$/gm)).toHaveLength(1);
+    expect(gitignoreSource.match(/^feedback\.md$/gm)).toHaveLength(1);
     expect(trackedFiles).not.toMatch(/(^|\/)feedback\.md$/m);
     expect(trackedFiles).not.toMatch(/(^|\/)fb[^/]*\.txt$/m);
     expect(trackedFiles).not.toMatch(/^feedback\.md$/m);
@@ -304,7 +306,7 @@ describe("portfolio project content", () => {
     expect(caseStudySource).toContain("검증 근거");
     expect(caseStudySource).not.toContain("측정 시나리오");
     expect(caseStudySource).toContain("구현 포인트");
-    expect(caseStudySource).toContain("기술 스택");
+    expect(caseStudySource).not.toContain('SidebarSection title="기술 스택"');
     expect(caseStudySource).toContain("한계와 다음 검증");
     expect(caseStudySource).toContain("예상 면접 질문");
     expect(caseStudySource).toContain("GitHub 근거 보기");

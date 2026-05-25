@@ -42,7 +42,7 @@ export function PortfolioCaseCard({
             {portfolioCase.domain}
           </p>
           <h3 className="text-primary text-xl leading-8 font-semibold tracking-tight [overflow-wrap:anywhere]">
-            {portfolioCase.title}
+            {portfolioCase.displayTitle}
           </h3>
           <p className="text-muted-foreground text-sm leading-6 [overflow-wrap:anywhere]">
             {portfolioCase.resumeLine}
