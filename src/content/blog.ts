@@ -42,8 +42,8 @@ export const blogTopics: BlogTopic[] = [
       {
         title: "Concert Booking: 대기열과 좌석 경합",
         paragraphs: [
-          "Concert Booking에서는 Redis가 대기열 토큰과 빠른 stock 조회를 돕지만, 좌석/예약의 최종 기준 데이터는 PostgreSQL Reservation / Seat 상태입니다. 동일 좌석 100개 동시 요청에서 success 1, fail 99, overselling 0을 기록한 것도 Redis 단독 결과가 아니라 transaction, seat lock, Idempotency-Key, Outbox를 함께 묶은 결과입니다.",
-          "서로 다른 좌석 50명 동시 예약에서는 pessimistic lock과 Redis distributed lock 모두 50/50 성공을 확인했습니다. 다만 이 결과도 운영 성능 주장이 아니라 로컬 시나리오에서 락 전략의 실패 양상을 비교한 evidence로만 둡니다.",
+          "Concert Booking에서는 Redis가 대기열 token과 빠른 stock 조회를 돕지만, 좌석과 예약의 최종 기준 데이터는 PostgreSQL에 둡니다. 동일 좌석 Testcontainers 시나리오에서는 10개 thread를 동시에 시작해 성공 1건, 실패 9건, HELD 좌석 1건으로 수렴하는지 검증했습니다.",
+          "대기열 진입 권한, 좌석 변경의 직렬화, client retry 중복을 한 장치에 몰지 않았습니다. Queue Token, DB lock, Idempotency-Key가 각각 다른 경쟁 조건을 책임지며 세 예약 전략에 동일한 token policy test를 적용했습니다.",
           "Redis stock과 DB 상태가 어긋날 수 있다는 전제를 버리지 않았기 때문에 reconciliation은 Redis 값을 기준으로 DB를 고치는 방식이 아니라, PostgreSQL 기준으로 Redis 보조 상태를 복구하는 방향으로 설계했습니다.",
         ],
       },

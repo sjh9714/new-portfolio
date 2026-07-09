@@ -1,68 +1,63 @@
-import type { Metadata } from "next";
-import { notFound, redirect } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 
 import { CaseStudyArticle } from "@/components/case-study-article";
 import {
-  featuredPortfolioCases,
-  getPortfolioCaseBySlug,
+  caseStudies,
+  getCaseStudyBySlug,
   legacyCaseStudyAliases,
 } from "@/content/portfolio-cases";
 import { getProjectBySlug } from "@/content/projects";
+import { createPageMetadata } from "@/lib/site";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
 export function generateStaticParams() {
-  return featuredPortfolioCases.map((portfolioCase) => ({
-    slug: portfolioCase.slug,
-  }));
+  return caseStudies.map(({ slug }) => ({ slug }));
 }
 
-export async function generateMetadata({
-  params,
-}: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps) {
   const { slug } = await params;
-  const resolvedSlug = legacyCaseStudyAliases[slug] ?? slug;
-  const portfolioCase = resolvedSlug.startsWith("/")
-    ? undefined
-    : getPortfolioCaseBySlug(resolvedSlug);
+  const alias = legacyCaseStudyAliases.get(slug);
+  const resolvedSlug = alias && !alias.startsWith("/") ? alias : slug;
+  const caseStudy = getCaseStudyBySlug(resolvedSlug);
 
-  if (!portfolioCase) {
-    return {
+  if (!caseStudy) {
+    return createPageMetadata({
       title: "문제 해결 사례",
-    };
+      path: `/case-studies/${slug}`,
+      noIndex: true,
+    });
   }
 
-  return {
-    title: portfolioCase.displayTitle,
-    description: portfolioCase.resumeLine,
-  };
+  return createPageMetadata({
+    title: caseStudy.title,
+    description: caseStudy.summary,
+    path: `/case-studies/${caseStudy.slug}`,
+    imagePath: `/case-studies/${caseStudy.slug}/opengraph-image`,
+  });
 }
 
 export default async function CaseStudyPage({ params }: PageProps) {
   const { slug } = await params;
-  const alias = legacyCaseStudyAliases[slug];
-
-  if (alias?.startsWith("/")) {
-    redirect(alias);
-  }
+  const alias = legacyCaseStudyAliases.get(slug);
 
   if (alias) {
-    redirect(`/case-studies/${alias}`);
+    permanentRedirect(alias.startsWith("/") ? alias : `/case-studies/${alias}`);
   }
 
-  const portfolioCase = getPortfolioCaseBySlug(slug);
+  const caseStudy = getCaseStudyBySlug(slug);
 
-  if (!portfolioCase) {
+  if (!caseStudy) {
     notFound();
   }
 
-  const project = getProjectBySlug(portfolioCase.projectSlug);
+  const project = getProjectBySlug(caseStudy.projectSlug);
 
   if (!project) {
     notFound();
   }
 
-  return <CaseStudyArticle portfolioCase={portfolioCase} project={project} />;
+  return <CaseStudyArticle caseStudy={caseStudy} project={project} />;
 }

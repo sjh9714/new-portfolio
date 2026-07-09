@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { Badge } from "@/components/ui/badge";
 import { getBlogTopicBySlug, publishedBlogTopics } from "@/content/blog";
+import { createPageMetadata } from "@/lib/site";
 
 type BlogArticlePageProps = {
   params: Promise<{
@@ -16,20 +16,23 @@ export function generateStaticParams() {
   }));
 }
 
-export async function generateMetadata({
-  params,
-}: BlogArticlePageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: BlogArticlePageProps) {
   const { slug } = await params;
   const topic = getBlogTopicBySlug(slug);
 
   if (!topic || topic.status !== "published") {
-    return {};
+    return createPageMetadata({
+      title: "기술 글",
+      path: `/blog/${slug}`,
+      noIndex: true,
+    });
   }
 
-  return {
+  return createPageMetadata({
     title: topic.title,
     description: topic.summary,
-  };
+    path: `/blog/${topic.slug}`,
+  });
 }
 
 export default async function BlogArticlePage({
@@ -43,7 +46,7 @@ export default async function BlogArticlePage({
   }
 
   return (
-    <article className="mx-auto flex max-w-3xl flex-col gap-10 px-5 py-12 md:px-8 md:py-16">
+    <article className="mx-auto flex max-w-3xl flex-col gap-10 px-5 py-10 md:px-8 md:py-16">
       <header className="border-border flex flex-col gap-4 border-b pb-8">
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant="outline" className="rounded-md">
@@ -60,7 +63,7 @@ export default async function BlogArticlePage({
             </span>
           ) : null}
         </div>
-        <h1 className="text-foreground text-4xl leading-tight font-bold tracking-tight md:text-5xl">
+        <h1 className="heading-wrap text-foreground text-4xl leading-tight font-bold tracking-[-0.04em] md:text-5xl">
           {topic.title}
         </h1>
         <p className="text-muted-foreground text-lg leading-8">

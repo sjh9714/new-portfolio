@@ -1,43 +1,10 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import {
-  getSiteUrl,
-  siteDescription,
-  siteName,
-  siteOgDescription,
-} from "@/lib/site";
+import { createRootMetadata } from "@/lib/site";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-export const metadata: Metadata = {
-  metadataBase: new URL(getSiteUrl()),
-  title: {
-    default: siteName,
-    template: `%s | ${siteName}`,
-  },
-  description: siteDescription,
-  openGraph: {
-    title: siteName,
-    description: siteOgDescription,
-    type: "website",
-    url: getSiteUrl(),
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-};
+export const metadata: Metadata = createRootMetadata();
 
 export default function RootLayout({
   children,
@@ -45,13 +12,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="ko"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
+    <html lang="ko" className="h-full antialiased">
       <body className="flex min-h-full flex-col">
+        <a
+          href="#main-content"
+          className="bg-foreground fixed top-3 left-3 z-[100] -translate-y-20 rounded-md px-4 py-3 text-sm font-semibold text-white transition-transform focus:translate-y-0"
+        >
+          본문 바로가기
+        </a>
         <SiteHeader />
-        <main className="flex-1">{children}</main>
+        <main id="main-content" tabIndex={-1} className="min-w-0 flex-1">
+          {children}
+        </main>
         <SiteFooter />
       </body>
     </html>

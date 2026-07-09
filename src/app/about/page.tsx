@@ -1,101 +1,93 @@
-import type { Metadata } from "next";
+import { ExternalLink, Mail } from "lucide-react";
 
+import { ExpertiseMap } from "@/components/expertise-map";
 import { SectionHeader } from "@/components/section-header";
-import { StatusBadge } from "@/components/status-badge";
 import { Button } from "@/components/ui/button";
-import { getProjectBySlug } from "@/content/projects";
 import { profile } from "@/content/profile";
+import { createPageMetadata } from "@/lib/site";
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "연락처",
-  description: "성진혁 백엔드 포트폴리오 연락처와 관심 문제.",
-};
+  description: "성진혁 Java/Spring 백엔드 포트폴리오 연락처와 관심 문제.",
+  path: "/about",
+});
+
+const focusAreas = [
+  "동시성 제어와 데이터 정합성",
+  "이벤트 발행 실패와 재처리 경계",
+  "실시간 메시징 구독 인가와 재연결 복구",
+  "사용량·Webhook·Ledger 중복 처리",
+] as const;
 
 export default function AboutPage() {
-  const representativeEvidence = [
-    {
-      project: "Concert Booking",
-      evidence: getProjectBySlug("concert-booking")?.evidence.find(
-        (item) => item.label === "동일 좌석 경합",
-      ),
-    },
-    {
-      project: "Realtime Chat",
-      evidence: getProjectBySlug("realtime-chat")?.evidence.find(
-        (item) => item.label === "채팅방 조회 API RPS",
-      ),
-    },
-    {
-      project: "AI Usage Billing Gateway",
-      evidence: getProjectBySlug("ai-usage-billing-gateway")?.evidence.find(
-        (item) => item.label === "사용량 중복 처리",
-      ),
-    },
-  ].filter((item) => item.evidence);
-
   return (
-    <div className="mx-auto flex max-w-4xl flex-col gap-8 px-5 py-12 md:px-8 md:py-16">
-      <SectionHeader title="연락처" description={profile.summary} />
-      <div className="grid gap-5 md:grid-cols-2">
-        <section className="border-border flex flex-col gap-3 border p-5">
-          <h2 className="text-foreground text-lg font-semibold">관심 문제</h2>
-          <p className="text-muted-foreground text-sm leading-7">
-            Java/Spring 기반으로 동시성, 이벤트 정합성, 실시간 메시징, 과금/정산
-            흐름을 테스트와 수치로 설명하는 백엔드 포트폴리오입니다.
-          </p>
-          <ul className="text-muted-foreground flex flex-col gap-2 text-sm leading-6">
-            <li>동시성 제어와 데이터 정합성</li>
-            <li>이벤트 기반 장애 복구</li>
-            <li>실시간 메시징과 reconnect 복구</li>
-            <li>과금/정산/감사 로그</li>
+    <div className="page-shell py-10 md:py-16">
+      <SectionHeader
+        as="h1"
+        eyebrow="About / Contact"
+        title="문제를 재현하고, 선택의 근거를 설명하는 백엔드 개발자"
+        description={profile.summary}
+      />
+
+      <div className="border-border mt-12 grid gap-10 border-y py-8 md:grid-cols-[1fr_1fr] md:gap-14 md:py-10">
+        <section aria-labelledby="focus-title">
+          <h2 id="focus-title" className="text-foreground text-xl font-bold">
+            관심 문제
+          </h2>
+          <ul className="mt-5 grid gap-3">
+            {focusAreas.map((area, index) => (
+              <li
+                key={area}
+                className="grid grid-cols-[2.5rem_1fr] gap-3 text-sm leading-6"
+              >
+                <span className="text-primary font-mono text-xs font-semibold">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <span className="text-foreground">{area}</span>
+              </li>
+            ))}
           </ul>
         </section>
-        <section className="border-border flex flex-col gap-3 border p-5">
-          <h2 className="text-foreground text-lg font-semibold">관심 포지션</h2>
-          <p className="text-muted-foreground text-sm leading-7">
-            Java/Spring 백엔드, 커머스/예약/결제/정산 도메인, 플랫폼/메시징
-            백엔드 포지션에 관심이 있습니다.
+
+        <section aria-labelledby="position-title">
+          <h2 id="position-title" className="text-foreground text-xl font-bold">
+            관심 포지션
+          </h2>
+          <p className="text-muted-foreground mt-5 text-base leading-7">
+            Java/Spring 백엔드와 예약·커머스·결제·정산·플랫폼 메시징 도메인에서,
+            장애 이후에도 설명 가능한 데이터 경계를 만드는 일에 관심이 있습니다.
           </p>
         </section>
       </div>
 
-      <section className="border-border flex flex-col gap-4 border p-5">
-        <h2 className="text-foreground text-lg font-semibold">대표 근거</h2>
-        <div className="grid gap-3 md:grid-cols-3">
-          {representativeEvidence.map((item) =>
-            item.evidence ? (
-              <div
-                key={item.project}
-                className="border-border bg-card flex flex-col gap-2 rounded-md border p-3"
-              >
-                <p className="text-muted-foreground text-xs font-semibold tracking-[0.16em] uppercase">
-                  {item.project}
-                </p>
-                <div className="flex items-start justify-between gap-2">
-                  <h3 className="text-foreground text-sm font-semibold [overflow-wrap:anywhere]">
-                    {item.evidence.label}
-                  </h3>
-                  <StatusBadge status={item.evidence.status} />
-                </div>
-                <p className="text-muted-foreground text-xs leading-5 [overflow-wrap:anywhere]">
-                  {item.evidence.value}
-                </p>
-              </div>
-            ) : null,
-          )}
-        </div>
+      <section className="mt-14">
+        <ExpertiseMap />
       </section>
 
-      <section className="border-border flex flex-col gap-3 border p-5">
-        <h2 className="text-foreground text-lg font-semibold">링크</h2>
-        <div className="flex flex-wrap gap-3">
-          <Button asChild variant="outline">
-            <a href={profile.githubUrl} target="_blank" rel="noreferrer">
-              GitHub
+      <section className="border-border mt-14 flex flex-col gap-6 border-t pt-8 md:flex-row md:items-center md:justify-between">
+        <div>
+          <p className="section-kicker">Let&apos;s talk</p>
+          <h2 className="text-foreground mt-2 text-2xl font-bold tracking-tight">
+            사례의 전제와 트레이드오프를 더 자세히 설명드리겠습니다.
+          </h2>
+        </div>
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <Button asChild>
+            <a href={`mailto:${profile.email}`}>
+              이메일
+              <Mail aria-hidden="true" />
             </a>
           </Button>
           <Button asChild variant="outline">
-            <a href={`mailto:${profile.email}`}>이메일</a>
+            <a
+              href={profile.githubUrl}
+              target="_blank"
+              rel="noreferrer"
+              aria-label="GitHub (새 창)"
+            >
+              GitHub
+              <ExternalLink aria-hidden="true" />
+            </a>
           </Button>
         </div>
       </section>

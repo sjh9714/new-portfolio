@@ -5,10 +5,7 @@ import { generateMetadata as generateCaseStudyMetadata } from "./case-studies/[s
 import robots from "./robots";
 import sitemap from "./sitemap";
 import { publishedBlogTopics } from "@/content/blog";
-import {
-  featuredPortfolioCases,
-  getPortfolioCaseBySlug,
-} from "@/content/portfolio-cases";
+import { caseStudies, getCaseStudyBySlug } from "@/content/portfolio-cases";
 
 describe("metadata routes", () => {
   it("uses NEXT_PUBLIC_SITE_URL for robots and sitemap", () => {
@@ -22,9 +19,9 @@ describe("metadata routes", () => {
         "https://portfolio.example/projects",
         "https://portfolio.example/resume",
         "https://portfolio.example/about",
-        ...featuredPortfolioCases.map(
-          (portfolioCase) =>
-            `https://portfolio.example/case-studies/${portfolioCase.slug}`,
+        ...caseStudies.map(
+          (caseStudy) =>
+            `https://portfolio.example/case-studies/${caseStudy.slug}`,
         ),
       ]),
     );
@@ -36,6 +33,21 @@ describe("metadata routes", () => {
         ),
       ]),
     );
+    expect(robots().host).toBe("https://portfolio.example");
+
+    const staticEntry = sitemap().find(
+      (entry) => entry.url === "https://portfolio.example/projects",
+    );
+    const publishedBlogEntry = sitemap().find(
+      (entry) =>
+        entry.url ===
+        `https://portfolio.example/blog/${publishedBlogTopics[0]?.slug}`,
+    );
+
+    expect(staticEntry).not.toHaveProperty("lastModified");
+    expect(publishedBlogEntry?.lastModified).toBe(
+      publishedBlogTopics[0]?.publishedAt,
+    );
 
     vi.unstubAllEnvs();
   });
@@ -44,11 +56,12 @@ describe("metadata routes", () => {
     expect(publishedBlogTopics.map((topic) => topic.slug)).toContain(
       "redis-queue-lock-presence-reconciliation",
     );
-    expect(blogMetadata.robots).toBeUndefined();
+    expect(blogMetadata.robots).toEqual({ index: true, follow: true });
   });
 
-  it("uses short portfolio case display titles for case-study metadata", async () => {
-    const portfolioCase = getPortfolioCaseBySlug(
+  it("uses canonical case titles and summaries for case-study metadata", async () => {
+    vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://portfolio.example");
+    const caseStudy = getCaseStudyBySlug(
       "concert-seat-overselling-consistency",
     );
 
@@ -59,8 +72,12 @@ describe("metadata routes", () => {
         }),
       }),
     ).resolves.toMatchObject({
-      title: portfolioCase?.displayTitle,
-      description: portfolioCase?.resumeLine,
+      title: caseStudy?.title,
+      description: caseStudy?.summary,
+      alternates: {
+        canonical:
+          "https://portfolio.example/case-studies/concert-seat-overselling-consistency",
+      },
     });
 
     await expect(
@@ -68,16 +85,23 @@ describe("metadata routes", () => {
         params: Promise.resolve({ slug: "concert-booking" }),
       }),
     ).resolves.toMatchObject({
-      title: portfolioCase?.displayTitle,
-      description: portfolioCase?.resumeLine,
+      title: caseStudy?.title,
+      description: caseStudy?.summary,
+      alternates: {
+        canonical:
+          "https://portfolio.example/case-studies/concert-seat-overselling-consistency",
+      },
     });
 
     await expect(
       generateCaseStudyMetadata({
         params: Promise.resolve({ slug: "unknown-case" }),
       }),
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       title: "문제 해결 사례",
+      robots: { index: false, follow: false },
     });
+
+    vi.unstubAllEnvs();
   });
 });

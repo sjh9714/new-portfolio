@@ -20,20 +20,18 @@ describe("architecture SVG generator", () => {
     }
   });
 
-  it("keeps spec output files aligned with portfolio problemArchitecture metadata", () => {
-    const outputFiles = architectureSpecs.map((spec) => spec.outputFile);
-
-    expect(outputFiles).toEqual(
-      featuredPortfolioCases.map(
-        (portfolioCase) => portfolioCase.problemArchitecture.sourceFile,
-      ),
-    );
-
+  it("keeps spec output files aligned with case-study architecture metadata", () => {
     expect(
       architectureSpecs.map((spec) => `/architecture/cases/${spec.slug}.svg`),
     ).toEqual(
       featuredPortfolioCases.map(
-        (portfolioCase) => portfolioCase.problemArchitecture.imageSrc,
+        (portfolioCase) => portfolioCase.architecture.imageSrc,
+      ),
+    );
+
+    expect(architectureSpecs.map((spec) => spec.outputFile)).toEqual(
+      featuredPortfolioCases.map(
+        (portfolioCase) => `public${portfolioCase.architecture.imageSrc}`,
       ),
     );
   });
@@ -49,7 +47,7 @@ describe("architecture SVG generator", () => {
         expect(node.y % 20).toBe(0);
         expect(node.w % 20).toBe(0);
         expect(node.h % 20).toBe(0);
-        expect(node.h).toBeGreaterThanOrEqual(38 + node.lines.length * 18);
+        expect(node.h).toBeGreaterThanOrEqual(40 + node.lines.length * 20);
       }
 
       for (const edge of spec.edges) {
@@ -71,6 +69,7 @@ describe("architecture SVG generator", () => {
       expect(svg).toContain("viewBox");
       expect(svg).toContain("<text");
       expect(svg).toContain("<tspan");
+      expect(svg).not.toMatch(/font-size="(?:1[0-3]|[0-9])"/);
 
       for (const forbidden of [
         "<foreignObject",
@@ -84,6 +83,20 @@ describe("architecture SVG generator", () => {
       ]) {
         expect(svg).not.toContain(forbidden);
       }
+    }
+  });
+
+  it("keeps every generated label readable and removes unsupported history", () => {
+    for (const spec of architectureSpecs) {
+      const svg = renderDiagram(spec);
+      const fontSizes = Array.from(
+        svg.matchAll(/font-size="(\d+)"/g),
+        (match) => Number(match[1]),
+      );
+
+      expect(fontSizes.length).toBeGreaterThan(0);
+      expect(fontSizes.every((size) => size >= 14)).toBe(true);
+      expect(svg).not.toMatch(/1,010|201 queries|23ms|추가 측정 예정/);
     }
   });
 
@@ -112,7 +125,7 @@ describe("architecture SVG generator", () => {
     expect(readmeSource).toContain("npm run generate:architecture");
     expect(readmeSource).toContain("npm run check:architecture");
     expect(readmeSource).toContain("전체 아키텍처 SVG");
-    expect(readmeSource).toContain("generator output");
+    expect(readmeSource).toContain("public/architecture/cases");
     expect(rulesSource).toContain("raw SVG를 직접 편집하지 않습니다");
     expect(rulesSource).toContain("fromPort");
     expect(rulesSource).toContain("toPort");

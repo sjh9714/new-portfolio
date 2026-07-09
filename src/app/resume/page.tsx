@@ -1,210 +1,251 @@
-import { existsSync } from "node:fs";
-import path from "node:path";
-import type { Metadata } from "next";
-import Link from "next/link";
+import { resume } from "@/content/resume";
+import { createPageMetadata, getSiteUrl } from "@/lib/site";
 
-import { ProjectRow } from "@/components/project-card";
-import { SectionHeader } from "@/components/section-header";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  getFeaturedPortfolioProjectGroups,
-  getSupportingProjects,
-  type PortfolioCase,
-} from "@/content/portfolio-cases";
-import { additionalProjects } from "@/content/projects";
-import { profile } from "@/content/profile";
+import styles from "./resume.module.css";
 
-export const metadata: Metadata = {
+const resumeFileName = "resume-sung-jinhyuk-backend.pdf";
+const resumeDescription =
+  "성진혁 Java/Spring 백엔드 개발자의 대표 문제 해결 사례와 검증 근거를 정리한 이력서.";
+
+export const metadata = createPageMetadata({
   title: "이력서",
-  description: "성진혁 백엔드 포트폴리오 웹 이력서.",
-};
+  description: resumeDescription,
+  path: "/resume",
+});
 
-const coreSkillGroups = [
-  {
-    title: "Backend",
-    skills: ["Java", "Spring Boot", "JPA", "REST API"],
-  },
-  {
-    title: "Data / Consistency",
-    skills: ["PostgreSQL", "Redis", "트랜잭션 경계", "Idempotency"],
-  },
-  {
-    title: "Messaging / Realtime",
-    skills: ["Kafka", "RabbitMQ", "WebSocket", "STOMP", "Outbox", "DLT"],
-  },
-  {
-    title: "Testing / Operations",
-    skills: ["Testcontainers", "k6", "Docker", "Prometheus", "Grafana"],
-  },
-];
-
-const resumePdfFileName = "resume-sung-jinhyuk-backend.pdf";
-const supportingAdditionalProjects = getSupportingProjects(additionalProjects);
-const featuredPortfolioProjectGroups = getFeaturedPortfolioProjectGroups();
+const evidenceStatusLabel = {
+  measured: "측정 완료",
+  verified: "시나리오 검증",
+} as const;
 
 export default function ResumePage() {
-  const resumeExists = existsSync(
-    path.join(process.cwd(), "public", resumePdfFileName),
-  );
+  const portfolioUrl = `${getSiteUrl()}/case-studies`;
 
   return (
-    <div className="mx-auto flex max-w-5xl flex-col gap-10 px-5 py-12 md:px-8 md:py-16 print:max-w-none print:px-0 print:py-0">
-      <header className="border-border flex flex-col gap-5 border-b pb-8 md:flex-row md:items-end md:justify-between">
-        <div className="flex flex-col gap-3">
-          <p className="text-muted-foreground text-sm font-semibold tracking-[0.18em] uppercase">
-            웹 이력서
-          </p>
-          <h1 className="text-foreground text-4xl font-bold tracking-tight">
-            {profile.name} / {profile.role}
-          </h1>
-          <p className="text-foreground text-sm font-medium">
-            지원 구분: 신입 / 주니어 백엔드 개발자 · 관심 포지션: Java/Spring
-            백엔드
-          </p>
-          <p className="text-muted-foreground max-w-3xl text-base leading-7">
-            {profile.headline}
-          </p>
-        </div>
-        {resumeExists ? (
-          <Button asChild>
-            <a
-              href={`/${resumePdfFileName}`}
-              download="sung-jinhyuk-resume.pdf"
-            >
-              PDF 다운로드
-            </a>
-          </Button>
-        ) : null}
-      </header>
+    <article id="resume-document" className={styles.page}>
+      <div className={styles.toolbar}>
+        <a
+          className={styles.download}
+          href={`/${resumeFileName}`}
+          download="sung-jinhyuk-backend-resume.pdf"
+        >
+          PDF 이력서
+        </a>
+      </div>
 
-      <section className="flex flex-col gap-4">
-        <SectionHeader title="백엔드 요약" />
-        <p className="text-muted-foreground text-sm leading-7">
-          고동시성 예매, 실시간 메시징, 멀티테넌트 과금, SAGA/Outbox 보상 흐름을
-          문제-해결-결과 구조로 정리했습니다. 측정한 수치와 아직 검증이 필요한
-          항목을 구분해 면접에서 검증 가능한 대화를 유도합니다.
-        </p>
-      </section>
-
-      <section className="flex flex-col gap-4">
-        <SectionHeader title="핵심 기술" />
-        <div className="grid gap-4 md:grid-cols-2">
-          {coreSkillGroups.map((group) => (
-            <div
-              key={group.title}
-              className="border-border flex flex-col gap-3 border p-4"
-            >
-              <h2 className="text-foreground text-sm font-semibold">
-                {group.title}
-              </h2>
-              <div className="flex flex-wrap gap-2">
-                {group.skills.map((skill) => (
-                  <Badge key={skill} variant="outline" className="rounded-md">
-                    {skill}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="flex flex-col gap-5">
-        <SectionHeader
-          title="대표 문제 해결 문장"
-          description="이력서의 한 줄이 포트폴리오 상세 문서로 이어지도록 구성했습니다."
-        />
-        <div className="border-border border-y">
-          {featuredPortfolioProjectGroups.map(({ project, cases }) => (
-            <article
-              key={project.slug}
-              className="border-border grid gap-4 border-b py-5 last:border-b-0 lg:grid-cols-[1fr_2.4fr_1fr] lg:items-start"
-            >
-              <div>
-                <h3 className="text-foreground font-semibold">
-                  {project.title}
-                </h3>
-                <p className="text-muted-foreground text-sm">
-                  {formatPortfolioCaseDomains(cases)}
-                </p>
-                <p className="text-muted-foreground mt-2 text-xs">
-                  {project.team ?? project.role}
-                </p>
-              </div>
-              <ul className="text-foreground flex list-disc flex-col gap-2 pl-5 text-sm leading-7 [overflow-wrap:anywhere]">
-                {cases.map((portfolioCase) => (
-                  <li key={portfolioCase.slug}>{portfolioCase.resumeLine}</li>
-                ))}
-              </ul>
-              <div className="flex flex-wrap gap-2">
-                {project.primaryTechStack.map((tech) => (
-                  <Badge key={tech} variant="outline" className="rounded-md">
-                    {tech}
-                  </Badge>
-                ))}
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="flex flex-col gap-5 print:hidden">
-        <SectionHeader title="추가 프로젝트" />
-        <div className="border-border border-y">
-          {supportingAdditionalProjects.map((project) => (
-            <ProjectRow key={project.slug} project={project} />
-          ))}
-        </div>
-      </section>
-
-      <section className="grid gap-5 md:grid-cols-2">
-        <div className="border-border flex flex-col gap-3 border p-5">
-          <h2 className="text-foreground text-lg font-semibold">관심 문제</h2>
-          <p className="text-muted-foreground text-sm leading-7">
-            Java/Spring 백엔드에서 동시성 제어, 이벤트 정합성, 실시간 메시징,
-            멀티테넌트 과금 흐름을 테스트와 수치로 설명하는 데 집중합니다.
-          </p>
-        </div>
-        <div className="border-border flex flex-col gap-3 border p-5">
-          <h2 className="text-foreground text-lg font-semibold">링크</h2>
-          <div className="flex flex-wrap gap-3">
-            <Button asChild variant="outline">
-              <a href={profile.githubUrl} target="_blank" rel="noreferrer">
-                GitHub
-              </a>
-            </Button>
-            <Button asChild variant="outline">
-              <Link href="/projects">프로젝트</Link>
-            </Button>
-            <Button asChild variant="outline">
-              <a href={`mailto:${profile.email}`}>이메일</a>
-            </Button>
+      <div className={styles.sheet}>
+        <header className={styles.header}>
+          <div>
+            <p className={styles.eyebrow}>Backend Engineer</p>
+            <h1 className={styles.name}>{resume.identity.name}</h1>
+            <p className={styles.role}>{resume.identity.role}</p>
           </div>
-        </div>
-      </section>
-    </div>
+
+          <address className={styles.contact} aria-label="연락처">
+            <a className={styles.link} href={`mailto:${resume.identity.email}`}>
+              {resume.identity.email}
+            </a>
+            <a
+              className={styles.link}
+              href={resume.identity.githubUrl}
+              target="_blank"
+              rel="noreferrer"
+              aria-label="성진혁 GitHub (새 창)"
+            >
+              github.com/sjh9714
+            </a>
+            <a
+              className={styles.link}
+              href={portfolioUrl}
+              target="_blank"
+              rel="noreferrer"
+              aria-label="성진혁 문제 해결 사례 (새 창)"
+            >
+              Portfolio / Case Studies
+            </a>
+          </address>
+        </header>
+
+        <ResumeSection title="Profile">
+          <p className={styles.summary}>{resume.summary}</p>
+        </ResumeSection>
+
+        <ResumeSection title="Core Stack">
+          <ul className={styles.skillList} aria-label="핵심 기술">
+            {resume.skills.map((skill) => (
+              <li key={skill} className={styles.skill}>
+                {skill}
+              </li>
+            ))}
+          </ul>
+        </ResumeSection>
+
+        <ResumeSection title="Selected Work">
+          <ol className={styles.projectList}>
+            {resume.projects.map((project) => (
+              <li key={project.slug} className={styles.project}>
+                <div className={styles.projectHeader}>
+                  <div>
+                    <h3 className={styles.projectTitle}>{project.title}</h3>
+                    <p className={styles.projectMeta}>
+                      {[
+                        project.domain,
+                        project.team ?? project.role,
+                        project.period,
+                      ]
+                        .filter(Boolean)
+                        .join(" · ")}
+                    </p>
+                  </div>
+                  <a
+                    className={`${styles.link} ${styles.projectLink}`}
+                    href={project.repoUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={`${project.title} GitHub 저장소 (새 창)`}
+                  >
+                    GitHub
+                  </a>
+                </div>
+
+                <dl className={styles.facts}>
+                  <div className={styles.fact}>
+                    <dt>문제</dt>
+                    <dd>{project.problem}</dd>
+                  </div>
+                  {project.contribution ? (
+                    <div className={styles.fact}>
+                      <dt>기여</dt>
+                      <dd>{project.contribution}</dd>
+                    </div>
+                  ) : null}
+                  <div className={styles.fact}>
+                    <dt>판단</dt>
+                    <dd>{project.decision}</dd>
+                  </div>
+                  <div className={styles.fact}>
+                    <dt>결과</dt>
+                    <dd>{project.result}</dd>
+                  </div>
+                  <div className={styles.fact}>
+                    <dt>근거</dt>
+                    <dd className={styles.evidenceRow}>
+                      <span
+                        className={`${styles.evidenceBadge} ${
+                          project.evidence.status === "measured"
+                            ? styles.evidenceBadgeMeasured
+                            : ""
+                        }`}
+                      >
+                        {evidenceStatusLabel[project.evidence.status]}
+                      </span>
+                      <span>
+                        <span className={styles.evidenceLabel}>
+                          {project.evidence.label}
+                        </span>{" "}
+                        <span className={styles.evidenceValue}>
+                          {project.evidence.value}
+                        </span>
+                      </span>
+                      <a
+                        className={styles.link}
+                        href={project.evidence.source.permalink}
+                        target="_blank"
+                        rel="noreferrer"
+                        aria-label={`${project.title} 검증 근거 (새 창)`}
+                      >
+                        근거 보기
+                      </a>
+                    </dd>
+                  </div>
+                </dl>
+              </li>
+            ))}
+          </ol>
+        </ResumeSection>
+
+        {resume.experience.length > 0 ? (
+          <ResumeSection title="Experience">
+            <ul className={styles.compactList}>
+              {resume.experience.map((item) => (
+                <li
+                  key={`${item.organization}-${item.role ?? "role"}`}
+                  className={styles.compactItem}
+                >
+                  <h3 className={styles.compactItemTitle}>
+                    {item.organization}
+                  </h3>
+                  {[item.role, item.period].filter(Boolean).length > 0 ? (
+                    <p className={styles.compactItemMeta}>
+                      {[item.role, item.period].filter(Boolean).join(" · ")}
+                    </p>
+                  ) : null}
+                  {item.contributions?.map((contribution) => (
+                    <p key={contribution} className={styles.compactItemText}>
+                      {contribution}
+                    </p>
+                  ))}
+                </li>
+              ))}
+            </ul>
+          </ResumeSection>
+        ) : null}
+
+        {resume.education.length > 0 ? (
+          <ResumeSection title="Education">
+            <ul className={styles.compactList}>
+              {resume.education.map((item) => (
+                <li
+                  key={`${item.institution}-${item.program ?? "program"}`}
+                  className={styles.compactItem}
+                >
+                  <h3 className={styles.compactItemTitle}>
+                    {item.institution}
+                  </h3>
+                  {[item.program, item.period].filter(Boolean).length > 0 ? (
+                    <p className={styles.compactItemMeta}>
+                      {[item.program, item.period].filter(Boolean).join(" · ")}
+                    </p>
+                  ) : null}
+                  {item.details?.map((detail) => (
+                    <p key={detail} className={styles.compactItemText}>
+                      {detail}
+                    </p>
+                  ))}
+                </li>
+              ))}
+            </ul>
+          </ResumeSection>
+        ) : null}
+
+        <footer className={styles.footer}>
+          <span>대표 4개 프로젝트 · 공개 근거가 연결된 사실만 수록</span>
+          <a
+            className={styles.link}
+            href={portfolioUrl}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="성진혁 포트폴리오 상세 사례 (새 창)"
+          >
+            상세 사례와 구조도 보기
+          </a>
+        </footer>
+      </div>
+    </article>
   );
 }
 
-function formatPortfolioCaseDomains(cases: PortfolioCase[]) {
-  if (cases.length <= 1) {
-    return cases[0]?.domain ?? "";
-  }
-
-  const domainParts = cases.map((portfolioCase) =>
-    portfolioCase.domain.split(" / "),
+function ResumeSection({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className={styles.section}>
+      <h2 className={styles.sectionTitle}>{title}</h2>
+      <div>{children}</div>
+    </section>
   );
-  const sharedDomain = domainParts[0]?.[0];
-
-  if (
-    sharedDomain &&
-    domainParts.every((parts) => parts[0] === sharedDomain && parts.length > 1)
-  ) {
-    return `${sharedDomain} / ${domainParts
-      .map((parts) => parts.slice(1).join(" / "))
-      .join(" · ")}`;
-  }
-
-  return cases.map((portfolioCase) => portfolioCase.domain).join(" / ");
 }

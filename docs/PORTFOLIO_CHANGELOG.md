@@ -1,12 +1,14 @@
 # Portfolio Changelog
 
-이 문서는 공개 포트폴리오 제출 전 구조와 근거 정리 이력을 짧게 기록합니다.
+## 2026-07 Neutral Minimal 재구성
 
-## 2026-05
-
-- 프로젝트 소개형 구성을 이력서 한 줄을 확장한 문제 해결 포트폴리오로 변경했습니다.
-- 대표 사례를 Concert Booking, Realtime Chat, AI Usage Billing Gateway, BorrowMe의 문제 해결 단위로 재구성했습니다.
-- 각 상세 페이지에 문제 구간 아키텍처, 아키텍처 판단 요약, 문제/해결/결과, 검증 근거를 분리했습니다.
-- evidence 상태를 `측정 완료`, `시나리오 검증`, `추가 측정 예정`으로 구분했습니다.
-- 대표 레포의 README, raw artifact, validator가 확인된 항목만 공개 근거로 연결했습니다.
-- PDF 이력서는 `public/resume-sung-jinhyuk-backend.pdf`가 있을 때만 노출되도록 유지했습니다.
+- 홈과 상세 페이지를 `문제 → 설계 판단 → 결과 → 근거` 순서의 구분선 기반 레이아웃으로 재구성했습니다.
+- 프로젝트와 evidence는 `src/content/projects.ts`, 사례는 `src/content/portfolio-cases.ts`만 단일 원천으로 사용합니다.
+- 공개 evidence를 `measured`와 `verified`로 제한하고 commit-pinned GitHub permalink를 필수로 만들었습니다.
+- 향후 검증은 evidence에서 제거하고 상세 페이지의 접힌 `nextValidation`에만 둡니다.
+- Concert 좌석 정합성과 Outbox/DLT 복구를 별도 사례로 분리했습니다.
+- Realtime 사례를 조회 N+1이 아니라 구독 인가, room ordering, receiver completeness, reconnect 경계 중심으로 바꿨습니다.
+- Billing 주장을 API Key, 사용량 idempotency, webhook, ledger 정합성으로 좁혔습니다.
+- BorrowMe는 현재 snapshot과 query-count guard만 공개합니다.
+- 웹 이력서와 A4 한 페이지 PDF를 동일한 TypeScript 데이터에서 생성합니다.
+- prototype-key route, canonical/OG, 접근성, 반응형, PDF, Playwright/axe 회귀 검증을 추가했습니다.

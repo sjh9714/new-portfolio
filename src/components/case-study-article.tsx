@@ -1,372 +1,285 @@
-import { PortfolioCaseDiagram } from "@/components/portfolio-case-diagram";
+import { ArrowLeft, ArrowRight, ExternalLink } from "lucide-react";
+import Link from "next/link";
+
+import { ArchitectureExplorer } from "@/components/architecture-explorer";
 import { StatusBadge } from "@/components/status-badge";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { caseStudies, type CaseStudy } from "@/content/portfolio-cases";
 import {
-  getPortfolioCaseProjectBadge,
-  type PortfolioCase,
-} from "@/content/portfolio-cases";
-import type { Project, ProjectEvidence } from "@/content/projects";
+  getEvidenceByIds,
+  type Evidence,
+  type ProjectSummary,
+} from "@/content/projects";
 
 export function CaseStudyArticle({
-  portfolioCase,
+  caseStudy,
   project,
 }: {
-  portfolioCase: PortfolioCase;
-  project: Project;
+  caseStudy: CaseStudy;
+  project: ProjectSummary;
 }) {
-  const heroEvidence = portfolioCase.primaryEvidenceLabels
-    ? selectEvidenceByLabels(portfolioCase, portfolioCase.primaryEvidenceLabels)
-    : portfolioCase.evidence;
-  const heroStatus = heroEvidence[0]?.status;
+  const heroEvidence = getEvidenceByIds(caseStudy.heroEvidenceIds);
+  const evidence = getEvidenceByIds(caseStudy.evidenceIds);
+  const currentIndex = caseStudies.findIndex(
+    (candidate) => candidate.slug === caseStudy.slug,
+  );
+  const previous = currentIndex > 0 ? caseStudies[currentIndex - 1] : undefined;
+  const next =
+    currentIndex < caseStudies.length - 1
+      ? caseStudies[currentIndex + 1]
+      : undefined;
 
   return (
-    <article className="mx-auto flex max-w-7xl flex-col gap-10 px-5 py-12 md:px-8 md:py-16">
-      <header className="border-border flex flex-col gap-5 border-b pb-8">
-        <div className="flex flex-col gap-3">
-          <p className="text-muted-foreground text-sm font-semibold tracking-[0.18em] uppercase">
-            문제 해결 포트폴리오 / {portfolioCase.domain}
+    <article className="page-shell py-8 md:py-14">
+      <nav aria-label="현재 위치" className="mb-8">
+        <ol className="text-muted-foreground flex flex-wrap items-center gap-2 text-sm">
+          <li>
+            <Link
+              href="/case-studies"
+              prefetch={false}
+              className="hover:text-foreground flex min-h-11 items-center hover:underline"
+            >
+              문제 해결 사례
+            </Link>
+          </li>
+          <li aria-hidden="true">/</li>
+          <li aria-current="page" className="text-foreground">
+            {caseStudy.title}
+          </li>
+        </ol>
+      </nav>
+
+      <header className="border-border grid gap-8 border-b pb-10 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-end lg:gap-14">
+        <div className="hero-sequence grid max-w-4xl gap-5">
+          <p className="section-kicker">
+            {project.title} / {project.domain}
           </p>
-          <div className="flex flex-wrap items-center gap-2">
-            {heroStatus ? <StatusBadge status={heroStatus} /> : null}
-            <Badge variant="outline" className="rounded-md">
-              {getPortfolioCaseProjectBadge(portfolioCase)}
-            </Badge>
-          </div>
-          <h1 className="text-foreground max-w-4xl text-4xl leading-tight font-bold tracking-tight [text-wrap:balance] [word-break:keep-all] md:text-5xl">
-            {portfolioCase.displayTitle}
+          <h1 className="heading-wrap text-foreground text-[clamp(2.35rem,7vw,4.8rem)] leading-[1.04] font-bold tracking-[-0.055em]">
+            {caseStudy.title}
           </h1>
-          <p className="text-muted-foreground max-w-3xl text-lg leading-8 [word-break:keep-all]">
-            {portfolioCase.resumeLine}
+          <p className="text-muted-foreground max-w-3xl text-lg leading-8 md:text-xl">
+            {caseStudy.summary}
           </p>
         </div>
-        <HeroMetricStrip metrics={portfolioCase.heroMetrics} />
-        <MethodTagList tags={portfolioCase.methodTags} />
-        <CompactMetaRow portfolioCase={portfolioCase} project={project} />
+        <div className="grid gap-3">
+          <p className="text-muted-foreground text-sm leading-6">
+            핵심 구현과 검증 파일은 저장소의 고정 permalink로 연결합니다.
+          </p>
+          <Button asChild variant="outline">
+            <a
+              href={project.repoUrl}
+              target="_blank"
+              rel="noreferrer"
+              aria-label={`${caseStudy.title} GitHub 저장소 (새 창)`}
+            >
+              GitHub 저장소
+              <ExternalLink aria-hidden="true" />
+            </a>
+          </Button>
+        </div>
       </header>
 
-      <div className="grid gap-10 lg:grid-cols-[minmax(0,800px)_340px] lg:items-start">
-        <section className="flex min-w-0 flex-col gap-8">
-          <PortfolioCaseDiagram portfolioCase={portfolioCase} />
+      {heroEvidence.length > 0 ? (
+        <section
+          aria-labelledby="hero-evidence-title"
+          className="border-border grid border-b md:grid-cols-3"
+        >
+          <h2 id="hero-evidence-title" className="sr-only">
+            핵심 근거
+          </h2>
+          {heroEvidence.map((item) => (
+            <div
+              key={item.id}
+              className="border-border grid content-start gap-3 border-b py-6 last:border-b-0 md:min-h-44 md:border-r md:border-b-0 md:px-6 md:first:pl-0 md:last:border-r-0 md:last:pr-0"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <p className="text-foreground text-sm font-semibold">
+                  {item.label}
+                </p>
+                <StatusBadge status={item.status} />
+              </div>
+              <p className="text-primary font-mono text-lg font-bold tracking-tight [overflow-wrap:anywhere]">
+                {item.value}
+              </p>
+              <p className="text-muted-foreground text-xs leading-5">
+                {formatEvidenceContext(item)}
+              </p>
+            </div>
+          ))}
+        </section>
+      ) : null}
 
-          <section className="grid gap-4">
-            <SummaryBlock title="문제" items={portfolioCase.problem} />
-            <SummaryBlock title="해결" items={portfolioCase.solution} />
-            <SummaryBlock title="결과" items={portfolioCase.result} />
-          </section>
+      <div className="grid gap-14 py-12 md:gap-20 md:py-16">
+        <ArchitectureExplorer architecture={caseStudy.architecture} />
 
-          <EvidenceSection portfolioCase={portfolioCase} />
-
-          <ImplementationPointSection portfolioCase={portfolioCase} />
-
-          {portfolioCase.stateTransitions?.length ? (
-            <StateTransitionTable
-              transitions={portfolioCase.stateTransitions}
+        <div className="grid gap-12 lg:grid-cols-[12rem_minmax(0,1fr)] lg:gap-16">
+          <div className="lg:sticky lg:top-8 lg:self-start">
+            <p className="section-kicker">Design review</p>
+            <p className="text-muted-foreground mt-3 text-sm leading-6">
+              문제를 좁히고, 실패 경계를 분리한 뒤, 재현 가능한 결과만
+              남겼습니다.
+            </p>
+          </div>
+          <div className="grid gap-12">
+            <CaseSection title="문제" items={caseStudy.problem} />
+            <CaseSection
+              title="단순 구현에서의 문제"
+              items={caseStudy.naiveApproach}
             />
-          ) : null}
+            <CaseSection title="설계 판단" items={caseStudy.decisions} />
+            <CaseSection title="검증 결과" items={caseStudy.results} />
+          </div>
+        </div>
 
-          <GitHubEvidenceLink project={project} />
+        <section aria-labelledby="evidence-title" className="grid gap-6">
+          <div>
+            <p className="section-kicker">Evidence</p>
+            <h2
+              id="evidence-title"
+              className="text-foreground mt-2 text-2xl font-bold tracking-tight md:text-3xl"
+            >
+              검증 근거
+            </h2>
+          </div>
+          <div className="border-border border-t">
+            {evidence.map((item) => (
+              <EvidenceRow key={item.id} evidence={item} />
+            ))}
+          </div>
         </section>
 
-        <CaseStudySidebar portfolioCase={portfolioCase} project={project} />
+        <section aria-label="추가 검토 항목" className="grid gap-3">
+          <FoldedSection title="한계와 다음 확인">
+            <GroupedList title="현재 한계" items={caseStudy.limitations} />
+            <GroupedList title="다음 확인" items={caseStudy.nextValidation} />
+          </FoldedSection>
+          <FoldedSection title="예상 면접 질문">
+            <ul className="grid gap-3">
+              {caseStudy.interviewQuestions.map((question) => (
+                <li
+                  key={question}
+                  className="border-primary text-foreground border-l-2 pl-4 text-sm leading-6"
+                >
+                  {question}
+                </li>
+              ))}
+            </ul>
+          </FoldedSection>
+        </section>
       </div>
+
+      <nav
+        aria-label="사례 이동"
+        className="border-border grid gap-4 border-t pt-8 sm:grid-cols-[1fr_auto_1fr] sm:items-center"
+      >
+        {previous ? (
+          <Link
+            href={`/case-studies/${previous.slug}`}
+            prefetch={false}
+            className="text-muted-foreground hover:text-primary flex min-h-11 items-center gap-2 text-sm font-semibold"
+          >
+            <ArrowLeft aria-hidden="true" className="size-4" />
+            <span>이전: {previous.title}</span>
+          </Link>
+        ) : (
+          <span />
+        )}
+        <Link
+          href="/case-studies"
+          prefetch={false}
+          className="text-primary flex min-h-11 items-center justify-center text-sm font-semibold hover:underline"
+        >
+          사례 목록
+        </Link>
+        {next ? (
+          <Link
+            href={`/case-studies/${next.slug}`}
+            prefetch={false}
+            className="text-muted-foreground hover:text-primary flex min-h-11 items-center justify-end gap-2 text-right text-sm font-semibold"
+          >
+            <span>다음: {next.title}</span>
+            <ArrowRight aria-hidden="true" className="size-4" />
+          </Link>
+        ) : (
+          <span />
+        )}
+      </nav>
     </article>
   );
 }
 
-function HeroMetricStrip({
-  metrics,
-}: {
-  metrics?: PortfolioCase["heroMetrics"];
-}) {
-  if (!metrics?.length) {
-    return null;
-  }
-
+function CaseSection({ title, items }: { title: string; items: string[] }) {
   return (
-    <div
-      aria-label="핵심 결과"
-      className="grid gap-2 sm:grid-cols-3 lg:max-w-3xl"
-    >
-      {metrics.map((metric) => (
-        <div
-          key={`${metric.label}-${metric.value}`}
-          className="border-border bg-card rounded-md border px-4 py-3"
-        >
-          <p className="text-primary text-xs font-semibold">{metric.label}</p>
-          <p className="text-foreground mt-1 text-sm leading-6 font-semibold [overflow-wrap:anywhere]">
-            {metric.value}
-          </p>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function MethodTagList({ tags }: { tags: string[] }) {
-  if (!tags.length) {
-    return null;
-  }
-
-  return (
-    <div className="flex flex-wrap items-center gap-2">
-      <span className="text-primary text-xs font-semibold">해결 키워드</span>
-      {tags.map((tag) => (
-        <Badge key={tag} variant="outline" className="rounded-md">
-          {tag}
-        </Badge>
-      ))}
-    </div>
-  );
-}
-
-function CompactMetaRow({
-  portfolioCase,
-  project,
-}: {
-  portfolioCase: PortfolioCase;
-  project: Project;
-}) {
-  const visibleTechStack = project.primaryTechStack.slice(0, 5);
-  const metaItems = [
-    ["프로젝트", project.title],
-    ["참여", project.team ?? project.role],
-    ...(project.period ? [["기간", project.period]] : []),
-    ["기술", visibleTechStack.join(" · ")],
-  ];
-
-  return (
-    <dl
-      aria-label={`${portfolioCase.displayTitle} 메타 정보`}
-      className="border-border bg-card text-muted-foreground flex flex-wrap gap-x-4 gap-y-2 rounded-md border px-4 py-3 text-sm leading-6"
-    >
-      {metaItems.map(([label, value]) => (
-        <div key={label} className="flex min-w-0 gap-1">
-          <dt className="text-primary shrink-0 font-semibold">{label}</dt>
-          <dd className="text-foreground min-w-0 [overflow-wrap:anywhere]">
-            {value}
-          </dd>
-        </div>
-      ))}
-    </dl>
-  );
-}
-
-function SummaryBlock({ title, items }: { title: string; items: string[] }) {
-  return (
-    <section className="border-border bg-card rounded-md border p-5">
-      <h2 className="text-foreground text-xl font-semibold">{title}</h2>
-      <OrderedList items={items} />
-    </section>
-  );
-}
-
-function EvidenceSection({ portfolioCase }: { portfolioCase: PortfolioCase }) {
-  const primaryEvidence = portfolioCase.primaryEvidenceLabels
-    ? selectEvidenceByLabels(portfolioCase, portfolioCase.primaryEvidenceLabels)
-    : portfolioCase.evidence;
-  const referenceEvidence = selectEvidenceByLabels(
-    portfolioCase,
-    portfolioCase.referenceEvidenceLabels ?? [],
-  );
-
-  return (
-    <ContentSection title="검증 근거">
-      <div className="grid gap-3">
-        {primaryEvidence.map((evidence) => renderEvidenceCard(evidence))}
-      </div>
-
-      {referenceEvidence.length ? (
-        <div className="grid gap-3">
-          {referenceEvidence.map((evidence) =>
-            renderReferenceEvidence(
-              evidence,
-              portfolioCase.referenceEvidenceTitle ?? "참고 기록",
-            ),
-          )}
-        </div>
-      ) : null}
-    </ContentSection>
-  );
-}
-
-function selectEvidenceByLabels(
-  portfolioCase: PortfolioCase,
-  labels: string[],
-) {
-  return labels.map((label) => {
-    const evidence = portfolioCase.evidence.find(
-      (item) => item.label === label,
-    );
-
-    if (!evidence) {
-      throw new Error(
-        `Missing evidence "${label}" on portfolio case "${portfolioCase.slug}"`,
-      );
-    }
-
-    return evidence;
-  });
-}
-
-function renderEvidenceCard(
-  evidence: ProjectEvidence,
-  options?: { badgeLabel?: string },
-) {
-  return (
-    <div
-      key={evidence.label}
-      className="border-border bg-card rounded-md border p-4"
-    >
-      <div className="flex items-start justify-between gap-3">
-        <h3 className="text-foreground font-semibold [overflow-wrap:anywhere]">
-          {evidence.label}
-        </h3>
-        {options?.badgeLabel ? (
-          <Badge variant="outline" className="shrink-0 rounded-md">
-            {options.badgeLabel}
-          </Badge>
-        ) : (
-          <StatusBadge status={evidence.status} />
-        )}
-      </div>
-      <p className="text-muted-foreground mt-2 text-sm leading-6 [overflow-wrap:anywhere]">
-        {evidence.value}
-      </p>
-    </div>
-  );
-}
-
-function renderReferenceEvidence(evidence: ProjectEvidence, title: string) {
-  return renderEvidenceCard(evidence, { badgeLabel: title });
-}
-
-function ImplementationPointSection({
-  portfolioCase,
-}: {
-  portfolioCase: PortfolioCase;
-}) {
-  if (!portfolioCase.implementationDetails.length) {
-    return null;
-  }
-
-  return (
-    <ContentSection title="구현 포인트">
-      <div className="border-border bg-card rounded-md border p-5">
-        <OrderedList items={portfolioCase.implementationDetails.slice(0, 3)} />
-      </div>
-    </ContentSection>
-  );
-}
-
-function GitHubEvidenceLink({ project }: { project: Project }) {
-  return (
-    <section className="border-border bg-card flex flex-col gap-3 rounded-md border p-5">
-      <p className="text-muted-foreground text-sm leading-6">
-        세부 테스트, guard, raw artifact는 GitHub README와 docs에 정리했습니다.
-      </p>
-      <Button asChild className="w-fit">
-        <a href={project.repoUrl} target="_blank" rel="noreferrer">
-          GitHub 근거 보기
-        </a>
-      </Button>
-    </section>
-  );
-}
-
-function CaseStudySidebar({
-  portfolioCase,
-  project,
-}: {
-  portfolioCase: PortfolioCase;
-  project: Project;
-}) {
-  return (
-    <aside
-      aria-label={`${portfolioCase.displayTitle} 요약`}
-      className="border-border bg-card flex flex-col gap-6 rounded-md border p-5 lg:sticky lg:top-6"
-    >
-      <SidebarSection title="한계와 다음 검증">
-        <SidebarList items={portfolioCase.limitations} />
-      </SidebarSection>
-
-      <FoldedSidebarSection title="예상 면접 질문">
-        <SidebarList items={portfolioCase.interviewQuestions} />
-      </FoldedSidebarSection>
-
-      <Button asChild className="w-full">
-        <a href={project.repoUrl} target="_blank" rel="noreferrer">
-          GitHub 근거 보기
-        </a>
-      </Button>
-    </aside>
-  );
-}
-
-function StateTransitionTable({
-  transitions,
-}: {
-  transitions: NonNullable<PortfolioCase["stateTransitions"]>;
-}) {
-  return (
-    <ContentSection title="Outbox 상태 전이">
-      <div className="border-border overflow-hidden rounded-md border">
-        <table className="w-full border-collapse text-left text-sm">
-          <thead className="bg-card text-muted-foreground">
-            <tr>
-              <th className="border-border border-b px-3 py-2 font-semibold">
-                From
-              </th>
-              <th className="border-border border-b px-3 py-2 font-semibold">
-                To
-              </th>
-              <th className="border-border border-b px-3 py-2 font-semibold">
-                설명
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {transitions.map((transition) => (
-              <tr
-                key={`${transition.from}-${transition.to}`}
-                className="border-border border-b last:border-0"
-              >
-                <td className="text-foreground px-3 py-3 font-semibold [overflow-wrap:anywhere]">
-                  {transition.from}
-                </td>
-                <td className="text-foreground px-3 py-3 font-semibold [overflow-wrap:anywhere]">
-                  {transition.to}
-                </td>
-                <td className="text-muted-foreground px-3 py-3 leading-6 [overflow-wrap:anywhere]">
-                  {transition.description}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </ContentSection>
-  );
-}
-
-function ContentSection({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="flex flex-col gap-4">
-      <h2 className="text-foreground text-2xl font-semibold tracking-tight">
+    <section className="border-border grid gap-4 border-t pt-6">
+      <h2 className="text-foreground text-xl font-bold tracking-tight md:text-2xl">
         {title}
       </h2>
-      {children}
+      <ul className="grid gap-3">
+        {items.map((item) => (
+          <li
+            key={item}
+            className="text-muted-foreground grid grid-cols-[0.6rem_1fr] gap-3 text-base leading-7"
+          >
+            <span
+              aria-hidden="true"
+              className="bg-primary mt-[0.7rem] size-1.5 rounded-full"
+            />
+            <span>{item}</span>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }
 
-function SidebarSection({
+function EvidenceRow({ evidence }: { evidence: Evidence }) {
+  return (
+    <article className="border-border grid gap-4 border-b py-5 md:grid-cols-[10rem_minmax(0,1fr)_auto] md:items-start md:gap-6">
+      <div className="grid justify-items-start gap-2">
+        <StatusBadge status={evidence.status} />
+        <span className="text-muted-foreground font-mono text-[0.68rem] font-semibold tracking-[0.1em] uppercase">
+          {evidence.scope}
+        </span>
+      </div>
+      <div className="min-w-0">
+        <h3 className="text-foreground font-semibold">{evidence.label}</h3>
+        <p className="text-primary mt-1 font-mono text-sm font-semibold [overflow-wrap:anywhere]">
+          {evidence.value}
+        </p>
+        <p className="text-muted-foreground mt-2 text-sm leading-6">
+          {formatEvidenceContext(evidence)}
+        </p>
+        {evidence.source.command ? (
+          <code className="bg-muted text-foreground mt-2 block w-fit max-w-full px-2 py-1 font-mono text-xs [overflow-wrap:anywhere]">
+            {evidence.source.command}
+          </code>
+        ) : null}
+      </div>
+      <a
+        href={evidence.source.permalink}
+        target="_blank"
+        rel="noreferrer"
+        className="text-primary hover:text-accent-foreground flex min-h-11 items-center text-sm font-semibold hover:underline"
+        aria-label={`${evidence.label} 근거 파일 (새 창)`}
+      >
+        근거 파일
+        <ExternalLink className="ml-1 size-4" aria-hidden="true" />
+      </a>
+    </article>
+  );
+}
+
+function formatEvidenceContext(evidence: Evidence) {
+  if (evidence.status === "measured") {
+    return [evidence.measuredAt, evidence.scenario, evidence.environment]
+      .filter(Boolean)
+      .join(" · ");
+  }
+
+  return evidence.method;
+}
+
+function FoldedSection({
   title,
   children,
 }: {
@@ -374,54 +287,36 @@ function SidebarSection({
   children: React.ReactNode;
 }) {
   return (
-    <section className="flex flex-col gap-3">
-      <h2 className="text-primary text-sm font-semibold">{title}</h2>
-      {children}
-    </section>
-  );
-}
-
-function FoldedSidebarSection({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <details className="flex flex-col gap-3">
-      <summary className="text-primary cursor-pointer text-sm font-semibold">
+    <details className="group border-border bg-card open:border-primary border-y">
+      <summary className="text-foreground flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 py-3 font-semibold marker:hidden">
         {title}
+        <span
+          aria-hidden="true"
+          className="text-primary font-mono text-xl transition-transform group-open:rotate-45"
+        >
+          +
+        </span>
       </summary>
-      <div className="mt-3">{children}</div>
+      <div className="border-border grid gap-6 border-t py-5">{children}</div>
     </details>
   );
 }
 
-function OrderedList({ items }: { items: string[] }) {
-  return (
-    <ol className="text-muted-foreground mt-4 flex list-decimal flex-col gap-2 pl-5 text-sm leading-7">
-      {items.map((item) => (
-        <li key={item} className="[overflow-wrap:anywhere]">
-          {item}
-        </li>
-      ))}
-    </ol>
-  );
-}
+function GroupedList({ title, items }: { title: string; items: string[] }) {
+  if (items.length === 0) {
+    return null;
+  }
 
-function SidebarList({ items }: { items: string[] }) {
   return (
-    <ul className="text-muted-foreground flex flex-col gap-2 text-xs leading-5">
-      {items.map((item) => (
-        <li key={item} className="flex gap-2">
-          <span
-            aria-hidden="true"
-            className="bg-primary mt-2 size-1 shrink-0 rounded-full"
-          />
-          <span className="[overflow-wrap:anywhere]">{item}</span>
-        </li>
-      ))}
-    </ul>
+    <div>
+      <h3 className="text-muted-foreground font-mono text-xs font-semibold tracking-[0.12em] uppercase">
+        {title}
+      </h3>
+      <ul className="text-foreground mt-3 grid gap-2 text-sm leading-6">
+        {items.map((item) => (
+          <li key={item}>— {item}</li>
+        ))}
+      </ul>
+    </div>
   );
 }

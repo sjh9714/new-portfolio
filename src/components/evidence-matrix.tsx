@@ -1,66 +1,54 @@
 import { StatusBadge } from "@/components/status-badge";
-import type { EvidenceStatus } from "@/content/projects";
-
-const statusLabels: Record<EvidenceStatus, string> = {
-  measured: "측정 완료",
-  verified: "시나리오 검증",
-  pending: "추가 측정 예정",
-};
+import type { Evidence } from "@/content/projects";
 
 const rows: {
-  status: EvidenceStatus;
+  status: Evidence["status"];
   definition: string;
   standard: string;
 }[] = [
   {
     status: "measured",
-    definition: "부하/성능/용량을 도구로 측정하여 수치로 확인한 항목",
-    standard: "k6 부하 테스트, RPS/latency 측정, 리소스 사용량, 임계점 도출",
+    definition: "날짜·환경·시나리오를 함께 남긴 부하 또는 성능 측정",
+    standard: "측정 명령과 결과 artifact를 정확한 저장소 permalink로 연결",
   },
   {
     status: "verified",
-    definition:
-      "통합/정합성/복구 시나리오를 반복 실행하여 기대 결과를 검증한 항목",
-    standard:
-      "Testcontainers 통합 테스트, 재현 가능한 시나리오, 로그/지표 검증",
-  },
-  {
-    status: "pending",
-    definition:
-      "설계/구현 진행 중이거나 운영 데이터 축적으로 검증이 예정된 항목",
-    standard: "운영 지표 축적 필요, 추가 실험/데이터 수집 예정",
+    definition: "반복 가능한 테스트로 정합성·복구 경로를 확인한 항목",
+    standard: "테스트 파일과 실행 방법을 정확한 저장소 permalink로 연결",
   },
 ];
 
 export function EvidenceMatrix() {
   return (
-    <div className="grid gap-4 md:grid-cols-3">
-      {rows.map((row) => (
+    <div className="border-border grid border-y md:grid-cols-2">
+      {rows.map((row, index) => (
         <article
           key={row.status}
-          className="border-border bg-card flex min-w-0 flex-col gap-4 border p-4"
+          className="border-border grid gap-5 border-b py-5 last:border-b-0 md:border-b-0 md:px-6 md:first:pl-0 md:last:pr-0"
+          style={index > 0 ? { borderInlineStartWidth: 1 } : undefined}
         >
-          <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center justify-between gap-3">
             <h3 className="text-foreground font-semibold">
-              {statusLabels[row.status]}
+              {row.status === "measured" ? "측정 근거" : "검증 근거"}
             </h3>
             <StatusBadge status={row.status} />
           </div>
-          <EvidenceText label="정의" value={row.definition} />
-          <EvidenceText label="기준" value={row.standard} />
+          <dl className="grid gap-3 text-sm leading-6">
+            <div>
+              <dt className="text-muted-foreground font-mono text-[0.7rem] font-semibold tracking-[0.12em] uppercase">
+                정의
+              </dt>
+              <dd className="text-foreground mt-1">{row.definition}</dd>
+            </div>
+            <div>
+              <dt className="text-muted-foreground font-mono text-[0.7rem] font-semibold tracking-[0.12em] uppercase">
+                공개 기준
+              </dt>
+              <dd className="text-foreground mt-1">{row.standard}</dd>
+            </div>
+          </dl>
         </article>
       ))}
-    </div>
-  );
-}
-
-function EvidenceText({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex flex-col gap-2">
-      <p className="text-muted-foreground text-xs font-semibold tracking-[0.16em] uppercase">
-        {label}
-      </p>
-      <p className="text-foreground text-sm leading-6">{value}</p>
     </div>
   );
 }

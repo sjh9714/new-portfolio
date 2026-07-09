@@ -86,16 +86,16 @@ export function renderDiagram(spec: DiagramSpec): string {
 export function renderNode(node: DiagramNode): string {
   const style = nodeStyle[node.kind];
   const titleX = node.x + node.w / 2;
-  const titleY = node.y + 31;
-  const lineY = titleY + 24;
+  const titleY = node.y + 30;
+  const lineY = titleY + 25;
 
   return [
     `    <g id="node-${escapeXml(node.id)}">`,
-    `      <rect x="${node.x}" y="${node.y}" width="${node.w}" height="${node.h}" rx="8" fill="${style.fill}" stroke="${style.stroke}" stroke-width="${style.width}"/>`,
-    `      <text x="${titleX}" y="${titleY}" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#0f172a">${escapeXml(node.title)}</text>`,
+    `      <rect x="${node.x}" y="${node.y}" width="${node.w}" height="${node.h}" rx="4" fill="${style.fill}" stroke="${style.stroke}" stroke-width="${style.width}"/>`,
+    `      <text x="${titleX}" y="${titleY}" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#0f172a">${escapeXml(node.title)}</text>`,
     renderTextLines(titleX, lineY, node.lines, {
-      fontSize: 12,
-      lineHeight: 18,
+      fontSize: 14,
+      lineHeight: 20,
       fill: "#475569",
     }),
     `    </g>`,
@@ -194,7 +194,7 @@ export function renderLegend(spec: DiagramSpec): string {
     const item = [
       `    <g transform="translate(${x} ${startY - 16})">`,
       `      <line x1="0" y1="10" x2="24" y2="10" stroke="${style.stroke}" stroke-width="1.8"${style.dash ? ` stroke-dasharray="${style.dash}"` : ""} marker-end="url(#arrow-${kind})"/>`,
-      `      <text x="34" y="14" font-family="Arial, sans-serif" font-size="12" fill="#475569">${escapeXml(label)}</text>`,
+      `      <text x="34" y="15" font-family="Arial, sans-serif" font-size="14" fill="#475569">${escapeXml(label)}</text>`,
       `    </g>`,
     ].join("\n");
     x += width;
@@ -240,23 +240,23 @@ function renderDefs() {
 function renderContainer(container: Box & { id: string; title: string }) {
   return [
     `    <g id="container-${escapeXml(container.id)}">`,
-    `      <rect x="${container.x}" y="${container.y}" width="${container.w}" height="${container.h}" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.2" stroke-dasharray="4 4"/>`,
-    `      <text x="${container.x + 14}" y="${container.y + 24}" text-anchor="start" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#64748b">${escapeXml(container.title)}</text>`,
+    `      <rect x="${container.x}" y="${container.y}" width="${container.w}" height="${container.h}" rx="6" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.2" stroke-dasharray="4 4"/>`,
+    `      <text x="${container.x + 14}" y="${container.y + 25}" text-anchor="start" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#64748b">${escapeXml(container.title)}</text>`,
     `    </g>`,
   ].join("\n");
 }
 
 function renderEdgeLabel(edge: DiagramEdge, position: Point) {
   const label = edge.label ?? "";
-  const width = Math.max(82, label.length * 10 + 22);
-  const height = 22;
+  const width = Math.max(92, label.length * 12 + 24);
+  const height = 26;
   const x = position.x - width / 2;
   const y = position.y - height / 2;
 
   return [
     `    <g id="edge-label-${escapeXml(edge.id)}">`,
-    `      <rect x="${round(x)}" y="${round(y)}" width="${round(width)}" height="${height}" rx="11" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>`,
-    `      <text x="${position.x}" y="${position.y + 4}" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#475569">${escapeXml(label)}</text>`,
+    `      <rect x="${round(x)}" y="${round(y)}" width="${round(width)}" height="${height}" rx="4" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>`,
+    `      <text x="${position.x}" y="${position.y + 5}" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#475569">${escapeXml(label)}</text>`,
     `    </g>`,
   ].join("\n");
 }
@@ -275,7 +275,7 @@ function assertGrid(slug: string, node: DiagramNode) {
 }
 
 function assertNodeHeight(slug: string, node: DiagramNode) {
-  const required = 38 + node.lines.length * 18;
+  const required = 40 + node.lines.length * 20;
 
   if (node.h < required) {
     throw new Error(
@@ -374,8 +374,8 @@ function assertEdgeLabelDoesNotOverlapNodes(
 }
 
 function getEdgeLabelBox(label: string, position: Point): Box {
-  const width = Math.max(82, label.length * 10 + 22);
-  const height = 22;
+  const width = Math.max(92, label.length * 12 + 24);
+  const height = 26;
 
   return {
     x: position.x - width / 2,
