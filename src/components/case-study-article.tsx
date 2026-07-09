@@ -224,7 +224,7 @@ function CaseSection({ title, items }: { title: string; items: string[] }) {
               aria-hidden="true"
               className="bg-primary mt-[0.7rem] size-1.5 rounded-full"
             />
-            <span>{item}</span>
+            <span className="[overflow-wrap:anywhere]">{item}</span>
           </li>
         ))}
       </ul>
