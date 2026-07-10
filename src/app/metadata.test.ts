@@ -41,7 +41,7 @@ describe("page metadata", () => {
 
     expect(homeMetadata.alternates).toEqual({ canonical: "/" });
     expect(homeMetadata.openGraph).toHaveProperty("url", "/");
-    expect(notFoundMetadata.robots).toEqual({ index: false, follow: false });
+    expect(notFoundMetadata.robots).toBeUndefined();
     expect(notFoundMetadata.alternates).toBeUndefined();
     expect(notFoundMetadata.openGraph).toBeUndefined();
   });
