@@ -104,6 +104,18 @@ test("mobile menu opens, follows route, and closes with Escape", async ({
   ).toHaveCount(0);
 });
 
+test("mobile flow keeps inactive actor text accessible", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/flows/realtime-message-lifecycle?variant=designed&step=1");
+
+  const results = await new AxeBuilder({ page }).analyze();
+  expect(
+    results.violations.filter((item) =>
+      ["serious", "critical"].includes(item.impact ?? ""),
+    ),
+  ).toEqual([]);
+});
+
 test("flow controls update the visible step and URL", async ({ page }) => {
   await page.goto("/flows/realtime-message-lifecycle?variant=designed&step=1");
   await expect(

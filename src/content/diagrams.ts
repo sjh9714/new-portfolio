@@ -7,8 +7,8 @@ const diagramDrafts = [
     caption:
       "2024년 팀 제품의 알림 흐름과 2026년 개인 회귀 검증을 같은 시기로 섞지 않습니다.",
     sourceIds: [
-      "borrow-team-notification-pr",
-      "borrow-rest-notification-pr",
+      "borrow-comment-notification-commit",
+      "borrow-rest-notification-commit",
       "borrow-team-demo",
       "borrow-query-guard",
       "borrow-stock-invariant",
@@ -22,7 +22,7 @@ const diagramDrafts = [
         y: 34,
         width: 19,
         compact: { x: 8, y: 10, width: 84 },
-        sourceIds: ["borrow-team-notification-pr"],
+        sourceIds: ["borrow-comment-notification-commit"],
       },
       {
         id: "notification",
@@ -33,8 +33,8 @@ const diagramDrafts = [
         width: 22,
         compact: { x: 8, y: 30, width: 84 },
         sourceIds: [
-          "borrow-team-notification-pr",
-          "borrow-rest-notification-pr",
+          "borrow-comment-notification-commit",
+          "borrow-rest-notification-commit",
         ],
         tone: "accent",
       },
@@ -46,7 +46,7 @@ const diagramDrafts = [
         y: 12,
         width: 18,
         compact: { x: 8, y: 50, width: 84 },
-        sourceIds: ["borrow-rest-notification-pr", "borrow-team-demo"],
+        sourceIds: ["borrow-rest-notification-commit", "borrow-team-demo"],
         tone: "success",
       },
       {
@@ -76,14 +76,14 @@ const diagramDrafts = [
         from: "comment",
         to: "notification",
         label: "creates",
-        sourceIds: ["borrow-team-notification-pr"],
+        sourceIds: ["borrow-comment-notification-commit"],
       },
       {
         id: "notification-frontend",
         from: "notification",
         to: "frontend",
         label: "2024 REST",
-        sourceIds: ["borrow-rest-notification-pr", "borrow-team-demo"],
+        sourceIds: ["borrow-rest-notification-commit", "borrow-team-demo"],
       },
       {
         id: "notification-query",
@@ -104,8 +104,8 @@ const diagramDrafts = [
       {
         text: "2024년 댓글 알림과 REST endpoint를 팀 클라이언트에 연결했습니다.",
         sourceIds: [
-          "borrow-team-notification-pr",
-          "borrow-rest-notification-pr",
+          "borrow-comment-notification-commit",
+          "borrow-rest-notification-commit",
           "borrow-team-demo",
         ],
       },

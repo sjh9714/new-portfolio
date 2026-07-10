@@ -29,8 +29,8 @@ export const projects: readonly ProjectStory[] = [
         title: "알림이 실제 제품 흐름에 들어가게 만들기",
         body: "댓글 알림을 구현하고 프론트엔드가 호출할 REST 경계로 전환해 팀 시연까지 연결했습니다.",
         sourceIds: [
-          "borrow-team-notification-pr",
-          "borrow-rest-notification-pr",
+          "borrow-comment-notification-commit",
+          "borrow-rest-notification-commit",
           "borrow-team-demo",
         ],
       },
@@ -56,8 +56,8 @@ export const projects: readonly ProjectStory[] = [
     ],
     tech: ["Java", "Spring Boot", "MySQL", "JPA", "Testcontainers"],
     sourceIds: [
-      "borrow-team-notification-pr",
-      "borrow-rest-notification-pr",
+      "borrow-comment-notification-commit",
+      "borrow-rest-notification-commit",
       "borrow-team-demo",
       "borrow-query-guard",
       "borrow-stock-invariant",

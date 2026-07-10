@@ -2,20 +2,22 @@ import type { SourceRef } from "./types";
 
 export const sources: readonly SourceRef[] = [
   {
-    id: "borrow-team-notification-pr",
-    kind: "pull-request",
+    id: "borrow-comment-notification-commit",
+    kind: "commit",
     verification: "public",
-    label: "BorrowMe 댓글 알림 기능 PR",
-    url: "https://github.com/ardkyer/borrow_me/pull/1",
-    repository: "ardkyer/borrow_me",
+    label: "댓글 저장 시 게시글 작성자 알림 생성 구현",
+    url: "https://github.com/sjh9714/borrow_me/blob/88a572d5100c0957e32104e5f36e21c2910ab170/src/main/java/com/ardkyer/rion/service/CommentServiceImpl.java#L21-L52",
+    repository: "sjh9714/borrow_me",
+    sha: "88a572d5100c0957e32104e5f36e21c2910ab170",
   },
   {
-    id: "borrow-rest-notification-pr",
-    kind: "pull-request",
+    id: "borrow-rest-notification-commit",
+    kind: "commit",
     verification: "public",
-    label: "NotificationController REST 전환 PR",
-    url: "https://github.com/ardkyer/borrow_me/pull/4",
-    repository: "ardkyer/borrow_me",
+    label: "NotificationController REST 전환 구현",
+    url: "https://github.com/sjh9714/borrow_me/blob/fbb81bd47541721b012145df24df9f350e9ba5de/src/main/java/com/ardkyer/rion/controller/NotificationController.java#L17-L74",
+    repository: "sjh9714/borrow_me",
+    sha: "fbb81bd47541721b012145df24df9f350e9ba5de",
   },
   {
     id: "borrow-team-demo",

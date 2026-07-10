@@ -234,6 +234,26 @@ describe("story content graph", () => {
         expect(source.url).toContain(source.sha);
       }
     }
+
+    const featuredSourceIds = new Set(
+      projects
+        .filter((project) => project.featured)
+        .flatMap((project) => [
+          ...project.sourceIds,
+          ...project.timeline.flatMap((entry) => entry.sourceIds),
+        ]),
+    );
+    for (const source of sources.filter((item) =>
+      featuredSourceIds.has(item.id),
+    )) {
+      if (
+        source.verification === "public" &&
+        source.url?.startsWith("https://github.com/")
+      ) {
+        expect(source.sha).toMatch(/^[0-9a-f]{40}$/);
+        expect(source.url).toContain(source.sha);
+      }
+    }
   });
 
   it("does not publish rejected claims", () => {
