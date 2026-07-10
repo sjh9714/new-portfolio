@@ -1,31 +1,32 @@
 import type { MetadataRoute } from "next";
 
-import { publishedBlogTopics } from "@/content/blog";
-import { featuredPortfolioCases } from "@/content/portfolio-cases";
+import { engineeringCases } from "@/content/cases";
+import { flows } from "@/content/flows";
+import { projects } from "@/content/projects";
 import { getSiteUrl } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = getSiteUrl();
-  const routes = ["", "/case-studies", "/projects", "/resume", "/about"];
-  const blogRoutes = publishedBlogTopics.length > 0 ? ["/blog"] : [];
-  const blogArticleRoutes = publishedBlogTopics.map(
-    (topic) => `/blog/${topic.slug}`,
-  );
-  const caseStudyRoutes = featuredPortfolioCases.map(
-    (portfolioCase) => `/case-studies/${portfolioCase.slug}`,
-  );
-
+  const base = getSiteUrl();
   return [
-    ...routes,
-    ...blogRoutes,
-    ...blogArticleRoutes,
-    ...caseStudyRoutes,
-  ].map((route) => {
-    const url = route === "" ? `${baseUrl}/` : `${baseUrl}${route}`;
-
-    return {
-      url,
-      lastModified: new Date(),
-    };
-  });
+    { url: base, changeFrequency: "monthly", priority: 1 },
+    { url: `${base}/projects`, changeFrequency: "monthly", priority: 0.9 },
+    ...projects.map((project) => ({
+      url: `${base}/projects/${project.slug}`,
+      changeFrequency: "monthly" as const,
+      priority: 0.8,
+    })),
+    { url: `${base}/cases`, changeFrequency: "monthly", priority: 0.75 },
+    ...engineeringCases.map((item) => ({
+      url: `${base}/cases/${item.slug}`,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    })),
+    { url: `${base}/flows`, changeFrequency: "monthly", priority: 0.8 },
+    ...flows.map((flow) => ({
+      url: `${base}/flows/${flow.slug}`,
+      changeFrequency: "monthly" as const,
+      priority: 0.75,
+    })),
+    { url: `${base}/resume`, changeFrequency: "monthly", priority: 0.7 },
+  ];
 }

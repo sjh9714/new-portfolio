@@ -3,8 +3,7 @@ name: CI
 on:
   pull_request:
   push:
-    branches:
-      - main
+    branches: [main]
 
 permissions:
   contents: read
@@ -16,15 +15,15 @@ concurrency:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     env:
       NEXT_PUBLIC_SITE_URL: https://new-portfolio-smoky-one-41.vercel.app
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
 
       - name: Setup Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version: 22
           cache: npm
@@ -32,5 +31,49 @@ jobs:
       - name: Install
         run: npm ci
 
-      - name: Verify
-        run: npm run ci
+      - name: Content graph
+        run: npm run check:content
+
+      - name: Format
+        run: npm run format:check
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Production build
+        run: npm run build
+
+      - name: Install Chromium and deterministic Korean fonts
+        run: |
+          npx playwright install --with-deps chromium
+          sudo apt-get install -y fonts-noto-cjk
+          fc-cache -f
+
+      - name: Generate and validate resume PDF
+        run: |
+          RESUME_OUTPUT_PATH=/tmp/resume-generated.pdf npm run resume:pdf
+          npm run resume:check -- public/resume-sung-jinhyuk-backend.pdf
+          npm run resume:check -- /tmp/resume-generated.pdf
+          npm run resume:compare -- public/resume-sung-jinhyuk-backend.pdf /tmp/resume-generated.pdf
+
+      - name: Browser and accessibility tests
+        run: npm run e2e
+
+      - name: Production dependency audit
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Upload browser report on failure
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report
+            test-results
+          retention-days: 7

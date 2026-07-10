@@ -1,33 +1,113 @@
+"use client";
+
+import { Code2, Menu, X } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 import { navigationItems, profile } from "@/content/profile";
 
+function isCurrent(pathname: string, href: string) {
+  if (href === "/projects" && pathname.startsWith("/cases")) return true;
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
 export function SiteHeader() {
+  const pathname = usePathname();
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [open]);
+
   return (
-    <header className="border-border bg-background border-b">
-      <div className="mx-auto flex max-w-7xl flex-col gap-3 px-5 py-4 md:flex-row md:items-center md:justify-between md:gap-6 md:px-8">
+    <header className="site-header">
+      <div className="site-header-inner">
         <Link
           href="/"
-          className="text-foreground text-2xl font-bold tracking-tight"
-          aria-label="성진혁 portfolio home"
+          prefetch={false}
+          className="brand-link"
+          aria-label="성진혁 홈"
         >
-          {profile.initials}
+          <span className="brand-mark" aria-hidden="true">
+            SJH
+          </span>
+          <span>{profile.name}</span>
         </Link>
-        <nav
-          aria-label="Primary navigation"
-          className="flex w-full items-center gap-5 overflow-x-auto md:w-auto md:gap-7"
-        >
-          {navigationItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="text-foreground hover:text-primary shrink-0 text-sm font-medium transition-colors"
-            >
-              {item.label}
-            </Link>
-          ))}
+
+        <nav className="desktop-nav" aria-label="주요 메뉴">
+          {navigationItems.map((item) => {
+            const current = isCurrent(pathname, item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                prefetch={false}
+                aria-current={current ? "page" : undefined}
+                className="nav-link"
+              >
+                {item.label}
+              </Link>
+            );
+          })}
+          <a
+            className="nav-link nav-external"
+            href={profile.githubUrl}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="성진혁 GitHub (새 창)"
+          >
+            <Code2 size={17} aria-hidden="true" />
+            GitHub
+          </a>
         </nav>
+
+        <button
+          className="menu-button"
+          type="button"
+          aria-expanded={open}
+          aria-controls="mobile-menu"
+          aria-label={open ? "메뉴 닫기" : "메뉴 열기"}
+          onClick={() => setOpen((value) => !value)}
+        >
+          {open ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
+        </button>
       </div>
+
+      {open ? (
+        <nav id="mobile-menu" className="mobile-nav" aria-label="모바일 메뉴">
+          {navigationItems.map((item) => {
+            const current = isCurrent(pathname, item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                prefetch={false}
+                aria-current={current ? "page" : undefined}
+                className="mobile-nav-link"
+                onClick={() => setOpen(false)}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
+          <a
+            className="mobile-nav-link"
+            href={profile.githubUrl}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="성진혁 GitHub (새 창)"
+            onClick={() => setOpen(false)}
+          >
+            GitHub <span aria-hidden="true">↗</span>
+          </a>
+        </nav>
+      ) : null}
     </header>
   );
 }
