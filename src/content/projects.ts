@@ -72,6 +72,19 @@ export const projects: readonly ProjectStory[] = [
         description:
           "알림 구현에서 시작해 조회·재고 회귀 검증으로 이어진 두 시기",
         accent: "green",
+        eyebrow: "TWO CHAPTERS",
+        milestones: [
+          {
+            label: "2024",
+            title: "Team demo",
+            detail: "댓글 알림 → REST → Client",
+          },
+          {
+            label: "2026",
+            title: "Return & verify",
+            detail: "Query guard → Stock invariant",
+          },
+        ],
       },
     ],
   },
@@ -338,6 +351,14 @@ export const projects: readonly ProjectStory[] = [
         title: "Auth → Album → Letter & Photo",
         description: "팀 제품 안에서 직접 맡은 백엔드 범위를 분리한 기능 맵",
         accent: "amber",
+        eyebrow: "OWNED BACKEND SCOPE",
+        stages: [
+          { index: "01", label: "Auth" },
+          { index: "02", label: "Album" },
+          { index: "03", label: "Letter" },
+          { index: "04", label: "Photo" },
+        ],
+        note: "Team client integration & demo",
       },
     ],
   },

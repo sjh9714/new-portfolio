@@ -95,12 +95,7 @@ export default async function ProjectPage({
       </header>
 
       <div className="project-detail-media page-shell">
-        <ProjectArtwork
-          projectSlug={project.slug}
-          title={project.title}
-          media={project.media[0]}
-          priority
-        />
+        <ProjectArtwork media={project.media[0]} priority />
       </div>
 
       <section

@@ -41,16 +41,49 @@ describe("story content graph", () => {
     for (const project of projects) {
       expect(project.tech.length).toBeLessThanOrEqual(5);
       expect(project.userJourney.length).toBeGreaterThanOrEqual(2);
+      expect(project.media.length).toBeGreaterThan(0);
+      for (const media of project.media) {
+        expect(media.title.length).toBeGreaterThan(0);
+        expect(media.description.length).toBeGreaterThan(0);
+        switch (media.kind) {
+          case "product-preview":
+            expect(media.imageSrc).toMatch(/^\/work\//);
+            expect(media.imageAlt.length).toBeGreaterThan(0);
+            break;
+          case "story-timeline":
+            expect(media.milestones).toHaveLength(2);
+            media.milestones.forEach((milestone) => {
+              expect(milestone.label.length).toBeGreaterThan(0);
+              expect(milestone.title.length).toBeGreaterThan(0);
+              expect(milestone.detail.length).toBeGreaterThan(0);
+            });
+            break;
+          case "scope-map":
+            expect(media.stages.length).toBeGreaterThanOrEqual(2);
+            expect(media.note.length).toBeGreaterThan(0);
+            break;
+          default: {
+            const exhaustiveMedia: never = media;
+            throw new Error(`Unsupported project media: ${exhaustiveMedia}`);
+          }
+        }
+      }
       project.sourceIds.forEach((id) => expect(sourceIds.has(id)).toBe(true));
       project.timeline
         .flatMap((item) => item.sourceIds)
         .forEach((id) => expect(sourceIds.has(id)).toBe(true));
-      project.caseSlugs.forEach((slug) =>
-        expect(caseSlugs.has(slug)).toBe(true),
-      );
-      project.flowSlugs.forEach((slug) =>
-        expect(flowSlugs.has(slug)).toBe(true),
-      );
+      project.caseSlugs.forEach((slug) => {
+        expect(caseSlugs.has(slug)).toBe(true);
+        expect(
+          engineeringCases.find((item) => item.slug === slug)?.projectSlug,
+        ).toBe(project.slug);
+      });
+      project.flowSlugs.forEach((slug) => {
+        expect(flowSlugs.has(slug)).toBe(true);
+        expect(flows.find((item) => item.slug === slug)?.projectSlug).toBe(
+          project.slug,
+        );
+      });
     }
 
     for (const item of engineeringCases) {
@@ -59,9 +92,23 @@ describe("story content graph", () => {
       expect(
         projects.some((project) => project.slug === item.projectSlug),
       ).toBe(true);
+      item.flowSlugs.forEach((slug) => {
+        expect(flowSlugs.has(slug)).toBe(true);
+        const flow = flows.find((candidate) => candidate.slug === slug);
+        expect(flow?.caseSlug).toBe(item.slug);
+        expect(flow?.projectSlug).toBe(item.projectSlug);
+      });
     }
 
     for (const flow of flows) {
+      const parentCase = engineeringCases.find(
+        (item) => item.slug === flow.caseSlug,
+      );
+      expect(parentCase?.projectSlug).toBe(flow.projectSlug);
+      expect(
+        projects.some((project) => project.slug === flow.projectSlug),
+      ).toBe(true);
+      expect(parentCase?.flowSlugs).toContain(flow.slug);
       const flowSourceIds = new Set(flow.sourceIds);
       flow.sourceIds.forEach((id) => expect(sourceIds.has(id)).toBe(true));
       expect(

@@ -21,14 +21,36 @@ export type SourceRef = {
   observedAt?: string;
 };
 
-export type ProjectMedia = {
-  kind: "product-preview" | "story-timeline" | "scope-map";
+type ProjectMediaBase = {
   title: string;
   description: string;
   accent: "blue" | "green" | "rose" | "amber";
-  imageSrc?: string;
-  imageAlt?: string;
 };
+
+type ProductPreviewMedia = ProjectMediaBase & {
+  kind: "product-preview";
+  imageSrc: string;
+  imageAlt: string;
+};
+
+type StoryTimelineMedia = ProjectMediaBase & {
+  kind: "story-timeline";
+  eyebrow: string;
+  milestones: [
+    { label: string; title: string; detail: string },
+    { label: string; title: string; detail: string },
+  ];
+};
+
+type ScopeMapMedia = ProjectMediaBase & {
+  kind: "scope-map";
+  eyebrow: string;
+  stages: { index: string; label: string }[];
+  note: string;
+};
+
+export type ProjectMedia =
+  ProductPreviewMedia | StoryTimelineMedia | ScopeMapMedia;
 
 export type ProjectTimelineItem = {
   label: string;
@@ -61,7 +83,7 @@ export type ProjectStory = {
   flowSlugs: string[];
   repoUrl: string;
   demoUrl?: string;
-  media: ProjectMedia[];
+  media: [ProjectMedia, ...ProjectMedia[]];
 };
 
 export type EngineeringCase = {

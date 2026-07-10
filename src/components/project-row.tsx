@@ -27,11 +27,7 @@ export function ProjectRow({
         prefetch={false}
         aria-label={`${project.title} 프로젝트 이야기 보기`}
       >
-        <ProjectArtwork
-          projectSlug={project.slug}
-          title={project.title}
-          media={project.media[0]}
-        />
+        <ProjectArtwork media={project.media[0]} />
       </Link>
       <div className="project-row-copy">
         <div className="project-meta">

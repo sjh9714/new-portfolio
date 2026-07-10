@@ -1,26 +1,50 @@
 "use client";
 
 import { Maximize2, X } from "lucide-react";
-import { useRef } from "react";
+import { useId, useRef } from "react";
 
 import type { DiagramSpec } from "@/content/types";
 
-function DiagramSvg({ spec }: { spec: DiagramSpec }) {
-  const nodeMap = new Map(spec.nodes.map((node) => [node.id, node]));
+type DiagramLayout = "desktop" | "compact";
+
+function DiagramSvg({
+  spec,
+  layout,
+}: {
+  spec: DiagramSpec;
+  layout: DiagramLayout;
+}) {
+  const reactId = useId();
+  const instanceId = `${spec.id}-${reactId.replace(/:/g, "")}`;
+  const titleId = `${instanceId}-title`;
+  const descriptionId = `${instanceId}-desc`;
+  const markerId = `${instanceId}-arrow`;
+  const isCompact = layout === "compact";
+  const viewBoxWidth = isCompact ? 300 : 1000;
+  const viewBoxHeight = isCompact ? 840 : 420;
+  const xScale = viewBoxWidth / 100;
+  const yScale = viewBoxHeight / 100;
   const nodeHeight = 82;
+  const nodes = spec.nodes.map((node) => ({
+    ...node,
+    x: isCompact ? node.compact.x : node.x,
+    y: isCompact ? node.compact.y : node.y,
+    width: isCompact ? node.compact.width : node.width,
+  }));
+  const nodeMap = new Map(nodes.map((node) => [node.id, node]));
 
   return (
     <svg
-      className="diagram-svg"
-      viewBox="0 0 1000 420"
+      className={`diagram-svg diagram-svg-${layout}`}
+      viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`}
       role="img"
-      aria-labelledby={`${spec.id}-title ${spec.id}-desc`}
+      aria-labelledby={`${titleId} ${descriptionId}`}
     >
-      <title id={`${spec.id}-title`}>{spec.title}</title>
-      <desc id={`${spec.id}-desc`}>{spec.caption}</desc>
+      <title id={titleId}>{spec.title}</title>
+      <desc id={descriptionId}>{spec.caption}</desc>
       <defs>
         <marker
-          id={`${spec.id}-arrow`}
+          id={markerId}
           markerWidth="8"
           markerHeight="8"
           refX="7"
@@ -35,15 +59,30 @@ function DiagramSvg({ spec }: { spec: DiagramSpec }) {
           const from = nodeMap.get(edge.from);
           const to = nodeMap.get(edge.to);
           if (!from || !to) return null;
-          const startX = (from.x + from.width) * 10;
-          const startY = from.y * 4.2;
-          const endX = to.x * 10;
-          const endY = to.y * 4.2;
-          const curve = Math.max(28, (endX - startX) * 0.44);
-          const path = `M ${startX} ${startY} C ${startX + curve} ${startY}, ${endX - curve} ${endY}, ${endX} ${endY}`;
+          const fromCenterY = from.y * yScale;
+          const toCenterY = to.y * yScale;
+          const direction = toCenterY >= fromCenterY ? 1 : -1;
+          const startX = isCompact
+            ? (from.x + from.width / 2) * xScale
+            : (from.x + from.width) * xScale;
+          const startY = isCompact
+            ? fromCenterY + (nodeHeight / 2) * direction
+            : fromCenterY;
+          const endX = isCompact
+            ? (to.x + to.width / 2) * xScale
+            : to.x * xScale;
+          const endY = isCompact
+            ? toCenterY - (nodeHeight / 2) * direction
+            : toCenterY;
+          const curve = isCompact
+            ? Math.max(28, Math.abs(endY - startY) * 0.36)
+            : Math.max(28, (endX - startX) * 0.44);
+          const path = isCompact
+            ? `M ${startX} ${startY} C ${startX} ${startY + curve * direction}, ${endX} ${endY - curve * direction}, ${endX} ${endY}`
+            : `M ${startX} ${startY} C ${startX + curve} ${startY}, ${endX - curve} ${endY}, ${endX} ${endY}`;
           return (
             <g key={edge.id}>
-              <path d={path} markerEnd={`url(#${spec.id}-arrow)`} />
+              <path d={path} markerEnd={`url(#${markerId})`} />
               <text x={(startX + endX) / 2} y={(startY + endY) / 2 - 9}>
                 {edge.label}
               </text>
@@ -52,10 +91,10 @@ function DiagramSvg({ spec }: { spec: DiagramSpec }) {
         })}
       </g>
       <g className="diagram-nodes">
-        {spec.nodes.map((node) => {
-          const x = node.x * 10;
-          const y = node.y * 4.2 - nodeHeight / 2;
-          const width = node.width * 10;
+        {nodes.map((node) => {
+          const x = node.x * xScale;
+          const y = node.y * yScale - nodeHeight / 2;
+          const width = node.width * xScale;
           return (
             <g
               key={node.id}
@@ -82,7 +121,7 @@ export function ArchitectureDiagram({ spec }: { spec: DiagramSpec }) {
   return (
     <figure className="architecture-figure">
       <div className="diagram-desktop">
-        <DiagramSvg spec={spec} />
+        <DiagramSvg spec={spec} layout="desktop" />
       </div>
       <div className="diagram-mobile">
         <ol>
@@ -111,7 +150,7 @@ export function ArchitectureDiagram({ spec }: { spec: DiagramSpec }) {
           </button>
         </div>
         <div className="dialog-canvas">
-          <DiagramSvg spec={spec} />
+          <DiagramSvg spec={spec} layout="compact" />
         </div>
       </dialog>
     </figure>

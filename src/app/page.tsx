@@ -107,7 +107,9 @@ export default function Home() {
         <div className="section-heading">
           <div>
             <p className="eyebrow">Selected work / 04</p>
-            <h2 id="selected-title">서로 다른 네 개의 이야기</h2>
+            <h2 id="selected-title">
+              서로 다른 <span className="keep-together">네 개의 이야기</span>
+            </h2>
           </div>
           <p>
             팀에서 화면까지 연결한 경험과, 혼자 만든 시스템을 실제 사용 흐름으로

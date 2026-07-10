@@ -352,6 +352,9 @@ svg {
   font-size: 16px;
   line-height: 1.75;
 }
+.keep-together {
+  white-space: nowrap;
+}
 .project-list {
   display: grid;
 }
@@ -379,8 +382,11 @@ svg {
     transform 240ms cubic-bezier(0.2, 0.8, 0.2, 1),
     box-shadow 240ms ease;
 }
-.project-art > img {
-  object-fit: cover;
+.project-art-product-preview {
+  aspect-ratio: 4 / 3;
+}
+.project-art-product-preview > img {
+  object-fit: contain;
   object-position: center;
 }
 .project-media-link:hover .project-art {
@@ -559,6 +565,7 @@ svg {
   margin-top: 28px;
 }
 .text-link {
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
   gap: 7px;
@@ -573,6 +580,9 @@ svg {
   transform: translate(3px, -3px);
 }
 .quiet-link {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
   color: var(--muted);
   font-size: 13px;
   font-weight: 650;
@@ -971,6 +981,9 @@ svg {
 .project-detail-media .project-art {
   aspect-ratio: 16 / 9;
 }
+.project-detail-media .project-art-product-preview {
+  aspect-ratio: 4 / 3;
+}
 .story-section {
   display: grid;
   grid-template-columns: 240px minmax(0, 1fr);
@@ -1261,6 +1274,10 @@ svg {
 }
 .diagram-edges text {
   fill: var(--muted);
+  stroke: var(--surface);
+  stroke-width: 8px;
+  stroke-linejoin: round;
+  paint-order: stroke;
   font-family: var(--font-mono);
   font-size: 15px;
   text-anchor: middle;
@@ -1304,6 +1321,7 @@ svg {
 .diagram-dialog,
 .flow-dialog {
   width: min(1180px, calc(100vw - 30px));
+  max-height: calc(100dvh - 30px);
   max-width: none;
   padding: 0;
   border: 1px solid var(--border);
@@ -1336,11 +1354,17 @@ svg {
 }
 .dialog-canvas,
 .dialog-flow-stage {
+  max-height: calc(100dvh - 95px);
   padding: 20px;
   overflow: auto;
 }
 .dialog-canvas .diagram-svg {
   min-width: 900px;
+}
+.dialog-canvas .diagram-svg-compact {
+  width: min(100%, 420px);
+  min-width: 0;
+  margin-inline: auto;
 }
 
 .case-index {
@@ -2427,6 +2451,9 @@ svg {
   .project-detail-media .project-art {
     aspect-ratio: 16 / 10;
   }
+  .project-detail-media .project-art-product-preview {
+    aspect-ratio: 4 / 3;
+  }
   .story-section {
     padding-block: 52px;
   }
@@ -2494,6 +2521,9 @@ svg {
     cursor: pointer;
     font-size: 12px;
     font-weight: 700;
+  }
+  .dialog-canvas {
+    padding: 10px;
   }
   .case-index > a {
     grid-template-columns: 42px 1fr 22px;
