@@ -1,238 +1,192 @@
-import { BookOpen, ExternalLink, Mail } from "lucide-react";
+import { ArrowDown, ArrowUpRight, Code2, FileText } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
-import { EvidenceMatrix } from "@/components/evidence-matrix";
-import { PortfolioProjectGroupCard } from "@/components/portfolio-project-group-card";
-import { SectionHeader } from "@/components/section-header";
-import { StatusBadge } from "@/components/status-badge";
-import { Button } from "@/components/ui/button";
-import { publishedBlogTopics } from "@/content/blog";
-import {
-  featuredProjectGroups,
-  getSupportingProjects,
-} from "@/content/portfolio-cases";
-import { additionalProjects, getProjectBySlug } from "@/content/projects";
+import { ProjectRow } from "@/components/project-row";
 import { profile } from "@/content/profile";
-
-const snapshotItems = [
-  {
-    projectSlug: "concert-booking",
-    projectName: "Concert Booking",
-    evidenceLabel: "동일 좌석 경합",
-  },
-  {
-    projectSlug: "realtime-chat",
-    projectName: "Realtime Chat",
-    evidenceLabel: "채팅방 조회 API RPS",
-  },
-  {
-    projectSlug: "ai-usage-billing-gateway",
-    projectName: "AI Billing",
-    evidenceLabel: "사용량 중복 처리",
-  },
-].map((item) => {
-  const project = getProjectBySlug(item.projectSlug);
-  const evidence = project?.evidence.find(
-    (entry) => entry.label === item.evidenceLabel,
-  );
-
-  return {
-    ...item,
-    evidence,
-  };
-});
-
-const portfolioPurpose =
-  "이 포트폴리오는 이력서에 한 줄로 압축한 문제 해결 경험을 구조도, 문제 원인, 해결 과정, 검증 결과로 확장한 문서입니다.";
-const supportingAdditionalProjects = getSupportingProjects(additionalProjects);
-const redisArticle = publishedBlogTopics.find(
-  (topic) => topic.slug === "redis-queue-lock-presence-reconciliation",
-);
-const validationMethodText =
-  "k6 · Testcontainers · Redis/Kafka/PostgreSQL 정합성 · Outbox/DLT/Idempotency";
+import { alsoShipped, featuredProjects } from "@/content/projects";
+import { getSiteUrl } from "@/lib/site";
 
 export default function Home() {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Person",
+        name: profile.name,
+        alternateName: profile.englishName,
+        url: getSiteUrl(),
+        sameAs: [profile.githubUrl],
+        jobTitle: "Java / Spring Backend Developer",
+      },
+      {
+        "@type": "ItemList",
+        name: "Selected Work",
+        itemListElement: featuredProjects.map((project, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          name: project.title,
+          url: `${getSiteUrl()}/projects/${project.slug}`,
+        })),
+      },
+    ],
+  };
+
   return (
-    <div className="bg-background">
-      <section className="border-border border-b">
-        <div className="mx-auto grid max-w-7xl gap-10 px-5 py-12 md:px-8 md:py-20 lg:grid-cols-[1.05fr_0.95fr] lg:items-end">
-          <div className="flex max-w-4xl flex-col gap-7">
-            <div className="flex flex-col gap-4">
-              <p className="text-primary text-sm font-semibold tracking-[0.2em] uppercase">
-                Java/Spring 백엔드 포트폴리오
-              </p>
-              <h1 className="text-foreground text-5xl leading-tight font-bold tracking-tight md:text-7xl">
-                Java/Spring 백엔드 개발자 성진혁
-              </h1>
-              <p className="text-muted-foreground max-w-3xl text-xl leading-9">
-                {profile.headline}
-              </p>
-              <p className="text-muted-foreground max-w-3xl text-base leading-7">
-                {portfolioPurpose}
-              </p>
-            </div>
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <Button asChild>
-                <Link href="/resume">
-                  <BookOpen data-icon="inline-start" aria-hidden="true" />웹
-                  이력서
-                </Link>
-              </Button>
-              <Button asChild variant="outline">
-                <Link href="/case-studies">문제 해결 사례</Link>
-              </Button>
-              <Button asChild variant="outline">
-                <a href={profile.githubUrl} target="_blank" rel="noreferrer">
-                  <ExternalLink data-icon="inline-start" aria-hidden="true" />
-                  GitHub
-                </a>
-              </Button>
-              <Button asChild variant="outline">
-                <a href={`mailto:${profile.email}`}>
-                  <Mail data-icon="inline-start" aria-hidden="true" />
-                  이메일
-                </a>
-              </Button>
-            </div>
-          </div>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData).replace(/</g, "\\u003c"),
+        }}
+      />
 
-          <aside className="border-border bg-card flex flex-col gap-5 border p-5">
-            <div className="flex flex-col gap-1">
-              <p className="text-primary text-sm font-semibold">
-                핵심 검증 근거
-              </p>
-              <h2 className="text-foreground text-2xl font-semibold tracking-tight">
-                대표 사례는 수치와 검증 상태로 먼저 읽힙니다.
-              </h2>
+      <section className="home-hero" aria-labelledby="home-title">
+        <div className="home-hero-grid page-shell">
+          <aside className="hero-profile" aria-label="프로필">
+            <div className="hero-avatar">
+              <Image
+                src={profile.avatarUrl}
+                alt="빈티지 타자기가 놓인 성진혁의 GitHub 프로필 이미지"
+                fill
+                priority
+                sizes="176px"
+              />
             </div>
-            <div className="flex flex-col gap-3">
-              {snapshotItems.map((item) =>
-                item.evidence ? (
-                  <div
-                    key={`${item.projectSlug}-${item.evidenceLabel}`}
-                    className="border-border bg-background flex flex-col gap-2 rounded-md border p-4"
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <p className="text-muted-foreground text-xs font-semibold tracking-[0.16em] uppercase">
-                          {item.projectName}
-                        </p>
-                        <h3 className="text-foreground mt-1 font-semibold [overflow-wrap:anywhere]">
-                          {item.evidence.label}
-                        </h3>
-                      </div>
-                      <StatusBadge status={item.evidence.status} />
-                    </div>
-                    <p className="text-muted-foreground text-sm leading-6 [overflow-wrap:anywhere]">
-                      {item.evidence.value}
-                    </p>
-                  </div>
-                ) : null,
-              )}
+            <div className="hero-profile-meta">
+              <span>Profile / 01</span>
+              <strong>{profile.englishName}</strong>
+              <p>{profile.role}</p>
             </div>
+            <p className="hero-profile-note">
+              코드는 오래 남습니다. 그래서 다시 읽고 확인할 수 있어야 합니다.
+            </p>
           </aside>
-        </div>
-
-        <div className="mx-auto max-w-7xl px-5 pb-12 md:px-8 md:pb-16">
-          <div className="border-border bg-card flex flex-col gap-2 border p-4 md:flex-row md:items-center md:justify-between">
-            <p className="text-primary text-xs font-semibold tracking-[0.16em] uppercase">
-              검증 방식
-            </p>
-            <p className="text-foreground text-sm leading-6 [overflow-wrap:anywhere]">
-              {validationMethodText}
-            </p>
+          <div className="hero-copy">
+            <div className="hero-copy-inner">
+              <p className="hero-role">{profile.role}</p>
+              <h1 id="home-title">
+                <span>{profile.name}</span>
+                만드는 데서 멈추지 않고,
+                <br />
+                다시 확인합니다.
+              </h1>
+              <p className="hero-lead">{profile.headline}</p>
+              <p className="hero-summary">{profile.summary}</p>
+              <div className="hero-actions">
+                <a className="primary-action" href="#selected-work">
+                  작업 보기 <ArrowDown aria-hidden="true" size={18} />
+                </a>
+                <Link
+                  className="secondary-action"
+                  href="/resume"
+                  prefetch={false}
+                >
+                  <FileText aria-hidden="true" size={18} /> 이력서
+                </Link>
+                <a
+                  className="secondary-action"
+                  href={profile.githubUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="성진혁 GitHub (새 창)"
+                >
+                  <Code2 aria-hidden="true" size={18} /> GitHub
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      <div className="mx-auto flex max-w-7xl flex-col gap-16 px-5 py-12 md:px-8 md:py-16">
-        <section className="flex flex-col gap-6">
-          <SectionHeader
-            title="대표 프로젝트 4개"
-            description="이력서에 압축한 문제 해결 경험을 프로젝트 단위로 묶고, 필요한 경우 별도 deep dive로 확장했습니다. Concert Booking은 동시성 정합성과 이벤트 복구를 각각 별도 문제 구간으로 나눠 설명합니다."
-            action={
-              <Button asChild variant="ghost">
-                <Link href="/case-studies">전체 사례 보기</Link>
-              </Button>
-            }
-          />
-          <div className="grid gap-4 md:grid-cols-2">
-            {featuredProjectGroups.map((group) => (
-              <PortfolioProjectGroupCard
-                key={group.projectSlug}
-                group={group}
-              />
-            ))}
+      <section
+        className="selected-work page-shell"
+        id="selected-work"
+        aria-labelledby="selected-title"
+      >
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">Selected work / 04</p>
+            <h2 id="selected-title">서로 다른 네 개의 이야기</h2>
           </div>
-        </section>
+          <p>
+            팀에서 화면까지 연결한 경험과, 혼자 만든 시스템을 실제 사용 흐름으로
+            끝낸 경험을 함께 보여줍니다.
+          </p>
+        </div>
+        <div className="project-list">
+          {featuredProjects.map((project, index) => (
+            <ProjectRow key={project.slug} project={project} index={index} />
+          ))}
+        </div>
+        <div className="section-end-link">
+          <Link className="text-link" href="/projects" prefetch={false}>
+            전체 작업 보기 <ArrowUpRight aria-hidden="true" size={18} />
+          </Link>
+        </div>
+      </section>
 
-        {redisArticle ? (
-          <section className="flex flex-col gap-5">
-            <SectionHeader
-              title="Redis 글"
-              description="대표 사례에서 반복되는 Redis의 역할과 최종 기준 데이터 경계를 한 글로 정리했습니다."
-              action={
-                <Button asChild variant="ghost">
-                  <Link href="/blog">글 목록 보기</Link>
-                </Button>
-              }
-            />
-            <article className="border-border bg-card flex flex-col gap-4 border p-5 md:flex-row md:items-start md:justify-between">
-              <div className="flex max-w-3xl flex-col gap-2">
-                <p className="text-primary text-xs font-semibold tracking-[0.16em] uppercase">
-                  {redisArticle.readingTime}
-                </p>
-                <h2 className="text-foreground text-xl leading-7 font-semibold [overflow-wrap:anywhere]">
-                  {redisArticle.title}
-                </h2>
-                <p className="text-muted-foreground line-clamp-2 text-sm leading-7 [overflow-wrap:anywhere]">
-                  {redisArticle.summary}
+      <section className="working-pattern">
+        <div className="page-shell pattern-grid">
+          <div>
+            <p className="eyebrow">Working pattern</p>
+            <h2>이야기와 근거의 역할을 나눕니다.</h2>
+          </div>
+          <ol>
+            <li>
+              <span>01</span>
+              <div>
+                <strong>맥락을 먼저 설명합니다.</strong>
+                <p>누구와 왜 만들었고 무엇을 맡았는지부터 시작합니다.</p>
+              </div>
+            </li>
+            <li>
+              <span>02</span>
+              <div>
+                <strong>전환점을 숨기지 않습니다.</strong>
+                <p>
+                  클라이언트를 붙이며 드러난 결함과 다시 설계한 이유를 남깁니다.
                 </p>
               </div>
-              <Button asChild variant="outline" className="shrink-0">
-                <Link href={`/blog/${redisArticle.slug}`}>글 읽기</Link>
-              </Button>
-            </article>
-          </section>
-        ) : null}
+            </li>
+            <li>
+              <span>03</span>
+              <div>
+                <strong>근거는 마지막에 연결합니다.</strong>
+                <p>커밋·PR·테스트가 이야기의 범위를 넘지 않도록 분리합니다.</p>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </section>
 
-        <section className="flex flex-col gap-6">
-          <details className="border-border bg-card rounded-md border p-5">
-            <summary className="text-foreground cursor-pointer text-lg font-semibold">
-              검증 기준 보기
-            </summary>
-            <p className="text-muted-foreground mt-3 text-sm leading-6">
-              측정한 수치, 재현 가능한 검증, 아직 채워야 하는 항목을 같은 색으로
-              뭉개지 않습니다.
-            </p>
-            <div className="mt-5">
-              <EvidenceMatrix />
-            </div>
-          </details>
-        </section>
-
-        <section className="flex flex-col gap-5">
-          <SectionHeader
-            title="추가 프로젝트"
-            description="대표 사례를 보완하는 팀 협업, 제품 구현, 캐싱, AI 서비스 경험을 짧게 정리합니다."
-          />
-          <div className="border-border bg-card flex flex-col gap-3 border p-5 md:flex-row md:items-center md:justify-between">
-            <div className="flex flex-wrap gap-x-3 gap-y-2">
-              {supportingAdditionalProjects.map((project) => (
-                <span
-                  key={project.slug}
-                  className="text-foreground text-sm font-semibold"
-                >
-                  {project.title}
-                </span>
-              ))}
-            </div>
-            <Button asChild variant="outline" size="sm" className="shrink-0">
-              <Link href="/projects">모든 프로젝트 보기</Link>
-            </Button>
+      <section
+        className="also-shipped page-shell"
+        aria-labelledby="shipped-title"
+      >
+        <div className="section-heading compact">
+          <div>
+            <p className="eyebrow">Also shipped</p>
+            <h2 id="shipped-title">다른 방식으로 전달한 작업</h2>
           </div>
-        </section>
-      </div>
-    </div>
+        </div>
+        <div className="shipped-list">
+          {alsoShipped.map((item) => (
+            <a
+              key={item.title}
+              href={item.href}
+              target="_blank"
+              rel="noreferrer"
+              aria-label={`${item.title} GitHub (새 창)`}
+            >
+              <span>{item.label}</span>
+              <strong>{item.title}</strong>
+              <p>{item.description}</p>
+              <ArrowUpRight aria-hidden="true" />
+            </a>
+          ))}
+        </div>
+      </section>
+    </>
   );
 }
