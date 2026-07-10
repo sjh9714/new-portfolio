@@ -1,5 +1,26 @@
 import type { NextConfig } from "next";
 
+export function createContentSecurityPolicy(
+  environment = process.env.NODE_ENV,
+) {
+  const scriptSources = ["'self'", "'unsafe-inline'"];
+  if (environment === "development") scriptSources.push("'unsafe-eval'");
+
+  return [
+    "default-src 'self'",
+    "img-src 'self' data:",
+    "style-src 'self' 'unsafe-inline'",
+    `script-src ${scriptSources.join(" ")}`,
+    "connect-src 'self'",
+    "font-src 'self'",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "frame-ancestors 'none'",
+    "upgrade-insecure-requests",
+  ].join("; ");
+}
+
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   turbopack: {
@@ -41,8 +62,7 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: "Content-Security-Policy",
-            value:
-              "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests",
+            value: createContentSecurityPolicy(),
           },
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },

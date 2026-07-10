@@ -4,21 +4,18 @@ import Link from "next/link";
 
 import { engineeringCases } from "@/content/cases";
 import { getProject } from "@/content/projects";
+import { createTopLevelMetadata } from "@/lib/site";
+
+const description = "프로젝트 안의 하나의 실패 경계를 깊게 다룬 사례.";
 
 export const metadata: Metadata = {
   title: "Engineering Cases",
-  description: "프로젝트 안의 하나의 실패 경계를 깊게 다룬 사례.",
-  alternates: { canonical: "/cases" },
-  openGraph: {
+  description,
+  ...createTopLevelMetadata({
     title: "Engineering Cases",
-    description: "프로젝트 안의 하나의 실패 경계를 깊게 다룬 사례.",
-    url: "/cases",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Engineering Cases",
-    description: "프로젝트 안의 하나의 실패 경계를 깊게 다룬 사례.",
-  },
+    description,
+    path: "/cases",
+  }),
 };
 
 export default function CasesPage() {

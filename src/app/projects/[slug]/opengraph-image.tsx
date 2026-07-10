@@ -1,7 +1,9 @@
 import { ImageResponse } from "next/og";
+import { notFound } from "next/navigation";
 
 import { getProject } from "@/content/projects";
 
+export const alt = "성진혁의 프로젝트 이야기 공유 이미지";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -12,8 +14,9 @@ export default async function ProjectOpenGraphImage({
 }) {
   const { slug } = await params;
   const project = getProject(slug);
-  const title = project?.title ?? "Work";
-  const summary = project?.oneLiner ?? "성진혁의 프로젝트 이야기";
+  if (!project) notFound();
+  const title = project.title;
+  const summary = project.oneLiner;
   return new ImageResponse(
     <div
       style={{
@@ -61,7 +64,7 @@ export default async function ProjectOpenGraphImage({
           {summary}
         </div>
       </div>
-      <div style={{ fontSize: 18, color: "#59636e" }}>{project?.setting}</div>
+      <div style={{ fontSize: 18, color: "#59636e" }}>{project.setting}</div>
     </div>,
     size,
   );

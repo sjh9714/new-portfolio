@@ -7,22 +7,20 @@ import {
   alsoShipped,
   featuredProjects,
 } from "@/content/projects";
+import { createTopLevelMetadata } from "@/lib/site";
+
+const description =
+  "팀 제품, 실제 클라이언트, 다시 검증한 코드로 구성한 성진혁의 대표 작업.";
+const socialDescription = "성진혁의 대표 프로젝트와 전달한 작업.";
 
 export const metadata: Metadata = {
   title: "Work",
-  description:
-    "팀 제품, 실제 클라이언트, 다시 검증한 코드로 구성한 성진혁의 대표 작업.",
-  alternates: { canonical: "/projects" },
-  openGraph: {
+  description,
+  ...createTopLevelMetadata({
     title: "Work",
-    description: "성진혁의 대표 프로젝트와 전달한 작업.",
-    url: "/projects",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Work",
-    description: "성진혁의 대표 프로젝트와 전달한 작업.",
-  },
+    description: socialDescription,
+    path: "/projects",
+  }),
 };
 
 export default function ProjectsPage() {

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { ArrowDown, ArrowUpRight, Code2, FileText } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -5,7 +6,22 @@ import Link from "next/link";
 import { ProjectRow } from "@/components/project-row";
 import { profile } from "@/content/profile";
 import { alsoShipped, featuredProjects } from "@/content/projects";
-import { getSiteUrl } from "@/lib/site";
+import {
+  createTopLevelMetadata,
+  getSiteUrl,
+  siteDescription,
+  siteName,
+  siteOgDescription,
+} from "@/lib/site";
+
+export const metadata: Metadata = {
+  description: siteDescription,
+  ...createTopLevelMetadata({
+    title: siteName,
+    description: siteOgDescription,
+    path: "/",
+  }),
+};
 
 export default function Home() {
   const structuredData = {

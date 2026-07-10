@@ -7,6 +7,7 @@ import {
   siteDescription,
   siteName,
   siteOgDescription,
+  siteSocialImage,
 } from "@/lib/site";
 
 import "./globals.css";
@@ -18,21 +19,20 @@ export const metadata: Metadata = {
     template: `%s | ${siteName}`,
   },
   description: siteDescription,
-  alternates: { canonical: "/" },
   openGraph: {
     title: siteName,
     description: siteOgDescription,
     type: "website",
-    url: "/",
     locale: "ko_KR",
     siteName,
+    images: [siteSocialImage],
   },
   twitter: {
     card: "summary_large_image",
     title: siteName,
     description: siteOgDescription,
+    images: [siteSocialImage],
   },
-  robots: { index: true, follow: true },
 };
 
 export const viewport: Viewport = {

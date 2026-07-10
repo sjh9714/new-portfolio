@@ -2,21 +2,19 @@ import type { Metadata } from "next";
 import { ArrowUpRight, Download } from "lucide-react";
 
 import { resume } from "@/content/resume";
+import { createTopLevelMetadata } from "@/lib/site";
+
+const description = "성진혁 Java/Spring 백엔드 개발자 웹 이력서.";
+const socialDescription = "Java/Spring 백엔드 개발자 성진혁의 이력서.";
 
 export const metadata: Metadata = {
   title: "Resume",
-  description: "성진혁 Java/Spring 백엔드 개발자 웹 이력서.",
-  alternates: { canonical: "/resume" },
-  openGraph: {
+  description,
+  ...createTopLevelMetadata({
     title: "Resume — 성진혁",
-    description: "Java/Spring 백엔드 개발자 성진혁의 이력서.",
-    url: "/resume",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Resume — 성진혁",
-    description: "Java/Spring 백엔드 개발자 성진혁의 이력서.",
-  },
+    description: socialDescription,
+    path: "/resume",
+  }),
 };
 
 export default function ResumePage() {

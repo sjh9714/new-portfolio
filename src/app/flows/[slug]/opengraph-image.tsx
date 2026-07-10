@@ -1,7 +1,9 @@
 import { ImageResponse } from "next/og";
+import { notFound } from "next/navigation";
 
 import { getFlow } from "@/content/flows";
 
+export const alt = "성진혁의 시스템 흐름 재생 공유 이미지";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -12,8 +14,9 @@ export default async function FlowOpenGraphImage({
 }) {
   const { slug } = await params;
   const flow = getFlow(slug);
+  if (!flow) notFound();
   const steps =
-    flow?.variants.find((variant) => variant.id === flow.initialVariant)?.steps
+    flow.variants.find((variant) => variant.id === flow.initialVariant)?.steps
       .length ?? 0;
   return new ImageResponse(
     <div
@@ -48,7 +51,7 @@ export default async function FlowOpenGraphImage({
           fontWeight: 760,
         }}
       >
-        {flow?.title ?? "Flow"}
+        {flow.title}
       </div>
       <div style={{ display: "flex", gap: 12 }}>
         {Array.from({ length: Math.max(steps, 3) }, (_, index) => (

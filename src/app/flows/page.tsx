@@ -4,21 +4,19 @@ import Link from "next/link";
 
 import { flows } from "@/content/flows";
 import { getProject } from "@/content/projects";
+import { createTopLevelMetadata } from "@/lib/site";
+
+const description = "동시성·이벤트 복구·메시지 재연결을 단계별로 재생합니다.";
+const socialDescription = "시스템의 실패와 복구를 단계별로 재생합니다.";
 
 export const metadata: Metadata = {
   title: "Flows",
-  description: "동시성·이벤트 복구·메시지 재연결을 단계별로 재생합니다.",
-  alternates: { canonical: "/flows" },
-  openGraph: {
+  description,
+  ...createTopLevelMetadata({
     title: "Flows",
-    description: "시스템의 실패와 복구를 단계별로 재생합니다.",
-    url: "/flows",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Flows",
-    description: "시스템의 실패와 복구를 단계별로 재생합니다.",
-  },
+    description: socialDescription,
+    path: "/flows",
+  }),
 };
 
 export default function FlowsPage() {

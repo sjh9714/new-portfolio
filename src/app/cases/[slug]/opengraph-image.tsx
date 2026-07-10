@@ -1,8 +1,10 @@
 import { ImageResponse } from "next/og";
+import { notFound } from "next/navigation";
 
 import { getCase } from "@/content/cases";
 import { getProject } from "@/content/projects";
 
+export const alt = "성진혁의 엔지니어링 사례 공유 이미지";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -13,7 +15,9 @@ export default async function CaseOpenGraphImage({
 }) {
   const { slug } = await params;
   const item = getCase(slug);
-  const project = item ? getProject(item.projectSlug) : undefined;
+  if (!item) notFound();
+  const project = getProject(item.projectSlug);
+  if (!project) notFound();
   return new ImageResponse(
     <div
       style={{
@@ -36,7 +40,7 @@ export default async function CaseOpenGraphImage({
           letterSpacing: 2,
         }}
       >
-        ENGINEERING CASE / {project?.title ?? "SJH"}
+        ENGINEERING CASE / {project.title}
       </div>
       <div
         style={{
@@ -47,7 +51,7 @@ export default async function CaseOpenGraphImage({
           fontWeight: 740,
         }}
       >
-        {item?.title ?? "Engineering Case"}
+        {item.title}
       </div>
       <div
         style={{
@@ -57,7 +61,7 @@ export default async function CaseOpenGraphImage({
           lineHeight: 1.45,
         }}
       >
-        {item?.summary}
+        {item.summary}
       </div>
     </div>,
     size,
