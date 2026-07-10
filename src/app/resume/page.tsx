@@ -1,4 +1,7 @@
 import type { Metadata } from "next";
+import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { ArrowUpRight, Download } from "lucide-react";
 
 import { resume } from "@/content/resume";
@@ -6,6 +9,11 @@ import { createTopLevelMetadata } from "@/lib/site";
 
 const description = "성진혁 Java/Spring 백엔드 개발자 웹 이력서.";
 const socialDescription = "Java/Spring 백엔드 개발자 성진혁의 이력서.";
+const resumeSourceFingerprint = createHash("sha256")
+  .update(JSON.stringify(resume))
+  .update(readFileSync(join(process.cwd(), "src/app/resume/page.tsx")))
+  .update(readFileSync(join(process.cwd(), "src/app/globals.css")))
+  .digest("hex");
 
 export const metadata: Metadata = {
   title: "Resume",
@@ -19,7 +27,10 @@ export const metadata: Metadata = {
 
 export default function ResumePage() {
   return (
-    <article className="resume-page page-shell">
+    <article
+      className="resume-page page-shell"
+      data-resume-source={resumeSourceFingerprint}
+    >
       <header className="resume-header">
         <div>
           <p className="eyebrow">Resume</p>

@@ -49,11 +49,21 @@ jobs:
       - name: Production build
         run: npm run build
 
-      - name: Install Chromium
-        run: npx playwright install --with-deps chromium
+      - name: Install Chromium and deterministic Korean fonts
+        run: |
+          npx playwright install --with-deps chromium
+          sudo apt-get install -y fonts-noto-cjk
+          fc-cache -f
+
+      - name: Generate and validate resume PDF
+        run: |
+          RESUME_OUTPUT_PATH=/tmp/resume-generated.pdf npm run resume:pdf
+          npm run resume:check -- public/resume-sung-jinhyuk-backend.pdf
+          npm run resume:check -- /tmp/resume-generated.pdf
+          npm run resume:compare -- public/resume-sung-jinhyuk-backend.pdf /tmp/resume-generated.pdf
 
       - name: Browser and accessibility tests
-        run: npm run e2e -- --ignore-snapshots
+        run: npm run e2e
 
       - name: Production dependency audit
         run: npm audit --omit=dev --audit-level=high
@@ -63,5 +73,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: playwright-report
-          path: playwright-report
+          path: |
+            playwright-report
+            test-results
           retention-days: 7

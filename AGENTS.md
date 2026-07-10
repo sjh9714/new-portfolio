@@ -62,6 +62,7 @@ npm run lint
 npm run build
 npm run e2e
 npm run resume:pdf
+npm run resume:check
 npm audit --omit=dev --audit-level=high
 ```
 

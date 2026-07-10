@@ -12,7 +12,9 @@
 /                    Profile Hub
 /projects            Selected work
 /projects/[project]  Project story
+/cases               Engineering case index
 /cases/[case]        One engineering boundary
+/flows               Interactive flow index
 /flows/[flow]        Interactive state playback
 /resume              Web/PDF resume source
 ```
@@ -62,6 +64,8 @@ npm test
 npm run lint
 npm run build
 npm run e2e
+npm run resume:pdf
+npm run resume:check
 npm audit --omit=dev --audit-level=high
 ```
 
