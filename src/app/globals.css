@@ -121,10 +121,12 @@ svg {
   gap: 30px;
 }
 .nav-link {
+  min-width: 44px;
   min-height: 44px;
   position: relative;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 7px;
   color: var(--muted);
   font-size: 14px;
