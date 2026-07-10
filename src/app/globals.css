@@ -1010,6 +1010,7 @@ svg {
 }
 .story-prose {
   max-width: 760px;
+  min-width: 0;
 }
 .story-prose.wide {
   max-width: none;
@@ -2586,6 +2587,12 @@ svg {
     align-items: flex-start;
     flex-direction: column;
     gap: 7px;
+  }
+}
+
+@media (max-width: 360px) {
+  .story-prose {
+    overflow-wrap: anywhere;
   }
 }
 

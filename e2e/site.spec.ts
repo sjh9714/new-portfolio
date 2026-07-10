@@ -279,12 +279,7 @@ test("legacy aliases are permanent redirects and prototype keys stay 404", async
 for (const width of [320, 390, 768, 1280]) {
   test(`no document overflow at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
-    for (const route of [
-      "/",
-      "/projects/concert-booking",
-      "/flows/realtime-message-lifecycle?variant=designed&step=3",
-      "/resume",
-    ]) {
+    for (const route of routes) {
       await page.goto(route);
       const overflow = await page.evaluate(
         () =>
@@ -372,4 +367,11 @@ test("unknown route presents the custom 404", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: /이 이야기는/ }),
   ).toBeVisible();
+  await expect(page.locator('meta[name="robots"]')).toHaveCount(1);
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
+    "content",
+    "noindex",
+  );
+  await expect(page.locator('link[rel="canonical"]')).toHaveCount(0);
+  await expect(page.locator('meta[property="og:url"]')).toHaveCount(0);
 });
