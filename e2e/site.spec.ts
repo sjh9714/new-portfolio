@@ -124,6 +124,48 @@ test("flow controls update the visible step and URL", async ({ page }) => {
   await expect(page.getByText("재연결 뒤 공백만 보충합니다")).toBeVisible();
 });
 
+test("flow transcript keeps native Space behavior without starting playback", async ({
+  page,
+}) => {
+  await page.goto("/flows/realtime-message-lifecycle?variant=designed&step=1");
+  const transcript = page.locator("details.flow-transcript");
+  const summary = transcript.getByText("전체 흐름 텍스트로 읽기", {
+    exact: true,
+  });
+
+  await summary.focus();
+  await page.keyboard.press("Space");
+
+  await expect(transcript).toHaveAttribute("open", "");
+  await expect(page.getByRole("button", { name: "재생" })).toBeVisible();
+  await expect(page).toHaveURL(/variant=designed&step=1$/);
+});
+
+test("flow autoplay advances URL without Router console errors", async ({
+  page,
+}) => {
+  const consoleErrors: string[] = [];
+  page.on("console", (message) => {
+    if (message.type() === "error") consoleErrors.push(message.text());
+  });
+  await page.goto("/flows/realtime-message-lifecycle?variant=designed&step=1");
+
+  await page.getByRole("button", { name: "재생" }).click();
+
+  await expect(page).toHaveURL(
+    /\/flows\/realtime-message-lifecycle\?variant=designed&step=2$/,
+    { timeout: 4_000 },
+  );
+  await expect(
+    page
+      .getByRole("heading", {
+        name: "같은 room partition에서 DB에 먼저 저장합니다",
+      })
+      .first(),
+  ).toBeVisible();
+  expect(consoleErrors).toEqual([]);
+});
+
 test("flow keyboard controls and reduced-motion behavior are deterministic", async ({
   page,
 }) => {
@@ -135,7 +177,7 @@ test("flow keyboard controls and reduced-motion behavior are deterministic", asy
   await page.keyboard.press("ArrowRight");
   await expect(page).toHaveURL(/step=3/);
   await page.keyboard.press("End");
-  await expect(page).toHaveURL(/step=5/);
+  await expect(page).toHaveURL(/step=6/);
   await page.keyboard.press("Home");
   await expect(page).toHaveURL(/step=1/);
 

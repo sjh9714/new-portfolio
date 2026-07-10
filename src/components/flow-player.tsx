@@ -14,6 +14,16 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import type { FlowPlayback, FlowVariant } from "@/content/types";
 
+const nativeInteractiveSelector =
+  'a, button, input, select, textarea, summary, [contenteditable="true"]';
+
+function isNativeInteractiveTarget(target: EventTarget | null) {
+  return (
+    target instanceof Element &&
+    target.closest(nativeInteractiveSelector) !== null
+  );
+}
+
 function FlowStage({
   variant,
   stepIndex,
@@ -112,25 +122,32 @@ export function FlowPlayer({ flow }: { flow: FlowPlayback }) {
   const [playing, setPlaying] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
 
-  const updateUrl = (nextVariant: string, nextStep: number) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("variant", nextVariant);
-    params.set("step", String(nextStep + 1));
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-  };
-
   const moveTo = (next: number) => {
     const bounded = Math.max(0, Math.min(next, variant.steps.length - 1));
     setStepIndex(bounded);
-    updateUrl(variant.id, bounded);
+    if (bounded >= variant.steps.length - 1) setPlaying(false);
   };
 
   const changeVariant = (nextVariant: string) => {
     setPlaying(false);
     setVariantId(nextVariant);
     setStepIndex(0);
-    updateUrl(nextVariant, 0);
   };
+
+  useEffect(() => {
+    const nextStep = String(stepIndex + 1);
+    if (
+      searchParams.get("variant") === variant.id &&
+      searchParams.get("step") === nextStep
+    ) {
+      return;
+    }
+
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("variant", variant.id);
+    params.set("step", nextStep);
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  }, [pathname, router, searchParams, stepIndex, variant.id]);
 
   useEffect(() => {
     const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -145,39 +162,32 @@ export function FlowPlayer({ flow }: { flow: FlowPlayback }) {
 
   useEffect(() => {
     if (!playing || reducedMotion) return;
-    const timer = window.setInterval(() => {
-      setStepIndex((current) => {
-        if (current >= variant.steps.length - 1) {
-          setPlaying(false);
-          return current;
-        }
-        const next = current + 1;
-        const params = new URLSearchParams(window.location.search);
-        params.set("variant", variant.id);
-        params.set("step", String(next + 1));
-        window.history.replaceState(
-          null,
-          "",
-          `${pathname}?${params.toString()}`,
-        );
-        return next;
-      });
+    if (stepIndex >= variant.steps.length - 1) return;
+
+    const timer = window.setTimeout(() => {
+      const next = stepIndex + 1;
+      setStepIndex(next);
+      if (next >= variant.steps.length - 1) setPlaying(false);
     }, 2500);
-    return () => window.clearInterval(timer);
-  }, [pathname, playing, reducedMotion, variant]);
+    return () => window.clearTimeout(timer);
+  }, [playing, reducedMotion, stepIndex, variant.steps.length]);
 
   const onKeyDown = (event: React.KeyboardEvent) => {
-    if (
-      ["INPUT", "BUTTON", "A"].includes((event.target as HTMLElement).tagName)
-    )
-      return;
+    if (isNativeInteractiveTarget(event.target)) return;
     if (event.key === " " && !reducedMotion) {
       event.preventDefault();
-      setPlaying((value) => !value);
+      setPlaying((value) =>
+        stepIndex >= variant.steps.length - 1 ? false : !value,
+      );
     } else if (event.key === "ArrowLeft") moveTo(stepIndex - 1);
     else if (event.key === "ArrowRight") moveTo(stepIndex + 1);
-    else if (event.key === "Home") moveTo(0);
-    else if (event.key === "End") moveTo(variant.steps.length - 1);
+    else if (event.key === "Home") {
+      event.preventDefault();
+      moveTo(0);
+    } else if (event.key === "End") {
+      event.preventDefault();
+      moveTo(variant.steps.length - 1);
+    }
   };
 
   const step = variant.steps[stepIndex];
