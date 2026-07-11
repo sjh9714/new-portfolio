@@ -1,0 +1,80 @@
+<mxfile host="Electron" modified="2026-07-11T03:30:00.000Z" agent="draw.io" version="30.3.6" type="device">
+  <diagram id="borrowme-reservation-lifecycle" name="대여 생명주기">
+    <mxGraphModel dx="1400" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="800" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="title" value="누가 상태를 바꾸고, 재고는 언제 돌아오는가?" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=30;fontStyle=1;fontColor=#172033;spacingLeft=0;" vertex="1" parent="1">
+          <mxGeometry x="70" y="45" width="1020" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="subtitle" value="BorrowMe 대여 생명주기 · 행위자 권한과 재고 hold/복원 경계" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=15;fontColor=#5D687A;spacingLeft=0;" vertex="1" parent="1">
+          <mxGeometry x="70" y="100" width="900" height="32" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="legend-hold" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F1F5FF;strokeColor=#2B5DCC;arcSize=40;" vertex="1" parent="1">
+          <mxGeometry x="1050" y="55" width="26" height="14" as="geometry"/>
+        </mxCell>
+        <mxCell id="legend-hold-label" value="hold 유지" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=13;fontColor=#344056;" vertex="1" parent="1">
+          <mxGeometry x="1082" y="46" width="95" height="32" as="geometry"/>
+        </mxCell>
+        <mxCell id="legend-restore" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDF8F2;strokeColor=#27845A;arcSize=40;" vertex="1" parent="1">
+          <mxGeometry x="1185" y="55" width="26" height="14" as="geometry"/>
+        </mxCell>
+        <mxCell id="legend-restore-label" value="재고 복원" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=13;fontColor=#344056;" vertex="1" parent="1">
+          <mxGeometry x="1217" y="46" width="105" height="32" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="main-lane" value="정상 대여 흐름" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=14;fontStyle=1;fontColor=#5D687A;" vertex="1" parent="1">
+          <mxGeometry x="70" y="185" width="180" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="terminal-lane" value="인도 전 종료" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=14;fontStyle=1;fontColor=#5D687A;" vertex="1" parent="1">
+          <mxGeometry x="70" y="500" width="180" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="requested" value="&lt;div style=&quot;text-align:left;line-height:1.35;&quot;&gt;&lt;font style=&quot;font-size:19px;&quot;&gt;&lt;b&gt;REQUESTED&lt;/b&gt;&lt;/font&gt;&lt;br&gt;&lt;font color=&quot;#2B5DCC&quot; style=&quot;font-size:14px;&quot;&gt;&lt;b&gt;대여자&lt;/b&gt; 요청&lt;/font&gt;&lt;br&gt;&lt;br&gt;&lt;font color=&quot;#4D5A70&quot; style=&quot;font-size:14px;&quot;&gt;재고: 요청 수량 hold&lt;/font&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F1F5FF;strokeColor=#2B5DCC;strokeWidth=2;arcSize=12;spacing=18;fontColor=#172033;" vertex="1" parent="1">
+          <mxGeometry x="70" y="235" width="250" height="170" as="geometry"/>
+        </mxCell>
+        <mxCell id="approved" value="&lt;div style=&quot;text-align:left;line-height:1.35;&quot;&gt;&lt;font style=&quot;font-size:19px;&quot;&gt;&lt;b&gt;APPROVED&lt;/b&gt;&lt;/font&gt;&lt;br&gt;&lt;font color=&quot;#2B5DCC&quot; style=&quot;font-size:14px;&quot;&gt;&lt;b&gt;소유자&lt;/b&gt; 승인&lt;/font&gt;&lt;br&gt;&lt;br&gt;&lt;font color=&quot;#4D5A70&quot; style=&quot;font-size:14px;&quot;&gt;재고: hold 유지&lt;/font&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F1F5FF;strokeColor=#2B5DCC;strokeWidth=2;arcSize=12;spacing=18;fontColor=#172033;" vertex="1" parent="1">
+          <mxGeometry x="400" y="235" width="250" height="170" as="geometry"/>
+        </mxCell>
+        <mxCell id="borrowed" value="&lt;div style=&quot;text-align:left;line-height:1.35;&quot;&gt;&lt;font style=&quot;font-size:19px;&quot;&gt;&lt;b&gt;BORROWED&lt;/b&gt;&lt;/font&gt;&lt;br&gt;&lt;font color=&quot;#2B5DCC&quot; style=&quot;font-size:14px;&quot;&gt;&lt;b&gt;소유자&lt;/b&gt; 인도 확인&lt;/font&gt;&lt;br&gt;&lt;br&gt;&lt;font color=&quot;#4D5A70&quot; style=&quot;font-size:14px;&quot;&gt;재고: hold 유지&lt;/font&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F1F5FF;strokeColor=#2B5DCC;strokeWidth=2;arcSize=12;spacing=18;fontColor=#172033;" vertex="1" parent="1">
+          <mxGeometry x="730" y="235" width="250" height="170" as="geometry"/>
+        </mxCell>
+        <mxCell id="returned" value="&lt;div style=&quot;text-align:left;line-height:1.35;&quot;&gt;&lt;font style=&quot;font-size:19px;&quot;&gt;&lt;b&gt;RETURNED&lt;/b&gt;&lt;/font&gt;&lt;br&gt;&lt;font color=&quot;#27845A&quot; style=&quot;font-size:14px;&quot;&gt;&lt;b&gt;소유자&lt;/b&gt; 반납 확인&lt;/font&gt;&lt;br&gt;&lt;br&gt;&lt;font color=&quot;#32634E&quot; style=&quot;font-size:14px;&quot;&gt;재고: 1회 복원&lt;/font&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDF8F2;strokeColor=#27845A;strokeWidth=2;arcSize=12;spacing=18;fontColor=#172033;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="235" width="250" height="170" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="rejected" value="&lt;div style=&quot;text-align:left;line-height:1.35;&quot;&gt;&lt;font style=&quot;font-size:19px;&quot;&gt;&lt;b&gt;REJECTED&lt;/b&gt;&lt;/font&gt;&lt;br&gt;&lt;font color=&quot;#27845A&quot; style=&quot;font-size:14px;&quot;&gt;&lt;b&gt;소유자&lt;/b&gt; 거절&lt;/font&gt;&lt;br&gt;&lt;br&gt;&lt;font color=&quot;#32634E&quot; style=&quot;font-size:14px;&quot;&gt;재고: 1회 복원&lt;/font&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDF8F2;strokeColor=#27845A;strokeWidth=2;arcSize=12;spacing=18;fontColor=#172033;" vertex="1" parent="1">
+          <mxGeometry x="70" y="545" width="250" height="150" as="geometry"/>
+        </mxCell>
+        <mxCell id="canceled" value="&lt;div style=&quot;text-align:left;line-height:1.35;&quot;&gt;&lt;font style=&quot;font-size:19px;&quot;&gt;&lt;b&gt;CANCELED&lt;/b&gt;&lt;/font&gt;&lt;br&gt;&lt;font color=&quot;#27845A&quot; style=&quot;font-size:14px;&quot;&gt;&lt;b&gt;대여자&lt;/b&gt; 인도 전 취소&lt;/font&gt;&lt;br&gt;&lt;br&gt;&lt;font color=&quot;#32634E&quot; style=&quot;font-size:14px;&quot;&gt;재고: 1회 복원&lt;/font&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDF8F2;strokeColor=#27845A;strokeWidth=2;arcSize=12;spacing=18;fontColor=#172033;" vertex="1" parent="1">
+          <mxGeometry x="400" y="545" width="250" height="150" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="edge-approve" value="1  승인" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#2B5DCC;strokeWidth=3;endArrow=block;endFill=1;fontSize=14;fontStyle=1;fontColor=#2B5DCC;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="requested" target="approved">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-handoff" value="2  인도" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#2B5DCC;strokeWidth=3;endArrow=block;endFill=1;fontSize=14;fontStyle=1;fontColor=#2B5DCC;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="approved" target="borrowed">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-return" value="3  반납" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#27845A;strokeWidth=3;endArrow=block;endFill=1;fontSize=14;fontStyle=1;fontColor=#27845A;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="borrowed" target="returned">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-reject" value="4  거절" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#27845A;strokeWidth=3;endArrow=block;endFill=1;fontSize=14;fontStyle=1;fontColor=#27845A;labelBackgroundColor=#FFFFFF;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="requested" target="rejected">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-cancel-approved" value="5  취소" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#27845A;strokeWidth=3;dashed=1;dashPattern=6 4;endArrow=block;endFill=1;fontSize=14;fontStyle=1;fontColor=#27845A;labelBackgroundColor=#FFFFFF;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="approved" target="canceled">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-cancel-requested" value="요청 직후에도 가능" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#27845A;strokeWidth=2;dashed=1;dashPattern=6 4;endArrow=block;endFill=1;fontSize=12;fontColor=#4E6E60;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.75;entryX=0;entryY=0.5;" edge="1" parent="1" source="requested" target="canceled">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="footer" value="종료 상태를 다시 요청해도 상태·재고·이력·알림은 한 번만 반영됩니다." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F7F8FA;strokeColor=#D7DCE5;arcSize=12;fontSize=14;fontColor=#4D5A70;align=left;spacingLeft=16;" vertex="1" parent="1">
+          <mxGeometry x="730" y="565" width="580" height="72" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

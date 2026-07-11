@@ -7,6 +7,7 @@ test("390px home stays inside the first-load request and transfer budget", async
   const cdp = await page.context().newCDPSession(page);
   await cdp.send("Network.enable");
   await cdp.send("Network.setCacheDisabled", { cacheDisabled: true });
+
   await page.goto("/", { waitUntil: "networkidle" });
   const result = await page.evaluate(() => {
     const resources = performance.getEntriesByType(
@@ -19,10 +20,27 @@ test("390px home stays inside the first-load request and transfer budget", async
       requestCountIncludingDocument: resources.length + 1,
       transferBytes:
         (navigation?.transferSize ?? 0) +
-        resources.reduce((sum, item) => sum + item.transferSize, 0),
+        resources.reduce((sum, resource) => sum + resource.transferSize, 0),
+      largestTransfers: resources
+        .map((resource) => ({
+          path: new URL(resource.name).pathname,
+          bytes: resource.transferSize,
+        }))
+        .sort((left, right) => right.bytes - left.bytes)
+        .slice(0, 5),
     };
   });
+  const diagnostic = JSON.stringify(result, null, 2);
 
-  expect(result.requestCountIncludingDocument).toBeLessThanOrEqual(15);
-  expect(result.transferBytes).toBeLessThanOrEqual(300 * 1024);
+  expect(result.requestCountIncludingDocument, diagnostic).toBeLessThanOrEqual(
+    15,
+  );
+  expect(result.transferBytes, diagnostic).toBeLessThanOrEqual(300 * 1024);
+  expect(
+    await page.evaluate(
+      () =>
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth,
+    ),
+  ).toBe(0);
 });

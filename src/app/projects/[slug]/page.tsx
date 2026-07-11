@@ -1,16 +1,15 @@
 import type { Metadata } from "next";
-import { ArrowLeft, ArrowUpRight, PlayCircle } from "lucide-react";
+import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
-import { ArchitectureDiagram } from "@/components/architecture-diagram";
 import { Breadcrumbs } from "@/components/breadcrumbs";
+import { GuidedFlow } from "@/components/guided-flow";
 import { ProjectArtwork } from "@/components/project-artwork";
 import { SourceList } from "@/components/source-list";
-import { getCasesForProject } from "@/content/cases";
-import { getDiagram } from "@/content/diagrams";
-import { getFlow } from "@/content/flows";
 import { getProject, projects } from "@/content/projects";
+import type { StoryChapter } from "@/content/types";
 
 export function generateStaticParams() {
   return projects.map((project) => ({ slug: project.slug }));
@@ -43,6 +42,32 @@ export async function generateMetadata({
   };
 }
 
+function Chapter({ chapter, index }: { chapter: StoryChapter; index: number }) {
+  return (
+    <section className="story-section page-shell" id={chapter.id}>
+      <div className="story-section-label">
+        <span>{String(index).padStart(2, "0")}</span>
+        <div>
+          <p className="eyebrow">{chapter.eyebrow}</p>
+          <h2>{chapter.title}</h2>
+        </div>
+      </div>
+      <div className="story-prose">
+        <p className="story-summary">{chapter.summary}</p>
+        <ul>
+          {chapter.body.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+        {chapter.visualIds?.length ? (
+          <ProjectArtwork visualIds={chapter.visualIds} showTranscript />
+        ) : null}
+        {chapter.proofId ? <SourceList sourceIds={[chapter.proofId]} /> : null}
+      </div>
+    </section>
+  );
+}
+
 export default async function ProjectPage({
   params,
 }: {
@@ -51,21 +76,19 @@ export default async function ProjectPage({
   const { slug } = await params;
   const project = getProject(slug);
   if (!project) notFound();
-  const cases = getCasesForProject(project.slug);
-  const diagram = getDiagram(`project-${project.slug}`);
 
   return (
     <article>
       <header className="project-detail-hero page-shell">
         <Breadcrumbs
           items={[
-            { label: "Work", href: "/projects" },
+            { label: "작업", href: "/projects" },
             { label: project.title },
           ]}
         />
-        <div className="project-detail-headline project-detail-headline-single">
+        <div className="project-detail-headline">
           <div>
-            <p className="eyebrow">{project.setting}</p>
+            <p className="eyebrow">{project.period}</p>
             <h1>{project.title}</h1>
             <p>{project.oneLiner}</p>
             <div className="project-detail-actions">
@@ -76,207 +99,178 @@ export default async function ProjectPage({
                 rel="noreferrer"
                 aria-label={`${project.title} GitHub 저장소 (새 창)`}
               >
-                GitHub 보기 <ArrowUpRight aria-hidden="true" size={18} />
+                GitHub에서 코드 보기
+                <ArrowUpRight aria-hidden="true" size={18} />
               </a>
-              {project.demoUrl ? (
-                <a
-                  className="secondary-action"
-                  href={project.demoUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label={`${project.title} Demo (새 창)`}
-                >
-                  Demo 열기
-                </a>
-              ) : null}
+              <a className="secondary-action" href="#project-story">
+                이야기부터 읽기
+              </a>
             </div>
           </div>
+          <aside className="project-summary-card" aria-label="프로젝트 요약">
+            <p>한눈에 보기</p>
+            <dl>
+              <div>
+                <dt>맥락</dt>
+                <dd>{project.overview.context}</dd>
+              </div>
+              <div>
+                <dt>역할</dt>
+                <dd>{project.overview.role}</dd>
+              </div>
+              <div>
+                <dt>전환점</dt>
+                <dd>{project.overview.turningPoint}</dd>
+              </div>
+              <div>
+                <dt>대표 근거</dt>
+                <dd>{project.overview.proof}</dd>
+              </div>
+            </dl>
+          </aside>
         </div>
       </header>
 
-      <div className="project-detail-media page-shell">
-        <ProjectArtwork media={project.media[0]} priority />
-      </div>
-
-      <section
-        className="story-section page-shell"
-        aria-labelledby="origin-title"
-      >
-        <div className="story-section-label">
-          <span>01</span>
-          <h2 id="origin-title">왜 시작됐는가</h2>
-        </div>
-        <div className="story-prose lead-prose">
-          <p>{project.origin}</p>
-        </div>
-      </section>
-
-      <section
-        className="story-section page-shell"
-        aria-labelledby="context-title"
-      >
-        <div className="story-section-label">
-          <span>02</span>
-          <h2 id="context-title">누구와 어떤 상황에서 만들었는가</h2>
-        </div>
-        <dl className="story-context">
-          <div>
-            <dt>Setting</dt>
-            <dd>{project.setting}</dd>
-          </div>
-          <div>
-            <dt>Audience</dt>
-            <dd>{project.audience}</dd>
-          </div>
-          <div>
-            <dt>Role</dt>
-            <dd>{project.role}</dd>
-          </div>
-        </dl>
-      </section>
-
-      <section
-        className="story-section page-shell"
-        aria-labelledby="owned-title"
-      >
-        <div className="story-section-label">
-          <span>03</span>
-          <h2 id="owned-title">내가 맡은 범위</h2>
-        </div>
-        <div className="story-prose">
-          <ul>
-            {project.contributions.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      <section
-        className="story-section page-shell"
-        aria-labelledby="journey-title"
-      >
-        <div className="story-section-label">
-          <span>04</span>
-          <h2 id="journey-title">실제 사용자 흐름</h2>
-        </div>
-        <div className="story-prose wide">
-          <ol className="project-journey">
-            {project.userJourney.map((item, index) => (
-              <li key={item}>
-                <span>{String(index + 1).padStart(2, "0")}</span>
-                <p>{item}</p>
-              </li>
-            ))}
-          </ol>
-          {diagram ? <ArchitectureDiagram spec={diagram} /> : null}
-        </div>
-      </section>
-
-      <section
-        className="story-section timeline-section page-shell"
-        aria-labelledby="turning-title"
-      >
-        <div className="story-section-label">
-          <span>05</span>
-          <h2 id="turning-title">전환점과 발견한 문제</h2>
-        </div>
-        <div className="story-prose wide turning-story">
-          <blockquote>{project.turningPoint}</blockquote>
-          <div className="story-timeline">
-            {project.timeline.map((item) => (
-              <div key={`${item.label}-${item.title}`}>
-                <span>{item.label}</span>
-                <h3>{item.title}</h3>
-                <p>{item.body}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section
-        className="story-section turning-section page-shell"
-        aria-labelledby="outcome-title"
-      >
-        <div className="story-section-label">
-          <span>06</span>
-          <h2 id="outcome-title">현재 결과</h2>
-        </div>
-        <div className="story-prose">
-          <p className="current-state">{project.currentState}</p>
-          <ul>
-            {project.outcomes.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      {cases.length > 0 ? (
-        <section className="project-deep-dives" aria-labelledby="deep-title">
-          <div className="page-shell">
-            <div className="section-heading compact">
-              <div>
-                <p className="eyebrow">Engineering cases</p>
-                <h2 id="deep-title">한 번에 한 경계만 깊게</h2>
-              </div>
-            </div>
-            <div className="deep-dive-list">
-              {cases.map((item, index) => (
-                <Link
-                  key={item.slug}
-                  href={`/cases/${item.slug}`}
-                  prefetch={false}
-                >
-                  <span>{String(index + 1).padStart(2, "0")}</span>
-                  <div>
-                    <h3>{item.title}</h3>
-                    <p>{item.summary}</p>
-                  </div>
-                  <ArrowUpRight aria-hidden="true" />
-                </Link>
-              ))}
-            </div>
-            {project.flowSlugs.length > 0 ? (
-              <div className="flow-project-links">
-                <p>이 프로젝트의 흐름을 단계별로 재생할 수 있습니다.</p>
-                {project.flowSlugs.map((flowSlug) => (
-                  <Link
-                    key={flowSlug}
-                    href={`/flows/${flowSlug}`}
-                    prefetch={false}
-                    aria-label={`${getFlow(flowSlug)?.title ?? project.title} Flow 재생하기`}
-                  >
-                    <PlayCircle aria-hidden="true" /> Flow 재생하기
-                  </Link>
-                ))}
-              </div>
-            ) : null}
-          </div>
+      {project.visualIds.length > 0 ? (
+        <section
+          className="project-detail-media page-shell"
+          aria-label="실제 화면"
+        >
+          <ProjectArtwork
+            visualIds={project.visualIds}
+            priority
+            showTranscript
+          />
         </section>
       ) : null}
 
-      <section
-        className="story-section page-shell"
-        aria-labelledby="proof-title"
-      >
-        <div className="story-section-label">
-          <span>07</span>
-          <h2 id="proof-title">공개 근거</h2>
+      <div id="project-story">
+        {project.kind === "team-product" ? (
+          <>
+            <section className="story-section page-shell">
+              <div className="story-section-label">
+                <span>01</span>
+                <div>
+                  <p className="eyebrow">팀 상황과 역할</p>
+                  <h2>함께 만든 범위와 내가 맡은 범위</h2>
+                </div>
+              </div>
+              <div className="story-prose">
+                <p className="story-summary">{project.context}</p>
+                <dl className="story-context">
+                  <div>
+                    <dt>기간</dt>
+                    <dd>{project.duration}</dd>
+                  </div>
+                  <div>
+                    <dt>팀</dt>
+                    <dd>{project.team}</dd>
+                  </div>
+                  <div>
+                    <dt>내 역할</dt>
+                    <dd>{project.role}</dd>
+                  </div>
+                </dl>
+                <h3>함께 연결한 순간</h3>
+                <ul>
+                  {project.collaboration.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            </section>
+            {project.chapters.map((chapter, index) => (
+              <Chapter key={chapter.id} chapter={chapter} index={index + 2} />
+            ))}
+            <section className="story-section page-shell">
+              <div className="story-section-label">
+                <span>
+                  {String(project.chapters.length + 2).padStart(2, "0")}
+                </span>
+                <div>
+                  <p className="eyebrow">당시 결과</p>
+                  <h2>팀이 실제로 끝낸 범위</h2>
+                </div>
+              </div>
+              <div className="story-prose">
+                <ul>
+                  {project.shippedOutcome.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            </section>
+            {project.revisit?.map((chapter, index) => (
+              <Chapter
+                key={chapter.id}
+                chapter={chapter}
+                index={project.chapters.length + index + 3}
+              />
+            ))}
+          </>
+        ) : (
+          <>
+            <section className="story-section page-shell">
+              <div className="story-section-label">
+                <span>01</span>
+                <div>
+                  <p className="eyebrow">완성 기준</p>
+                  <h2>사용자 여정을 완성 기준으로 삼았습니다</h2>
+                </div>
+              </div>
+              <div className="story-prose">
+                <p className="story-summary">{project.hypothesis}</p>
+                <ol className="journey-list">
+                  {project.userJourney.map((item, index) => (
+                    <li key={item}>
+                      <span>{String(index + 1).padStart(2, "0")}</span>
+                      <p>{item}</p>
+                    </li>
+                  ))}
+                </ol>
+                <h3>먼저 정한 실패 시나리오</h3>
+                <ul>
+                  {project.acceptanceCriteria.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            </section>
+            {project.milestones.map((chapter, index) => (
+              <Chapter key={chapter.id} chapter={chapter} index={index + 2} />
+            ))}
+          </>
+        )}
+      </div>
+
+      {project.guidedFlows?.map((flow) => (
+        <div className="flow-section page-shell" key={flow.id}>
+          <Suspense fallback={<p>흐름을 준비하고 있습니다.</p>}>
+            <GuidedFlow flow={flow} />
+          </Suspense>
         </div>
-        <div className="story-prose wide">
+      ))}
+
+      <section className="story-section page-shell" id="proof">
+        <div className="story-section-label">
+          <span>✓</span>
+          <div>
+            <p className="eyebrow">공개 근거</p>
+            <h2>문장의 범위를 확인할 수 있는 코드와 테스트</h2>
+          </div>
+        </div>
+        <div className="story-prose">
           <SourceList sourceIds={project.sourceIds} />
         </div>
       </section>
 
-      <section
-        className="story-section page-shell"
-        aria-labelledby="limits-title"
-      >
+      <section className="story-section page-shell" id="limitations">
         <div className="story-section-label">
-          <span>08</span>
-          <h2 id="limits-title">말하지 않는 것</h2>
+          <span>—</span>
+          <div>
+            <p className="eyebrow">한계</p>
+            <h2>이 프로젝트로 주장하지 않는 것</h2>
+          </div>
         </div>
         <div className="story-prose">
           <ul className="limitations">
@@ -291,9 +285,10 @@ export default async function ProjectPage({
           </div>
         </div>
       </section>
+
       <div className="page-shell back-row">
         <Link className="text-link" href="/projects" prefetch={false}>
-          <ArrowLeft aria-hidden="true" size={18} /> Work로 돌아가기
+          <ArrowLeft aria-hidden="true" size={18} /> 작업 목록으로 돌아가기
         </Link>
       </div>
     </article>

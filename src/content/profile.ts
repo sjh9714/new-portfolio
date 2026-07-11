@@ -2,18 +2,17 @@ export const profile = {
   initials: "SJH",
   name: "성진혁",
   englishName: "JinHyuk Sung",
-  role: "Java / Spring Backend Developer",
+  role: "신입 Java/Spring 백엔드 개발자",
   email: "jinhyuk9714@gmail.com",
   githubUrl: "https://github.com/sjh9714",
   avatarUrl: "/profile-typewriter.jpg",
   headline:
-    "팀에서 만든 기능을 실제 화면에 연결하고, 시간이 지나도 깨지지 않도록 다시 검증합니다.",
+    "2개월 팀 프로젝트에서 API를 실제 화면과 AWS에 연결했고, 이후 개인 프로젝트에서는 실패 복구를 브라우저 E2E까지 검증했습니다.",
   summary:
-    "협업에서 맡은 범위를 분명히 남기고, 혼자 만든 시스템도 사용 가능한 제품 흐름과 재현 가능한 테스트까지 연결합니다.",
+    "화면이 필요로 하는 백엔드 경계를 만들고, 실패한 사용자가 다음 행동을 선택할 수 있는지까지 확인합니다.",
 } as const;
 
 export const navigationItems = [
-  { href: "/projects", label: "Work" },
-  { href: "/flows", label: "Flows" },
-  { href: "/resume", label: "Resume" },
+  { href: "/projects", label: "작업" },
+  { href: "/resume", label: "이력서" },
 ] as const;

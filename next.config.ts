@@ -30,27 +30,30 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/case-studies",
-        destination: "/cases",
+        destination: "/projects",
         permanent: true,
       },
       {
         source: "/case-studies/concert-seat-overselling-consistency",
-        destination: "/cases/concert-seat-contention",
+        destination:
+          "/projects/concert-booking?flow=seat-contention&variant=designed&step=1#seat-contention",
         permanent: true,
       },
       {
         source: "/case-studies/concert-outbox-dlt-recovery",
-        destination: "/cases/concert-event-recovery",
+        destination:
+          "/projects/concert-booking?flow=event-recovery&variant=designed&step=1#event-recovery",
         permanent: true,
       },
       {
         source: "/case-studies/realtime-delivery-consistency",
-        destination: "/cases/realtime-message-lifecycle",
+        destination:
+          "/projects/realtime-chat?flow=message-lifecycle&variant=designed&step=1#message-lifecycle",
         permanent: true,
       },
       {
         source: "/case-studies/borrowme-product-list-n-plus-one",
-        destination: "/cases/borrowme-return-and-harden",
+        destination: "/projects/borrow-me#borrow-lifecycle",
         permanent: true,
       },
     ];
