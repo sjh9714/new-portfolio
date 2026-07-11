@@ -8,7 +8,6 @@ import { useEffect, useState } from "react";
 import { navigationItems, profile } from "@/content/profile";
 
 function isCurrent(pathname: string, href: string) {
-  if (href === "/projects" && pathname.startsWith("/cases")) return true;
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 

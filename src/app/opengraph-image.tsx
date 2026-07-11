@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "성진혁 — 만드는 데서 멈추지 않고 다시 확인합니다";
+export const alt = "성진혁 — 화면에 연결하고 실패 뒤까지 확인합니다";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -14,8 +14,8 @@ export default function OpenGraphImage() {
         flexDirection: "column",
         justifyContent: "space-between",
         padding: 64,
-        background: "#f6f8fa",
-        color: "#1f2328",
+        background: "#f7f5f0",
+        color: "#191c22",
         fontFamily: "sans-serif",
       }}
     >
@@ -46,8 +46,8 @@ export default function OpenGraphImage() {
         성진혁
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-        <div style={{ color: "#2457d6", fontSize: 20, letterSpacing: 2 }}>
-          JAVA / SPRING BACKEND
+        <div style={{ color: "#2455d6", fontSize: 20, letterSpacing: 2 }}>
+          신입 JAVA / SPRING 백엔드 개발자
         </div>
         <div
           style={{
@@ -60,8 +60,8 @@ export default function OpenGraphImage() {
             fontWeight: 760,
           }}
         >
-          <span>만드는 데서 멈추지 않고,</span>
-          <span>다시 확인합니다.</span>
+          <span>화면에 연결하고,</span>
+          <span>실패 뒤까지 확인합니다.</span>
         </div>
       </div>
       <div
@@ -69,10 +69,10 @@ export default function OpenGraphImage() {
           display: "flex",
           justifyContent: "space-between",
           fontSize: 18,
-          color: "#59636e",
+          color: "#5f6570",
         }}
       >
-        <span>Team products · Product clients · Source-backed stories</span>
+        <span>팀 화면·AWS 배포 · 실패 복구·브라우저 E2E</span>
         <span>sjh9714</span>
       </div>
     </div>,

@@ -8,11 +8,11 @@ export function SiteFooter() {
     <footer className="site-footer" id="contact">
       <div className="page-shell footer-grid">
         <div>
-          <p className="eyebrow">Contact</p>
-          <h2>함께 일할 사람을 찾고 계신가요?</h2>
+          <p className="eyebrow">연락</p>
+          <h2>프로젝트의 맥락과 판단을 더 이야기할 수 있습니다.</h2>
           <p className="footer-copy">
-            프로젝트의 결과보다 어떤 경계를 선택했고 무엇을 다시 확인했는지
-            이야기하고 싶습니다.
+            팀에서 맡았던 범위, 클라이언트를 연결하며 발견한 문제, 테스트로 남긴
+            경계를 편하게 물어봐 주세요.
           </p>
           <a
             className="text-link footer-email"
@@ -42,7 +42,7 @@ export function SiteFooter() {
         <span>
           © {new Date().getFullYear()} {profile.englishName}
         </span>
-        <span>Built from source-backed project stories.</span>
+        <span>프로젝트 사실과 공개 근거로 작성했습니다.</span>
       </div>
     </footer>
   );

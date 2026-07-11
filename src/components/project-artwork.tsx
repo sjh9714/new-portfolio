@@ -1,87 +1,77 @@
 import Image from "next/image";
-import { Fragment } from "react";
 
-import type { ProjectMedia } from "@/content/types";
+import type { VisualAsset } from "@/content/types";
+import { getVisuals } from "@/content/visuals";
 
 type ProjectArtworkProps = {
-  media: ProjectMedia;
+  visualIds: readonly string[];
   priority?: boolean;
+  compact?: boolean;
+  showTranscript?: boolean;
 };
 
-function assertNever(media: never): never {
-  throw new Error(`Unsupported project media: ${String(media)}`);
+function VisualFigure({
+  visual,
+  priority,
+}: {
+  visual: VisualAsset;
+  priority?: boolean;
+}) {
+  return (
+    <figure className="project-visual">
+      <div className="project-visual-image">
+        <Image
+          src={visual.src}
+          alt={visual.alt}
+          width={visual.width}
+          height={visual.height}
+          priority={priority}
+          unoptimized={visual.src.endsWith(".gif")}
+          sizes="(max-width: 720px) calc(100vw - 40px), (max-width: 1100px) 46vw, 560px"
+        />
+      </div>
+      <figcaption>{visual.caption}</figcaption>
+    </figure>
+  );
 }
 
-export function ProjectArtwork({ media, priority }: ProjectArtworkProps) {
-  const artClassName = `project-art project-art-${media.accent}`;
+export function ProjectArtwork({
+  visualIds,
+  priority,
+  compact = false,
+  showTranscript = false,
+}: ProjectArtworkProps) {
+  const visuals = getVisuals(visualIds);
+  if (visuals.length === 0) return null;
 
-  switch (media.kind) {
-    case "product-preview":
-      return (
-        <div className={`${artClassName} project-art-product-preview`}>
-          <Image
-            src={media.imageSrc}
-            alt={media.imageAlt}
-            fill
-            priority={priority}
-            sizes="(max-width: 900px) calc(100vw - 36px), 48vw"
+  return (
+    <div className="project-visual-block">
+      <div
+        className={`project-visuals ${visuals.length > 1 ? "project-visuals-gallery" : "project-visuals-single"} ${compact ? "is-compact" : ""}`}
+      >
+        {visuals.map((visual, index) => (
+          <VisualFigure
+            key={visual.id}
+            visual={visual}
+            priority={priority && index === 0}
           />
-        </div>
-      );
-    case "story-timeline":
-      return (
-        <div
-          className={`${artClassName} timeline-art`}
-          role="img"
-          aria-label={`${media.title}. ${media.description}`}
-        >
-          <p className="art-label">{media.eyebrow}</p>
-          <div className="timeline-line" aria-hidden="true">
-            {media.milestones.map((milestone, index) => (
-              <Fragment key={milestone.label}>
-                <span className="timeline-dot" />
-                {index < media.milestones.length - 1 ? <i /> : null}
-              </Fragment>
-            ))}
-          </div>
-          <div className="timeline-copy">
-            {media.milestones.map((milestone) => (
-              <strong key={milestone.label}>{milestone.label}</strong>
-            ))}
-          </div>
-          <div className="timeline-panels">
-            {media.milestones.map((milestone) => (
-              <div key={milestone.label}>
-                <b>{milestone.title}</b>
-                <span>{milestone.detail}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      );
-    case "scope-map":
-      return (
-        <div
-          className={`${artClassName} scope-art`}
-          role="img"
-          aria-label={`${media.title}. ${media.description}`}
-        >
-          <p className="art-label">{media.eyebrow}</p>
-          <div className="scope-path" aria-hidden="true">
-            {media.stages.map((stage, index) => (
-              <Fragment key={stage.index}>
-                <div>
-                  <span>{stage.index}</span>
-                  <strong>{stage.label}</strong>
-                </div>
-                {index < media.stages.length - 1 ? <i /> : null}
-              </Fragment>
-            ))}
-          </div>
-          <p className="scope-note">{media.note}</p>
-        </div>
-      );
-    default:
-      return assertNever(media);
-  }
+        ))}
+      </div>
+      {showTranscript ? (
+        <details className="visual-transcript">
+          <summary>이미지 설명 읽기</summary>
+          {visuals.map((visual) => (
+            <div key={visual.id}>
+              <strong>{visual.caption}</strong>
+              <ol>
+                {visual.transcript.map((line) => (
+                  <li key={line}>{line}</li>
+                ))}
+              </ol>
+            </div>
+          ))}
+        </details>
+      ) : null}
+    </div>
+  );
 }

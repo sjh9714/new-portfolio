@@ -1,28 +1,21 @@
 import { describe, expect, it } from "vitest";
 
-import { engineeringCases } from "@/content/cases";
-import { flows } from "@/content/flows";
 import { projects } from "@/content/projects";
 
 import robots from "./robots";
 import sitemap from "./sitemap";
 
 describe("metadata routes", () => {
-  it("publishes every current route without fake lastModified values", () => {
+  it("publishes only current public pages without fake lastModified values", () => {
     const routes = sitemap();
     const urls = routes.map((item) => item.url);
-    for (const project of projects)
+    for (const project of projects) {
       expect(
         urls.some((url) => url.endsWith(`/projects/${project.slug}`)),
       ).toBe(true);
-    for (const item of engineeringCases)
-      expect(urls.some((url) => url.endsWith(`/cases/${item.slug}`))).toBe(
-        true,
-      );
-    for (const flow of flows)
-      expect(urls.some((url) => url.endsWith(`/flows/${flow.slug}`))).toBe(
-        true,
-      );
+    }
+    expect(urls.some((url) => url.endsWith("/cases"))).toBe(false);
+    expect(urls.some((url) => url.endsWith("/flows"))).toBe(false);
     expect(routes.every((item) => item.lastModified === undefined)).toBe(true);
   });
 

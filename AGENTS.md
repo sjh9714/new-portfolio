@@ -1,57 +1,78 @@
 # AGENTS.md
 
-## Product Goal
+## 제품 목표
 
-이 저장소는 성진혁의 한국어 Java/Spring 포트폴리오다. 바쁜 면접관이 30초 안에 다음을 이해해야 한다.
+이 저장소는 신입 Java/Spring 백엔드 개발자 성진혁의 한국어 포트폴리오다. 바쁜 면접관이 30초 안에 다음 사실을 파악할 수 있어야 한다.
 
-1. 누구와 어떤 상황에서 만들었는가
-2. 성진혁이 직접 맡은 범위는 무엇인가
-3. 실제 화면이나 사용자 흐름을 연결하며 무엇이 드러났는가
-4. 지금 다시 확인할 수 있는 공개 근거는 무엇인가
+1. 팀 프로젝트에서 API를 실제 화면과 AWS 배포까지 연결했다.
+2. 개인 프로젝트에서 동시성·재시도·재연결 실패를 클라이언트와 브라우저 E2E로 재현했다.
+3. 팀 기여와 이후 개인 보강의 시점을 구분한다.
+4. 기술 주장은 공개 커밋과 테스트 permalink로 확인할 수 있다.
 
-기술 목록이나 성능 숫자가 이야기보다 먼저 나오면 안 된다.
+## 공개 정보 구조
 
-## Content Graph
+- `/`
+- `/projects`
+- `/projects/memory-of-year`
+- `/projects/concert-booking`
+- `/projects/realtime-chat`
+- `/projects/borrow-me`
+- `/resume`
 
-- `src/content/projects.ts`: 프로젝트 이야기와 시간축
-- `src/content/cases.ts`: 프로젝트 아래의 한 가지 엔지니어링 경계
-- `src/content/flows.ts`: 단계별 재생 상태
-- `src/content/diagrams.ts`: 새 inline SVG 구조도
-- `src/content/sources.ts`: 공개 permalink와 owner-confirmed 사실의 단일 레지스트리
+`/cases/*`와 `/flows/*`는 새 콘텐츠 페이지가 아니라 대응 프로젝트의 앵커로 308 이동하는 legacy 경로다. Blog, Additional Work, Billing, Agent-Gate, FocusYou는 공개하지 않는다.
 
-프로젝트는 product breadth와 협업 맥락, 사례는 하나의 failure boundary, Flow는 그 경계의 상태 전이를 맡는다. 홈에 별도 Featured Cases 섹션을 만들지 않는다.
+## 콘텐츠 단일 원천
 
-## Evidence Rules
+- 프로젝트 스토리와 내장 Flow: `src/content/projects.ts`
+- 공개 근거: `src/content/sources.ts`
+- 실제 시각 자료 메타데이터: `src/content/visuals.ts`
+- 웹 이력서와 PDF: `src/content/resume.ts`
 
-- 수치·기간·팀 규모·배포·사용자 수를 만들지 않는다.
-- 코드·테스트 기술 주장은 commit-pinned GitHub URL이 있어야 한다.
-- 팀 시연처럼 사용자가 직접 확인한 사실은 `owner-confirmed`로 기록할 수 있지만 기술 검증 근거로 사용하지 않는다.
-- BorrowMe의 출처가 불완전한 과거 전후 수치를 다시 공개하지 않는다.
-- Agent-Gate는 라이선스가 없으므로 오픈소스라고 부르지 않는다.
-- FocusYou의 App Store 공개 출시나 외부 사용자 검증을 주장하지 않는다.
-- Concert 결제는 항상 데모 결제라고 표시한다.
-- Concert·Realtime의 공개 demoUrl이 없으면 CTA 자체를 숨긴다.
+페이지와 컴포넌트에 프로젝트 사실이나 수치를 다시 복사하지 않는다.
 
-## Design Direction
+## 사실과 근거 규칙
 
-- Bright Profile Hub: 밝은 커뮤니티 프로필과 selected work 흐름
-- 배경 `#F6F8FA`, 표면 `#FFFFFF`, 본문 `#1F2328`, 액션 `#2457D6`
-- 이름·프로필 이미지·실제 작업 미디어가 첫 인상을 만든다.
-- terminal hero, dashboard card mosaic, glass, decorative gradient, dark mode를 사용하지 않는다.
-- 프로젝트 미디어가 없는 과거 팀 작업에 가상의 실제 UI를 만들지 않는다.
-- Flow node는 이동하지 않고 현재 node·edge·state만 전환한다.
-- reduced-motion에서 전환을 제거한다.
+- 수치, 기간, 팀 규모, 경력, 학력, 수상, 사용자 수를 만들지 않는다.
+- `owner-confirmed`는 팀 규모·기간·배포·시연 같은 맥락에만 사용한다.
+- 기술 결과는 공개 저장소의 40자 merge SHA가 포함된 commit-pinned permalink가 필수다.
+- private PR URL을 공개 근거로 사용하지 않는다.
+- BorrowMe의 과거 `1,010→23ms`, `201→3` 비교를 공개하지 않는다.
+- 로컬·통합·브라우저 테스트를 운영 성능이나 실사용자 결과로 표현하지 않는다.
+- 팀 결과와 개인 후속 보강의 시점을 섞지 않는다.
+
+## 프로젝트 순서와 역할
+
+1. Memory of Year — 팀 화면·AWS 배포 경험
+2. Concert Booking — 좌석 경합 패자의 복구와 이벤트 실패 복구
+3. Realtime Chat — persist-before-broadcast와 재연결 동기화
+4. BorrowMe — 첫 백엔드 협업과 2026 대여 생명주기
+
+홈에는 위 네 프로젝트만 노출한다.
+
+## 디자인 방향
+
+- 선택된 `docs/design/story-first-option-1.png`을 기준으로 한다.
+- 따뜻한 밝은 배경, 진한 본문, cobalt 액션, compact metadata를 사용한다.
+- hero는 짧게 유지하고 900px 높이 안에 첫 프로젝트 진입점을 보여준다.
+- 실제 작업 화면을 설명보다 늦게 배치하지 않는다.
+- Memory는 실제 팀 화면, Concert·Realtime은 실제 클라이언트 캡처를 사용한다.
+- BorrowMe는 과거 화면이 없으므로 가상 제품 UI를 만들지 않는다.
+- handcrafted SVG, inline SVG 구조도, CSS로 그린 가상 화면, AI 생성 서비스 화면을 사용하지 않는다.
+- 외부 웹폰트, 다크 모드, glass, gradient, terminal UI, dashboard 모자이크를 사용하지 않는다.
+- 본문은 16px 이상, 데스크톱 제목은 약 56px 이하, 모바일 제목은 약 38px 이하를 기준으로 한다.
 - 320/390/768/1280px에서 문서 가로 overflow를 허용하지 않는다.
+- 터치 영역은 44px 이상, 정상 페이지의 h1은 하나다.
 
-## Accessibility
+## 내장 Flow
 
-- 모든 최상위 페이지 h1은 정확히 하나다.
-- skip link, `aria-current`, 44px touch target을 유지한다.
-- 모바일 메뉴와 dialog는 Escape로 닫혀야 한다.
-- Flow는 키보드와 전체 transcript를 제공한다.
-- axe serious/critical 위반은 0이어야 한다.
+- Flow는 프로젝트 상세 안의 sticky 상태 카드와 단계 목록으로 제공한다.
+- 기본은 정지이며 사용자가 재생할 때만 약 2.5초 간격으로 진행한다.
+- URL `flow`, `variant`, `step`, 이전/다음, Space, 화살표, Home/End를 지원한다.
+- 현재 단계는 `aria-live`로 읽고 전체 transcript를 제공한다.
+- 모바일은 모든 단계를 세로로 읽을 수 있어야 하며 자동 재생하지 않는다.
+- `prefers-reduced-motion`에서는 자동 재생을 비활성화한다.
 
-## Required Verification
+## 필수 검증
 
 ```bash
 npm run check:content
@@ -62,10 +83,8 @@ npm run lint
 npm run build
 npm run e2e
 npm run resume:pdf
-npm run resume:check
+npm run resume:check -- public/resume-sung-jinhyuk-backend.pdf
 npm audit --omit=dev --audit-level=high
 ```
 
-## Preservation
-
-사용자의 기존 dirty worktree와 미추적 파일을 수정하거나 삭제하지 않는다. 새 사실은 source registry에서 시작하며 컴포넌트 안에 복사하지 않는다.
+완료 전 실제 브라우저에서 390px·1280px 화면을 선택 시안과 나란히 비교하고 `design-qa.md`의 최종 결과를 `passed`로 남긴다. 사용자가 둔 미추적 파일이나 다른 작업트리는 수정하거나 삭제하지 않는다.

@@ -1,0 +1,22 @@
+<mxfile host="app.diagrams.net" modified="2026-07-11T00:00:00.000Z" agent="Codex" version="30.3.6">
+  <diagram id="memory-deployment" name="Deployment Boundary">
+    <mxGraphModel dx="1080" dy="520" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1080" pageHeight="520" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="title" value="팀 시연에서 연결한 배포 경계" style="text;html=1;strokeColor=none;fillColor=none;fontSize=26;fontStyle=1;fontColor=#1f2328;align=left;" vertex="1" parent="1"><mxGeometry x="48" y="32" width="560" height="38" as="geometry"/></mxCell>
+        <mxCell id="subtitle" value="2024 참여자 확인 · 장기 운영이나 운영 SLO의 근거가 아님" style="text;html=1;strokeColor=none;fillColor=none;fontSize=16;fontColor=#59636e;align=left;" vertex="1" parent="1"><mxGeometry x="48" y="72" width="650" height="28" as="geometry"/></mxCell>
+        <mxCell id="browser" value="1  프론트엔드&lt;br&gt;&lt;font style=&quot;font-size:15px;color:#59636e&quot;&gt;팀 데모 화면&lt;/font&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#8c959f;strokeWidth=2;fontSize=19;fontStyle=1;fontColor=#1f2328;" vertex="1" parent="1"><mxGeometry x="48" y="176" width="180" height="92" as="geometry"/></mxCell>
+        <mxCell id="https" value="2  HTTPS&lt;br&gt;&lt;font style=&quot;font-size:15px;color:#59636e&quot;&gt;암호화된 요청&lt;/font&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#eef4ff;strokeColor=#2457d6;strokeWidth=2;fontSize=19;fontStyle=1;fontColor=#1f2328;" vertex="1" parent="1"><mxGeometry x="268" y="176" width="180" height="92" as="geometry"/></mxCell>
+        <mxCell id="api" value="3  EC2 Spring API&lt;br&gt;&lt;font style=&quot;font-size:15px;color:#59636e&quot;&gt;인증 · 앨범 · 편지 · 사진&lt;/font&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#eef4ff;strokeColor=#2457d6;strokeWidth=2;fontSize=19;fontStyle=1;fontColor=#1f2328;" vertex="1" parent="1"><mxGeometry x="488" y="176" width="230" height="92" as="geometry"/></mxCell>
+        <mxCell id="db" value="4  배포 DB&lt;br&gt;&lt;font style=&quot;font-size:15px;color:#59636e&quot;&gt;사용자 · 앨범 · 편지&lt;/font&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#effaf3;strokeColor=#18794e;strokeWidth=2;fontSize=19;fontStyle=1;fontColor=#1f2328;" vertex="1" parent="1"><mxGeometry x="790" y="132" width="220" height="92" as="geometry"/></mxCell>
+        <mxCell id="s3" value="4  S3&lt;br&gt;&lt;font style=&quot;font-size:15px;color:#59636e&quot;&gt;사진 파일 · URL&lt;/font&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#effaf3;strokeColor=#18794e;strokeWidth=2;fontSize=19;fontStyle=1;fontColor=#1f2328;" vertex="1" parent="1"><mxGeometry x="790" y="264" width="220" height="92" as="geometry"/></mxCell>
+        <mxCell id="note" value="팀 시연은 이 경계를 통과하는 배포 API를 사용했습니다." style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#fff8e8;strokeColor=#c88719;fontSize=16;fontColor=#5c4512;align=left;spacingLeft=18;" vertex="1" parent="1"><mxGeometry x="268" y="350" width="450" height="62" as="geometry"/></mxCell>
+        <mxCell id="e1" style="endArrow=block;html=1;strokeColor=#59636e;strokeWidth=2;" edge="1" parent="1" source="browser" target="https"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e2" style="endArrow=block;html=1;strokeColor=#59636e;strokeWidth=2;" edge="1" parent="1" source="https" target="api"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e3" value="JPA" style="endArrow=block;html=1;strokeColor=#59636e;strokeWidth=2;fontSize=15;" edge="1" parent="1" source="api" target="db"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e4" value="AWS SDK" style="endArrow=block;html=1;strokeColor=#59636e;strokeWidth=2;fontSize=15;" edge="1" parent="1" source="api" target="s3"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -7,8 +7,8 @@ import { ArrowUpRight, Download } from "lucide-react";
 import { resume } from "@/content/resume";
 import { createTopLevelMetadata } from "@/lib/site";
 
-const description = "성진혁 Java/Spring 백엔드 개발자 웹 이력서.";
-const socialDescription = "Java/Spring 백엔드 개발자 성진혁의 이력서.";
+const description = "성진혁 신입 Java/Spring 백엔드 개발자 웹 이력서.";
+const socialDescription = "신입 Java/Spring 백엔드 개발자 성진혁의 이력서.";
 const resumeSourceFingerprint = createHash("sha256")
   .update(JSON.stringify(resume))
   .update(readFileSync(join(process.cwd(), "src/app/resume/page.tsx")))
@@ -16,10 +16,10 @@ const resumeSourceFingerprint = createHash("sha256")
   .digest("hex");
 
 export const metadata: Metadata = {
-  title: "Resume",
+  title: "이력서",
   description,
   ...createTopLevelMetadata({
-    title: "Resume — 성진혁",
+    title: "이력서 — 성진혁",
     description: socialDescription,
     path: "/resume",
   }),
@@ -33,7 +33,7 @@ export default function ResumePage() {
     >
       <header className="resume-header">
         <div>
-          <p className="eyebrow">Resume</p>
+          <p className="eyebrow">이력서</p>
           <h1>{resume.identity.name}</h1>
           <p>{resume.identity.role}</p>
         </div>
@@ -64,7 +64,7 @@ export default function ResumePage() {
         className="resume-summary"
         aria-labelledby="resume-summary-title"
       >
-        <h2 id="resume-summary-title">Profile</h2>
+        <h2 id="resume-summary-title">소개</h2>
         <div>
           <p>{resume.summary}</p>
           <ul>
@@ -75,7 +75,7 @@ export default function ResumePage() {
         </div>
       </section>
       <section className="resume-skills" aria-labelledby="skills-title">
-        <h2 id="skills-title">Skills</h2>
+        <h2 id="skills-title">기술</h2>
         <div>
           {resume.skills.map((skill) => (
             <span key={skill}>{skill}</span>
@@ -86,7 +86,7 @@ export default function ResumePage() {
         className="resume-projects"
         aria-labelledby="resume-projects-title"
       >
-        <h2 id="resume-projects-title">Selected work</h2>
+        <h2 id="resume-projects-title">대표 작업</h2>
         <div>
           {resume.projects.map((project) => (
             <article key={project.slug}>

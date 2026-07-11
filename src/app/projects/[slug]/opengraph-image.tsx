@@ -26,17 +26,17 @@ export default async function ProjectOpenGraphImage({
         flexDirection: "column",
         justifyContent: "space-between",
         padding: 64,
-        background: "#ffffff",
-        color: "#1f2328",
+        background: "#fffdf8",
+        color: "#191c22",
         fontFamily: "sans-serif",
-        border: "28px solid #e7eeff",
+        border: "28px solid #ebe7df",
       }}
     >
       <div
         style={{
           display: "flex",
           justifyContent: "space-between",
-          color: "#2457d6",
+          color: "#2455d6",
           fontSize: 20,
         }}
       >
@@ -56,7 +56,7 @@ export default async function ProjectOpenGraphImage({
         <div
           style={{
             maxWidth: 930,
-            color: "#59636e",
+            color: "#5f6570",
             fontSize: 30,
             lineHeight: 1.45,
           }}
@@ -64,7 +64,9 @@ export default async function ProjectOpenGraphImage({
           {summary}
         </div>
       </div>
-      <div style={{ fontSize: 18, color: "#59636e" }}>{project.setting}</div>
+      <div style={{ fontSize: 18, color: "#5f6570" }}>
+        {project.overview.context}
+      </div>
     </div>,
     size,
   );

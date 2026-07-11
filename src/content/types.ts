@@ -1,5 +1,7 @@
 export type SourceVerification = "public" | "owner-confirmed";
 
+export type SourceUsage = "context" | "technical-proof";
+
 export type SourceKind =
   | "repository"
   | "commit"
@@ -14,6 +16,7 @@ export type SourceRef = {
   id: string;
   kind: SourceKind;
   verification: SourceVerification;
+  usage: SourceUsage;
   label: string;
   url?: string;
   repository?: string;
@@ -21,157 +24,94 @@ export type SourceRef = {
   observedAt?: string;
 };
 
-type ProjectMediaBase = {
-  title: string;
-  description: string;
-  accent: "blue" | "green" | "rose" | "amber";
-};
-
-type ProductPreviewMedia = ProjectMediaBase & {
-  kind: "product-preview";
-  imageSrc: string;
-  imageAlt: string;
-};
-
-type StoryTimelineMedia = ProjectMediaBase & {
-  kind: "story-timeline";
-  eyebrow: string;
-  milestones: [
-    { label: string; title: string; detail: string },
-    { label: string; title: string; detail: string },
-  ];
-};
-
-type ScopeMapMedia = ProjectMediaBase & {
-  kind: "scope-map";
-  eyebrow: string;
-  stages: { index: string; label: string }[];
-  note: string;
-};
-
-export type ProjectMedia =
-  ProductPreviewMedia | StoryTimelineMedia | ScopeMapMedia;
-
-export type ProjectTimelineItem = {
-  label: string;
-  title: string;
-  body: string;
+export type VisualAsset = {
+  id: string;
+  kind: "product-screen" | "storyboard" | "decision-map" | "deployment-map";
+  src: string;
+  alt: string;
+  caption: string;
+  transcript: string[];
   sourceIds: string[];
+  width: number;
+  height: number;
 };
 
-export type ProjectStory = {
-  slug: string;
-  title: string;
-  kind:
-    "team-product" | "independent-product" | "systems-product" | "public-tool";
-  featured: boolean;
-  oneLiner: string;
-  origin: string;
-  audience: string;
-  setting: string;
-  role: string;
-  contributions: string[];
-  userJourney: string[];
-  timeline: ProjectTimelineItem[];
-  turningPoint: string;
-  outcomes: string[];
-  currentState: string;
-  limitations: string[];
-  tech: string[];
-  sourceIds: string[];
-  caseSlugs: string[];
-  flowSlugs: string[];
-  repoUrl: string;
-  demoUrl?: string;
-  media: [ProjectMedia, ...ProjectMedia[]];
-};
-
-export type EngineeringCase = {
-  slug: string;
-  projectSlug: string;
+export type StoryChapter = {
+  id: string;
+  eyebrow: string;
   title: string;
   summary: string;
-  userImpact: string;
-  failureMode: string[];
-  constraints: string[];
-  decisions: string[];
-  tradeoffs: string[];
-  verification: string[];
+  body: string[];
   sourceIds: string[];
-  diagramId: string;
-  flowSlugs: string[];
-  limitations: string[];
+  visualIds?: string[];
+  proofId?: string;
 };
 
-export type FlowActor = {
-  id: string;
-  label: string;
-  detail: string;
-  x: number;
-  y: number;
-  sourceIds: string[];
-};
-
-export type FlowStep = {
+export type GuidedFlowStep = {
   id: string;
   title: string;
-  narrative: string;
-  activeNodeIds: string[];
-  activeEdgeIds: string[];
-  visibleState: Record<string, string>;
+  body: string;
+  state: string;
+  visualId?: string;
   sourceIds: string[];
 };
 
-export type FlowVariant = {
+export type GuidedFlowVariant = {
   id: string;
   label: string;
-  actors: FlowActor[];
-  edges: {
-    id: string;
-    from: string;
-    to: string;
-    label: string;
-    sourceIds: string[];
-  }[];
-  steps: FlowStep[];
+  steps: GuidedFlowStep[];
 };
 
-export type FlowPlayback = {
-  slug: string;
-  projectSlug: string;
-  caseSlug: string;
+export type GuidedFlow = {
+  id: string;
   title: string;
   summary: string;
   initialVariant: string;
-  sourceIds: string[];
-  variants: FlowVariant[];
+  variants: GuidedFlowVariant[];
 };
 
-export type DiagramSpec = {
-  id: string;
-  title: string;
-  caption: string;
-  sourceIds: string[];
-  nodes: {
-    id: string;
-    label: string;
-    detail: string;
-    x: number;
-    y: number;
-    width: number;
-    compact: { x: number; y: number; width: number };
-    sourceIds: string[];
-    tone?: "default" | "accent" | "success" | "danger";
-  }[];
-  edges: {
-    id: string;
-    from: string;
-    to: string;
-    label: string;
-    sourceIds: string[];
-  }[];
-  mobileSteps: {
-    text: string;
-    sourceIds: string[];
-  }[];
+type ProjectOverview = {
+  context: string;
+  role: string;
+  turningPoint: string;
+  proof: string;
+  primaryProofId: string;
 };
+
+type ProjectStoryBase = {
+  slug: string;
+  title: string;
+  featuredOrder: number;
+  oneLiner: string;
+  period: string;
+  overview: ProjectOverview;
+  visualIds: string[];
+  tech: string[];
+  sourceIds: string[];
+  limitations: string[];
+  repoUrl: string;
+};
+
+export type TeamProjectStory = ProjectStoryBase & {
+  kind: "team-product";
+  context: string;
+  duration: string;
+  team: string;
+  role: string;
+  collaboration: string[];
+  shippedOutcome: string[];
+  chapters: StoryChapter[];
+  revisit?: StoryChapter[];
+  guidedFlows?: GuidedFlow[];
+};
+
+export type ProductizedSystemStory = ProjectStoryBase & {
+  kind: "productized-system";
+  hypothesis: string;
+  acceptanceCriteria: string[];
+  userJourney: string[];
+  milestones: StoryChapter[];
+  guidedFlows: GuidedFlow[];
+};
+
+export type ProjectStory = TeamProjectStory | ProductizedSystemStory;
