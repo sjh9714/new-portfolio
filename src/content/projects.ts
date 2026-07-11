@@ -457,7 +457,7 @@ export const projects: readonly ProjectStory[] = [
       "첫 백엔드 협업에서 알림을 화면에 연결했고, 2년 뒤 돌아와 비어 있던 대여 생명주기를 직접 완성했습니다.",
     period: "2024 팀 프로젝트 · 2026 개인 보강",
     overview: {
-      context: "GGUM 해커톤 · 약 2개월 · 11인 팀",
+      context: "GGUM 해커톤 · 준비 약 2주 · 본 행사 1박 2일 · 11인 팀",
       role: "2024 알림·REST 연동, 2026 대여 생명주기",
       turningPoint: "예약 버튼 이후 승인·인도·반납 경로가 비어 있던 코드",
       proof: "역할·상태·재고 복원을 검증하는 MySQL 통합 테스트",
@@ -465,7 +465,7 @@ export const projects: readonly ProjectStory[] = [
     },
     context:
       "교내 물품 대여 서비스를 11명이 함께 만든 첫 백엔드 팀 프로젝트였습니다.",
-    duration: "약 2개월",
+    duration: "준비 약 2주 · 본 행사 1박 2일",
     team: "11인 팀",
     role: "2024년에는 댓글 기반 알림과 읽음·삭제, REST 전환과 프론트 연동을 맡았습니다. 예약 기능 전체를 당시 기여로 주장하지 않습니다.",
     collaboration: [
