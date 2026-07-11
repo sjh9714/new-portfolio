@@ -129,6 +129,21 @@ describe("story-first portfolio content", () => {
     }
   });
 
+  it("keeps the confirmed BorrowMe hackathon schedule distinct from Memory", () => {
+    const borrowMe = projects.find((project) => project.slug === "borrow-me");
+    const borrowContext = sources.find(
+      (source) => source.id === "borrow-team-context",
+    );
+
+    expect(borrowMe?.kind).toBe("team-product");
+    if (borrowMe?.kind === "team-product") {
+      expect(borrowMe.duration).toBe("준비 약 2주 · 본 행사 1박 2일");
+      expect(borrowMe.overview.context).not.toContain("2개월");
+    }
+    expect(borrowContext?.label).toContain("준비 약 2주 · 본 행사 1박 2일");
+    expect(borrowContext?.label).not.toContain("2개월");
+  });
+
   it("does not publish removed projects, unsupported metrics, or private links", () => {
     const publicText = JSON.stringify({ projects, sources, visualAssets });
     for (const rejected of [

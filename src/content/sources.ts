@@ -172,7 +172,7 @@ export const sources: readonly SourceRef[] = [
     verification: "owner-confirmed",
     usage: "context",
     label:
-      "2024 GGUM 해커톤 · 약 2개월 · 11인 팀 · 첫 백엔드 협업 · 프론트 연동 시연",
+      "2024 GGUM 해커톤 · 준비 약 2주 · 본 행사 1박 2일 · 11인 팀 · 첫 백엔드 협업 · 프론트 연동 시연",
   },
   {
     id: "borrow-notification-commit",
